@@ -3,7 +3,7 @@
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-  background-image: url('/assets/fondo2.png');
+  background-image: url('/assets/FondoLogin.png');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -21,7 +21,7 @@
 }
 
 .mainAuthContainer img {
-  width: 45%;
+  width: 55%;
   margin-bottom: 5px;
 }
 
@@ -59,7 +59,7 @@
 .formAuth button {
   width: 100%;
   padding: 13px 16px;
-  background-color: #FFFFFF;
+  background: linear-gradient(90deg, #A9DFD8, #59B8AC);
   border: none;
   border-radius: 8px;
   color: #000000;
@@ -77,6 +77,7 @@
   color: white;
   display: block;
   text-decoration: none;
+  float: right;
   font-weight: 400;
   font-size: 0.9rem;
   margin-top: 16px;
