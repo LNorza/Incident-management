@@ -1,7 +1,8 @@
 // Sidebar.tsx
 import {Building2, House, LogOut, User} from "lucide-react";
 import {useNavigate} from "react-router-dom";
-import "../style/sidebar.css";
+import style from "../style/sidebar.module.css";
+const logo = "/assets/logoLogin.svg";
 
 export const Sidebar = () => {
 	const navigate = useNavigate();
@@ -32,7 +33,8 @@ export const Sidebar = () => {
 	};
 
 	return (
-		<section className="sidebar">
+		<section className={`${style.sidebar}`}>
+			<img src={logo} alt="Logo" />
 			<ul>
 				<li>
 					<House />

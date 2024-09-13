@@ -1,8 +1,7 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Lock, User} from "lucide-react";
-import "../style/authStyle.css";
-
+import style from "../style/authStyle.module.css";
 interface LoginForm {
 	username: string;
 	password: string;
@@ -12,6 +11,7 @@ const logoLogin = "/assets/logoLogin.svg";
 
 export const Login = () => {
 	const navigate = useNavigate();
+
 	const [formData, setFormData] = useState<LoginForm>({
 		username: "",
 		password: "",
@@ -38,34 +38,36 @@ export const Login = () => {
 
 			const data = await response.json();
 
-			localStorage.setItem("token", data.token);
-
-			navigate("/build");
-
-			console.log("Login exitoso, token recibido:", data.token);
+			if (response.ok) {
+				localStorage.setItem("token", data.token);
+				navigate("/build");
+				console.log("Login exitoso, token recibido:", data.token);
+			}
 		} catch (error) {
 			console.error("Error:", error);
 		}
 	};
 
 	return (
-		<div className="authContainer">
-			<section className="mainAuthContainer">
+		<div className={`${style.authContainer}`}>
+			<section className={`${style.mainAuthContainer}`}>
 				<img src={logoLogin} alt="Logo de login" />
 
-				<form className="formAuth" onSubmit={handleSubmit}>
-					<div className="formInput">
+				<form className={`${style.formAuth}`}>
+					<div className={`${style.formInput}`}>
 						<User />
 						<input type="text" name="username" placeholder="Nombre de usuario" value={formData.username} onChange={handleInputChange} />
 					</div>
 
-					<div className="formInput">
+					<div className={`${style.formInput}`}>
 						<Lock />
 						<input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleInputChange} />
 					</div>
 
-					<div className="formButton">
-						<button type="submit">Iniciar Sesión</button>
+					<div className={`${style.formButton}`}>
+						<button type="submit" onClick={handleSubmit}>
+							Iniciar Sesión
+						</button>
 						<a href="">¿Olvidaste tú contraseña?</a>
 					</div>
 				</form>
