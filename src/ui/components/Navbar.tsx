@@ -1,7 +1,19 @@
+import { Bell, ChevronDown, CircleUser } from "lucide-react";
+import { SearchHere } from "./SearchHere";
+import "../style/navbar.css";
+
 export const Navbar = () => {
     return (
-        <>
-            <h1>Navbar</h1>
-        </>
+        <section className="navbar">
+            <SearchHere />
+            <div className="navbar-icons">
+                <Bell />
+
+                <div>
+                    <CircleUser />
+                    <ChevronDown />
+                </div>
+            </div>
+        </section>
     );
 };

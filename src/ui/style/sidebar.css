@@ -1,0 +1,23 @@
+.sidebar { 
+  width: 12%;
+  height: 100vh;
+  float: left;
+  border-right: 1px solid #2c2d33;
+  padding-top: 100px;
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar ul {
+  list-style-type: none;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sidebar ul li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
