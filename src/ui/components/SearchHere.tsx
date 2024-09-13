@@ -1,9 +1,9 @@
 import { Search } from "lucide-react";
-import "../style/search.css";
+import style from "../style/search.module.css";
 
 export const SearchHere = () => {
     return (
-        <div className="search-container">
+        <div className={`${style.searchContainer}`}>
             <Search />
             <input type="text" placeholder="Busca aquí..." />
         </div>

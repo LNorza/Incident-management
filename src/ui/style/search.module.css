@@ -1,4 +1,4 @@
-.search-container {
+.searchContainer {
   width: 85%;
   background-color: #21222D;
   border-radius: 8px;
@@ -8,7 +8,7 @@
   padding: 5px 30px;
 }
 
-.search-container input {
+.searchContainer input {
   width: 80%;
   height: 40px;
   background-color: #21222D;

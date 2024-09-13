@@ -1,15 +1,15 @@
 import { Bell, ChevronDown, CircleUser } from "lucide-react";
 import { SearchHere } from "./SearchHere";
-import "../style/navbar.css";
+import style from "../style/navbar.module.css";
 
 export const Navbar = () => {
     return (
-        <section className="navbar">
+        <section className={`${style.navbar}`}>
             <SearchHere />
-            <div className="navbar-icons">
+            <div className={`${style.navbarIcons}`}>
                 <Bell />
 
-                <div className="navbar-user">
+                <div>
                     <CircleUser />
                     <ChevronDown />
                 </div>
