@@ -9,7 +9,7 @@ export const Navbar = () => {
             <div className="navbar-icons">
                 <Bell />
 
-                <div>
+                <div className="navbar-user">
                     <CircleUser />
                     <ChevronDown />
                 </div>

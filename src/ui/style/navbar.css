@@ -1,10 +1,10 @@
 .navbar {
   height: 100px;
-  margin-left: 12%;
+  margin-left: 15%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 44px;
 }
 
 .navbar-icons {
