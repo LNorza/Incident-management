@@ -1,12 +1,12 @@
-import React from "react";
-import { Navigate } from "react-router-dom"; // Asegúrate de importar Navigate si lo estás utilizando
+// PublicRoute.tsx
+import {Navigate} from "react-router-dom";
 
-interface Props {
-    children: React.ReactNode;
-    logged: boolean;
+interface PublicRouteProps {
+	children: JSX.Element;
 }
 
-// Rutas públicas para usuarios no autenticados
-export const PublicRoute = ({ children, logged }: Props) => {
-    return !logged ? <>{children}</> : <Navigate to="/" />;
+export const PublicRoute = ({children}: PublicRouteProps) => {
+	const token = localStorage.getItem("token");
+
+	return !token ? children : <Navigate to="/" />;
 };

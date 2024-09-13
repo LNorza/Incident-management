@@ -1,11 +1,12 @@
-import { Navigate } from "react-router-dom";
+// PrivateRoute.tsx
+import {Navigate} from "react-router-dom";
 
-interface Props {
-    children: React.ReactNode;
-    logged: boolean;
+interface PrivateRouteProps {
+	children: JSX.Element;
 }
 
-// Rutas privadas que requieren autenticación
-export const PrivateRoute = ({ children, logged }: Props) => {
-    return logged ? <>{children}</> : <Navigate to="/login" />;
+export const PrivateRoute = ({children}: PrivateRouteProps) => {
+	const token = localStorage.getItem("token");
+
+	return token ? children : <Navigate to="/login" />;
 };
