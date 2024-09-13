@@ -3,7 +3,7 @@ import "../style/authStyle.css";
 
 const logoLogin = "/assets/logoLogin.svg";
 
-const Login = () => {
+export const Login = () => {
     return (
         <div className="authContainer">
             <section className="mainAuthContainer">
@@ -29,5 +29,3 @@ const Login = () => {
         </div>
     );
 };
-
-export default Login;

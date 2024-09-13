@@ -1,9 +1,11 @@
-import Login from "./auth/pages/Login";
+import { AppRouter } from "./routes/AppRouter";
+// import Login from "./auth/pages/Login";
 
 const GestorApp = () => {
     return (
         <>
-            <Login />
+            {/* <Login /> */}
+            <AppRouter />
         </>
     );
 };
