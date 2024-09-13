@@ -1,9 +1,12 @@
 import { Building2, House, LogOut, User } from "lucide-react";
-import "../style/sidebar.css";
+import style from "../style/sidebar.module.css";
+
+const logo = "/assets/logoLogin.svg";
 
 export const Sidebar = () => {
     return (
-        <section className="sidebar">
+        <section className={`${style.sidebar}`}>
+            <img src={logo} alt="Logo" />
             <ul>
                 <li>
                     <House />

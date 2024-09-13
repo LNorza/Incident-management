@@ -3,9 +3,14 @@
   height: 100vh;
   float: left;
   border-right: 1px solid #2c2d33;
-  padding-top: 100px;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+
+.sidebar img {
+  width: 80%;
+ height: 100px;
 }
 
 .sidebar ul {
