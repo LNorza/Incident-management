@@ -1,5 +1,5 @@
 import {Navigate, Route, Routes} from "react-router-dom";
-import BuildingPage from "../pages/BuildingPage";
+import {BuildingPage} from "../pages/BuildingPage";
 import {Navbar, Sidebar} from "../../ui";
 
 export const RouteManager = () => {

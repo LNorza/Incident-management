@@ -1,12 +1,12 @@
-const BuildingPage = () => {
-    // useEffect(() => {
-    // 	localStorage.removeItem("token");
-    // 	console.log("Removed");
-    // }, []);
+export const BuildingPage = () => {
+	// useEffect(() => {
+	// 	localStorage.removeItem("token");
+	// 	console.log("Removed");
+	// }, []);
 
-    return (
-        <>
-            <h1>Aqui la vista de los edificios</h1>
-        </>
-    );
+	return (
+		<>
+			<h1>Aqui la vista de los edificios</h1>
+		</>
+	);
 };

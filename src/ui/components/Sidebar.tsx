@@ -32,7 +32,7 @@ export const Sidebar = () => {
 
 	return (
 		<section className={`${style.sidebar}`}>
-			<img src={logo} alt="Logo" />
+			<img src={logo} alt="Logo" className={`${style.sidebarImage}`} />
 			<ul>
 				<Link to="/home" className={`${location.pathname === "/home" ? `${style.sidebarSelected}` : ""} non-selected`}>
 					<li>
