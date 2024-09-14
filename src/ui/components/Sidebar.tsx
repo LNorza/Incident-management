@@ -34,28 +34,28 @@ export const Sidebar = () => {
 		<section className={`${style.sidebar}`}>
 			<img src={logo} alt="Logo" className={`${style.sidebarImage}`} />
 			<ul>
-				<Link to="/home" className={`${location.pathname === "/home" ? `${style.sidebarSelected}` : ""} non-selected`}>
+				<Link to="/home" className={`${location.pathname === "/home" ? `${style.sidebarSelected}` : `${style.nonSelected}`}`}>
 					<li>
 						<House />
 						Inicio
 					</li>
 				</Link>
 
-				<Link to="/profile" className={`${location.pathname === "/profile" ? `${style.sidebarSelected}` : ""} non-selected`}>
+				<Link to="/profile" className={`${location.pathname === "/profile" ? `${style.sidebarSelected}` : `${style.nonSelected}`} `}>
 					<li>
 						<User />
 						Perfil
 					</li>
 				</Link>
 
-				<Link to="/build" className={`${location.pathname === "/build" ? `${style.sidebarSelected}` : ""} non-selected`}>
+				<Link to="/build" className={`${location.pathname === "/build" ? `${style.sidebarSelected}` : `${style.nonSelected}`} `}>
 					<li>
 						<Building2 />
 						Edificios
 					</li>
 				</Link>
 
-				<div onClick={handleLogOut} className={`${location.pathname === "/login" ? `${style.sidebarSelected}` : ""} non-selected`}>
+				<div onClick={handleLogOut} className={`${location.pathname === "/login" ? `${style.sidebarSelected}` : `${style.nonSelected}`} `}>
 					<li>
 						<LogOut />
 						Cerrar Sesión

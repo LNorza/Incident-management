@@ -1,28 +1,28 @@
 .authContainer {
-  display: flex;
+	display: flex;
 	justify-content: center;
 	align-items: center;
 	height: 100vh;
-  background-image: url('/assets/FondoLogin.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  color: white;
+	background-image: url("/assets/FondoLogin.png");
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	color: white;
 }
 
 .mainAuthContainer {
-  padding: 20px;
-  border-radius: 10px;
-  width: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+	padding: 20px;
+	border-radius: 10px;
+	width: 50%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .mainAuthContainer img {
-  width: 55%;
-  margin-bottom: 5px;
+	width: 55%;
+	margin-bottom: 5px;
 }
 
 .formAuth {
@@ -35,50 +35,60 @@
 }
 
 .formInput {
-  width: 50%;
-  max-height: 60px;
-  display: flex;
-  align-items: center;
-  padding: 13px 16px;
-  border: 1px solid #FFFFFF;
-  border-radius: 8px;
-  gap: 10px;
+	width: 50%;
+	max-height: 60px;
+	display: flex;
+	align-items: center;
+	padding: 13px 16px;
+	border: 1px solid #ffffff;
+	border-radius: 8px;
+	gap: 10px;
 }
 
 .formAuth input {
-  border-radius: 5px;
-  color: white;
-  background-color: transparent;
-  border: none;
-  outline: none;
-  line-height: 24.2px;
-  font-weight: 500;
-  font-size: 1rem;
+	border-radius: 5px;
+	color: white;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	line-height: 24.2px;
+	font-weight: 500;
+	font-size: 1rem;
 }
 
 .formAuth button {
-  width: 100%;
-  padding: 13px 16px;
-  background: linear-gradient(90deg, #A9DFD8, #59B8AC);
-  border: none;
-  border-radius: 8px;
-  color: #000000;
-  font-weight: 700;
-  font-size: 1.2rem;
-  cursor: pointer;
+	width: 100%;
+	padding: 13px 16px;
+	background: linear-gradient(90deg, #a9dfd8, #59b8ac);
+	border: none;
+	border-radius: 8px;
+	color: #000000;
+	font-weight: 700;
+	font-size: 1.2rem;
+	cursor: pointer;
+	transition: all 0.3s;
 }
 
 .formButton {
-  width: 50%;
-  max-height: 60px;
+	width: 50%;
+	max-height: 60px;
 }
 
 .formButton a {
-  color: white;
-  display: block;
-  text-decoration: none;
-  float: right;
-  font-weight: 400;
-  font-size: 0.9rem;
-  margin-top: 16px;
+	color: white;
+	display: block;
+	text-decoration: none;
+	float: right;
+	font-weight: 500;
+	font-size: 1rem;
+	margin-top: 16px;
+	transition: all 0.3s;
+}
+
+.formButton a:hover {
+	filter: brightness(1.15);
+}
+
+.formAuth button:hover {
+	filter: brightness(1.15);
 }

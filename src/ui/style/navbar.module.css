@@ -1,15 +1,15 @@
 .navbar {
-  position: relative;
-  height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 44px;
-  z-index: 1000;
-  background-color: #171821;
+	position: relative;
+	height: fit-content;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 32px 44px;
+	z-index: 1000;
+	background-color: #171821;
 }
 
 .navbarIcons {
-  display: flex;
-  gap: 16px;
+	display: flex;
+	gap: 16px;
 }
