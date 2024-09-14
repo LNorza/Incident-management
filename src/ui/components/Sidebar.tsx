@@ -1,16 +1,42 @@
+// Sidebar.tsx
 import { Building2, House, LogOut, User } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import style from "../style/sidebar.module.css";
-import { Link, useLocation } from "react-router-dom";
 
 const logo = "/assets/logoLogin.svg";
 
 export const Sidebar = () => {
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const handleLogOut = async () => {
+        const token = localStorage.getItem("token");
+
+        try {
+            const response = await fetch("http://localhost:3000/logout", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (response.ok) {
+                localStorage.removeItem("token");
+                navigate("/login");
+                console.log("Logout exitoso");
+            } else {
+                const data = await response.json();
+                console.error("Error en el logout:", data.message);
+            }
+        } catch (error) {
+            console.error("Error de red o del servidor:", error);
+        }
+    };
+
     return (
         <section className={`${style.sidebar}`}>
-            <div className={`${style.sidebarImage}`}>
-                <img src={logo} alt="Logo" />
-            </div>
+            <img src={logo} alt="Logo" />
             <ul>
                 <Link
                     to="/home"
