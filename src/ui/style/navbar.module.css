@@ -1,10 +1,12 @@
 .navbar {
+  position: relative;
   height: 100px;
-  margin-left: 15%;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 44px;
+  z-index: 1000;
+  background-color: #171821;
 }
 
 .navbarIcons {

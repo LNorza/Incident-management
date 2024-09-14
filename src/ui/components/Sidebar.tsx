@@ -1,9 +1,11 @@
 import {Building2, House, LogOut, User} from "lucide-react";
-import {useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import style from "../style/sidebar.module.css";
+
 const logo = "/assets/logoLogin.svg";
 
 export const Sidebar = () => {
+	const location = useLocation();
 	const navigate = useNavigate();
 
 	const handleLogOut = async () => {
@@ -32,22 +34,33 @@ export const Sidebar = () => {
 		<section className={`${style.sidebar}`}>
 			<img src={logo} alt="Logo" />
 			<ul>
-				<li>
-					<House />
-					Inicio
-				</li>
-				<li>
-					<User />
-					Perfil
-				</li>
-				<li>
-					<Building2 />
-					Edificios
-				</li>
-				<li onClick={handleLogOut}>
-					<LogOut />
-					Cerrar Sesión
-				</li>
+				<Link to="/home" className={`${location.pathname === "/home" ? `${style.sidebarSelected}` : ""} non-selected`}>
+					<li>
+						<House />
+						Inicio
+					</li>
+				</Link>
+
+				<Link to="/profile" className={`${location.pathname === "/profile" ? `${style.sidebarSelected}` : ""} non-selected`}>
+					<li>
+						<User />
+						Perfil
+					</li>
+				</Link>
+
+				<Link to="/build" className={`${location.pathname === "/build" ? `${style.sidebarSelected}` : ""} non-selected`}>
+					<li>
+						<Building2 />
+						Edificios
+					</li>
+				</Link>
+
+				<div onClick={handleLogOut} className={`${location.pathname === "/login" ? `${style.sidebarSelected}` : ""} non-selected`}>
+					<li>
+						<LogOut />
+						Cerrar Sesión
+					</li>
+				</div>
 			</ul>
 		</section>
 	);
