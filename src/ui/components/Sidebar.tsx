@@ -1,4 +1,3 @@
-// Sidebar.tsx
 import {Building2, House, LogOut, User} from "lucide-react";
 import {useNavigate} from "react-router-dom";
 import style from "../style/sidebar.module.css";
@@ -8,19 +7,16 @@ export const Sidebar = () => {
 	const navigate = useNavigate();
 
 	const handleLogOut = async () => {
-		const token = localStorage.getItem("token");
-
 		try {
 			const response = await fetch("http://localhost:3000/logout", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
-					Authorization: `Bearer ${token}`,
 				},
+				credentials: "include",
 			});
 
 			if (response.ok) {
-				localStorage.removeItem("token");
 				navigate("/login");
 				console.log("Logout exitoso");
 			} else {

@@ -1,15 +1,47 @@
-import {Route, Routes} from "react-router-dom";
+import {Route, Routes, useNavigate, useLocation} from "react-router-dom";
 import {PublicRoute} from "./PublicRoute";
 import {PrivateRoute} from "./PrivateRoute";
-import {useEffect} from "react";
 import {Login} from "../auth";
-import {GestorRoute} from "../app";
+import {RouteManager} from "../app";
+import {useEffect, useState} from "react";
 
 export const AppRouter = () => {
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+	const navigate = useNavigate();
+	const location = useLocation();
+	const verifyToken = async () => {
+		try {
+			const response = await fetch("http://localhost:3000/verify", {
+				method: "POST",
+				credentials: "include",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+
+			const data = await response.json();
+			setIsAuthenticated(data.valid);
+
+			if (!data.valid) {
+				navigate("/login");
+			}
+		} catch (error) {
+			console.error("Error verifying token:", error);
+			setIsAuthenticated(false);
+			navigate("/login");
+		}
+	};
+
 	useEffect(() => {
-		const token = "falso-token-123456";
-		localStorage.setItem("token", token);
-	}, []);
+		if (location.pathname !== "/login") {
+			verifyToken();
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [navigate]);
+
+	if (isAuthenticated === null) {
+		return <div>Loading...</div>;
+	}
 
 	return (
 		<Routes>
@@ -17,7 +49,7 @@ export const AppRouter = () => {
 			<Route
 				path="login/*"
 				element={
-					<PublicRoute>
+					<PublicRoute isAuthenticated={isAuthenticated}>
 						<Login />
 					</PublicRoute>
 				}
@@ -27,8 +59,8 @@ export const AppRouter = () => {
 			<Route
 				path="/*"
 				element={
-					<PrivateRoute>
-						<GestorRoute />
+					<PrivateRoute isAuthenticated={isAuthenticated}>
+						<RouteManager />
 					</PrivateRoute>
 				}
 			/>

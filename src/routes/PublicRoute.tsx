@@ -1,12 +1,10 @@
-// PublicRoute.tsx
 import {Navigate} from "react-router-dom";
 
 interface PublicRouteProps {
 	children: JSX.Element;
+	isAuthenticated: boolean;
 }
 
-export const PublicRoute = ({children}: PublicRouteProps) => {
-	const token = localStorage.getItem("token");
-
-	return !token ? children : <Navigate to="/" />;
+export const PublicRoute = ({children, isAuthenticated}: PublicRouteProps) => {
+	return !isAuthenticated ? children : <Navigate to="/" />;
 };

@@ -34,14 +34,16 @@ export const Login = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify(formData),
+				credentials: "include",
 			});
 
 			const data = await response.json();
 
 			if (response.ok) {
-				localStorage.setItem("token", data.token);
 				navigate("/build");
-				console.log("Login exitoso, token recibido:", data.token);
+				console.log("Login exitoso");
+			} else {
+				console.error("Error al iniciar sesión:", data.message);
 			}
 		} catch (error) {
 			console.error("Error:", error);

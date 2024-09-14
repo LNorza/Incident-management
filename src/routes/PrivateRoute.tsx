@@ -1,12 +1,10 @@
-// PrivateRoute.tsx
 import {Navigate} from "react-router-dom";
 
 interface PrivateRouteProps {
 	children: JSX.Element;
+	isAuthenticated: boolean;
 }
 
-export const PrivateRoute = ({children}: PrivateRouteProps) => {
-	const token = localStorage.getItem("token");
-
-	return token ? children : <Navigate to="/login" />;
+export const PrivateRoute = ({children, isAuthenticated}: PrivateRouteProps) => {
+	return isAuthenticated ? children : <Navigate to="/login" />;
 };

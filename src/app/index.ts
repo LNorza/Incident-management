@@ -1,1 +1,1 @@
-export * from './routes/GestorRoute.tsx'
+export * from "./routes/RouteManager.tsx";
