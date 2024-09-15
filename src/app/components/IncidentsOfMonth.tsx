@@ -13,7 +13,7 @@ export const IncidentsOfMonth = () => {
 				</div>
 
 				<div className={`${style.tinyCardSubtext}`}>
-					<h2>15</h2>
+					<h3>15</h3>
 					<h4>Incidencias</h4>
 					<p className={`${style.p1}`}>+1 incidencia con respecto al mes pasado</p>
 				</div>
@@ -25,7 +25,7 @@ export const IncidentsOfMonth = () => {
 				</div>
 
 				<div className={`${style.tinyCardSubtext}`}>
-					<h2>2</h2>
+					<h3>2</h3>
 					<h4>Reparaciones</h4>
 					<p className={`${style.p2}`}>+1 reparación con respecto al mes pasado</p>
 				</div>
@@ -37,7 +37,7 @@ export const IncidentsOfMonth = () => {
 				</div>
 
 				<div className={`${style.tinyCardSubtext}`}>
-					<h2>3</h2>
+					<h3>3</h3>
 					<h4>Reparaciones en curso</h4>
 					<p className={`${style.p3}`}>+2 reparaciones en curso al mismo tiempo</p>
 				</div>
@@ -49,7 +49,7 @@ export const IncidentsOfMonth = () => {
 				</div>
 
 				<div className={`${style.tinyCardSubtext}`}>
-					<h2>15</h2>
+					<h3>15</h3>
 					<h4>Mantenimientos</h4>
 					<p className={`${style.p4}`}>+4 mantenimientos completados con respecto al mes pasado</p>
 				</div>
