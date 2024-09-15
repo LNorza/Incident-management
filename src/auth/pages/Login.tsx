@@ -1,6 +1,7 @@
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import {Lock, User} from "lucide-react";
+import CustomInput from "../../ui/components/CustomInput";
 import style from "../style/authStyle.module.css";
 
 interface LoginForm {
@@ -57,14 +58,12 @@ export const Login = () => {
 				<img src={logoLogin} alt="Logo de login" />
 
 				<form className={`${style.formAuth}`} onSubmit={handleSubmit}>
-					<div className={`${style.formInput}`}>
-						<User />
-						<input type="text" name="username" placeholder="Nombre de usuario" value={formData.username} onChange={handleInputChange} autoComplete="username" />
+					<div className={`${style.inputContainer}`}>
+						<CustomInput icon={<User />} name="username" placeholder="Nombre de usuario" type="text" value={formData.username} onChange={handleInputChange} autoComplete="username" />
 					</div>
 
-					<div className={`${style.formInput}`}>
-						<Lock />
-						<input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleInputChange} autoComplete="password" />
+					<div className={`${style.inputContainer}`}>
+						<CustomInput icon={<Lock />} name="password" placeholder="Contraseña" type="password" value={formData.password} onChange={handleInputChange} autoComplete="password" />
 					</div>
 
 					<div className={`${style.formButton}`}>

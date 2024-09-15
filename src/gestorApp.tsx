@@ -1,13 +1,12 @@
-import { AppRouter } from "./routes/AppRouter";
-// import Login from "./auth/pages/Login";
+import {AppRouter} from "./routes/AppRouter";
 
 const GestorApp = () => {
-    return (
-        <>
-            {/* <Login /> */}
-            <AppRouter />
-        </>
-    );
+	return (
+		<>
+			{/* <Login /> */}
+			<AppRouter />
+		</>
+	);
 };
 
 export default GestorApp;
