@@ -1,0 +1,76 @@
+.container {
+    display: grid;
+    width: 100%;
+}
+
+.headerBuild {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.headerBuild span {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.headerBuild button {
+  padding: 12px 16px;
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.buildButton {
+  display: flex;
+  align-items: center;
+  background-color: #21222D;
+	color: rgba(255, 255, 255, 0.87);
+  border-radius: 8px;
+  border: none;
+  gap: 8px;
+}
+
+.dropdownBuild {
+  border-radius: 8px;
+  background-color: #21222D;
+  transition: all 0.3s linear;
+  cursor: pointer;
+}
+
+.dropdownTitle {
+  display: flex;
+  align-items: center;
+  padding: 24px 28px;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dropdownTitle span {
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 29.05px;
+  gap: 8px;
+}
+
+/* Estilo base cuando el contenido está oculto */
+.dropDownInfoContainer {
+  border-top: 1px solid gray;
+  opacity: 0;           /* Totalmente transparente */
+  height: 0;        /* Colapsado */
+  overflow: hidden;     /* Evita que el contenido sobrepase los bordes */
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+/* Clase para mostrar el contenido con animación */
+.showInfo {
+  padding: 24px 28px;
+  opacity: 1;           /* Totalmente opaco */
+  height: auto;
+  transition: all 0.3s ease; /* Transición suave */
+}
+
+
+
