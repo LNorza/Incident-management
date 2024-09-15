@@ -1,89 +1,125 @@
 .container {
-  position: relative;
-  width: 100%;
-  display: flex;
-  gap: 24px;
+	position: relative;
+	width: 100%;
+	display: flex;
+	gap: 16px;
 }
 
 .largeCard {
-  display: flex;
-  flex-direction: column;
-  width: 70%;
-  padding: 30px;
-  background-color: #21222D;
-  border-radius: 8px;
-  gap: 16px;
+	display: flex;
+	flex-direction: column;
+	width: 75%;
+	padding: 28px;
+	background-color: #21222d;
+	border-radius: 8px;
+	gap: 16px;
 }
 
-
 .pSubTitle {
-  color: #A0A0A0;
-  font-size: 16px;
+	color: #a0a0a0;
+	font-size: 16px;
 }
 
 .middleCard {
-  display: flex;
-  flex-direction: column;
-  width: 30%;
-  padding: 40px;
-  background-color: #21222D;
-  border-radius: 8px;
-  gap: 8px;
+	display: flex;
+	flex-direction: column;
+	width: 25%;
+	padding: 28px;
+	background-color: #21222d;
+	border-radius: 8px;
+	gap: inherit;
+	display: flex;
 }
 
 .middleCard h2 {
-  font-size: 20px;
-  color: #feaf5a;
+	font-size: 20px;
 }
 
 .middleCard p {
-  font-size: 16px;
-  padding-bottom: 14px;
-} 
+	font-size: 16px;
+}
 
 .containerCards {
-  display: flex;
-  gap: 16px;
+	display: flex;
+	gap: 12px;
+	height: 230px;
 }
 
 .smallCard {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  padding: 24px;
-  border-radius: 8px;
-  background-color: #171821;
-  gap: 16px;
-} 
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	padding: 24px;
+	border-radius: 8px;
+	background-color: #171821;
+	justify-content: space-between;
+	height: 230px;
+}
+
+.smallCardUser {
+	display: flex;
+	gap: 16px;
+	align-items: center;
+	width: 100%;
+}
+
+.smallCardUserIcon {
+	height: 64px;
+	width: 64px;
+}
+
+.smallCardPeriod {
+	display: flex;
+	gap: 16px;
+	width: 100%;
+}
+
+.smallCardPeriodIcon {
+	height: 64px;
+	width: 64px;
+}
 
 .tinyCard {
-  width: 25%;
-  padding: 10px;
-  border-radius: 8px;
-  background-color: #171821;
-} 
+	width: 25%;
+	padding: 24px;
+	border-radius: 8px;
+	background-color: #171821;
+	display: flex;
+	gap: 8px;
+	flex-direction: column;
+}
 
 .tinyCard p {
-  font-size: 12px;
+	font-size: 12px;
 }
 
 .tinyCard img {
-  width: 64px;
+	width: 64px;
+}
+
+.tinyCardIcon {
+	height: 64px;
+}
+
+.tinyCardSubtext {
+	display: flex;
+	flex-direction: column;
+	height: auto;
 }
 
 .p1 {
-  color: #C84242;
+	color: #c84242;
 }
 
 .p2 {
-  color: #A9DFD8;
+	color: #a9dfd8;
 }
 
 .p3 {
-  color: #F2C8ED;
+	color: #f2c8ed;
 }
 
 .p4 {
-  color: #20AEF3;
+	color: #20aef3;
 }
