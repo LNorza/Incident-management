@@ -31,6 +31,12 @@
   gap: 8px;
 }
 
+.dropdownContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .dropdownBuild {
   border-radius: 8px;
   background-color: #21222D;

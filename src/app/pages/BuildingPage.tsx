@@ -19,7 +19,25 @@ export const BuildingPage = () => {
                 </button>
             </section>
 
-            <section>
+            <section className={`${style.dropdownContainer}`}>
+                <article onClick={handleShowInfo} className={`${style.dropdownBuild}`}>
+                    <div className={`${style.dropdownTitle}`}>
+                        <span>
+                            <Building strokeWidth={1.75} />
+                            Edificio A
+                        </span>
+                        <button className={`${style.buildButton}`}>
+                            <ChevronDown />
+                        </button>
+                    </div>
+
+                    <div className={`${style.dropDownInfoContainer} ${showInfo ? style.showInfo : ""}`}>
+                        <p>
+                            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est dolore illo dolores quia nemo
+                            doloribus quaerat, magni numquam repellat reprehenderit.
+                        </p>
+                    </div>
+                </article>
                 <article onClick={handleShowInfo} className={`${style.dropdownBuild}`}>
                     <div className={`${style.dropdownTitle}`}>
                         <span>
