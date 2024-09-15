@@ -2,7 +2,7 @@ import {Navigate} from "react-router-dom";
 
 interface PublicRouteProps {
 	children: JSX.Element;
-	isAuthenticated: boolean;
+	isAuthenticated: boolean | null;
 }
 
 export const PublicRoute = ({children, isAuthenticated}: PublicRouteProps) => {

@@ -8,6 +8,12 @@
 	background-color: transparent;
 	width: 100%;
 	height: 100%;
+	transition: all 0.3s;
+}
+
+.inputContainer:focus-within {
+	border: 1px solid #a9dfd8;
+	box-shadow: inset 0 0 0 2px #a9dfd8;
 }
 
 .inputIcon {
