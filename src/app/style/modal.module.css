@@ -1,0 +1,84 @@
+.container {
+  position: fixed;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	height: 100%;
+	top: 0;
+	left: 0;
+	z-index: 99999999;
+}
+
+.overlay {
+  position: fixed;
+	width: 100%;
+	height: 100%;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+.modalInfoContainer { 
+  position: absolute;
+	width: 500px;
+	height: auto;
+  border-radius: 16px;
+	background-color: #21222D;
+  /* box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.9); */
+	color: white;
+}
+
+.titleModal {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  border-radius: 16px 16px 0 0;
+  border-bottom: 2px solid #323343;
+  padding: 26px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  gap: 10px;
+}
+
+.modalDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 32px;
+}
+
+.modalDetail section {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.25rem;
+  font-weight: 500;
+  gap: 12px;
+}
+
+.modalButtonContainer {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+
+}
+
+.modalButtonContainer button {
+  width: 150px;
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.cancelButton {
+  color: white;
+  background-color: transparent;
+  border: 1px solid #FFFFFF;
+}
+
+.saveButton {
+  background-color: #A9DFD8;
+}
+
+
+

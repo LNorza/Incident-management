@@ -1,5 +1,5 @@
 import { Building, ChevronDown, Ellipsis, Pencil, Plus, Trash2 } from "lucide-react";
-import style from "../style/BuildContainer.module.css";
+import style from "../../style/BuildContainer.module.css";
 import { useState } from "react";
 
 export const BuildContent = () => {
@@ -11,6 +11,7 @@ export const BuildContent = () => {
     return (
         <section className={`${style.dropdownContainer}`}>
             <article onClick={handleShowInfo} className={`${style.dropdownBuild}`}>
+                {/* Title of dropdown */}
                 <section className={`${style.dropdownTitle} ${style.dropdownTitlePadding}`}>
                     <span>
                         <Building strokeWidth={1.75} />
@@ -21,6 +22,7 @@ export const BuildContent = () => {
                     </button>
                 </section>
 
+                {/* Dropdown content */}
                 <section className={`${style.dropDownInfoContainer} ${showInfo ? style.showInfo : ""}`}>
                     <div className={`${style.dropdownTitle}`}>
                         <span>

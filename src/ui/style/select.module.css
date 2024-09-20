@@ -1,0 +1,96 @@
+.select {
+  cursor: pointer;
+  position: relative;
+	transition: all 0.3s;
+  color: white;
+  overflow: hidden;
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.selected {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  padding: 12px 16px;
+  background-color: #2a2f3b;
+	border: 1px solid white;
+	border-radius: 8px;
+  z-index: 999;
+}
+
+.arrow {
+  position: relative;
+  height: 15px;
+  transform: rotate(-90deg);
+  width: 40px;
+  fill: white;
+  z-index: 100000;
+  transition: 300ms;
+}
+
+.active .arrow {
+  transform: rotate(0deg);
+}
+
+.options {
+  display: none;
+  flex-direction: column;
+  border-radius: 8px;
+  padding: 12px;
+  background-color: #2a2f3b;
+  position: relative;
+  top: 0;
+  opacity: 1;
+  transition: 300ms;
+}
+
+.active + .options {
+  display: flex;
+}
+
+.option {
+  width: 100%;
+  padding: 12px;
+  border-bottom:1px solid #41424D ;
+  transition: 800ms;
+  font-size: 1.1rem;
+}
+
+.option:hover {
+  background-color: #323741;
+}
+
+.options input[type="radio"] {
+  display: none;
+}
+
+.options label {
+  display: inline-block;
+}
+
+.options label::before {
+  content: attr(data-txt);
+}
+
+.options input[type="radio"]:checked + label {
+  display: none;
+}
+
+.select:has(.options input[type="radio"]#all:checked) .selected::before {
+  content: attr(data-default);
+}
+
+.select:has(.options input[type="radio"]#option-1:checked) .selected::before {
+  content: attr(data-one);
+}
+
+.select:has(.options input[type="radio"]#option-2:checked) .selected::before {
+  content: attr(data-two);
+}
+
+.select:has(.options input[type="radio"]#option-3:checked) .selected::before {
+  content: attr(data-three);
+}
