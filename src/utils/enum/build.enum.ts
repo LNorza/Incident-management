@@ -1,0 +1,1 @@
+export type BuildModalType = 'AddBuild' | 'AddOfficeClass' 

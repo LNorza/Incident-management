@@ -68,16 +68,18 @@
   padding: 10px;
   font-size: 1rem;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .cancelButton {
   color: white;
-  background-color: transparent;
   border: 1px solid #FFFFFF;
+  background-color: transparent;
 }
 
 .saveButton {
   background-color: #A9DFD8;
+  border: none;
 }
 
 

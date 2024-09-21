@@ -1,8 +1,13 @@
 import { Building, ChevronDown, Ellipsis, Pencil, Plus, Trash2 } from "lucide-react";
 import style from "../../style/BuildContainer.module.css";
+import { BuildModalType } from "../../../utils";
 import { useState } from "react";
 
-export const BuildContent = () => {
+interface Props {
+    setTypeModal: (modalType: BuildModalType) => void;
+}
+
+export const BuildContent = ({ setTypeModal }: Props) => {
     const [showInfo, setShowInfo] = useState(false);
 
     const handleShowInfo = () => {
@@ -43,7 +48,7 @@ export const BuildContent = () => {
                     <ul className={`${style.buildInfo}`}>
                         <li>
                             Oficinas/Salones
-                            <button className={`${style.buildButton}`}>
+                            <button onClick={() => setTypeModal("AddOfficeClass")} className={`${style.buildButton}`}>
                                 <Plus />
                                 Agregar oficina/salon
                             </button>

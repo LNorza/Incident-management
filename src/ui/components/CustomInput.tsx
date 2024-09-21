@@ -11,7 +11,7 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
     autocomplete?: string;
 }
 
-const CustomInput = ({ icon, ...props }: Props) => {
+export const CustomInput = ({ icon, ...props }: Props) => {
     return (
         <div className={styles.inputContainer}>
             <span className={styles.inputIcon}>{icon}</span>
@@ -19,5 +19,3 @@ const CustomInput = ({ icon, ...props }: Props) => {
         </div>
     );
 };
-
-export default CustomInput;

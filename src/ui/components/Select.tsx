@@ -34,7 +34,7 @@ export const CustomSelect = () => {
                             type="radio"
                             onClick={() => handleOptionClick("Option 1")}
                         />
-                        <label className={style.option} htmlFor={`option-${id}`} data-txt="option-1" />
+                        <label className={style.option} htmlFor={`option-${id}`} data-txt="Hola soy primero" />
                     </div>
                     <div title="option-2">
                         <input

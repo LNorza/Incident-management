@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { Lock, User } from "lucide-react";
-import CustomInput from "../../ui/components/CustomInput";
 import style from "../style/authStyle.module.css";
 import { useForm } from "../../hooks/useForm";
+import { CustomInput } from "../../ui";
 
 interface LoginForm {
     username: string;

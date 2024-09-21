@@ -1,15 +1,21 @@
-import { Plus } from "lucide-react";
-import { AddBuildModal, BuildContent } from "../components/BuildPageContent";
-import style from "../style/BuildContainer.module.css";
 import { useState } from "react";
+import { BuildContent, BuildModal } from "../components";
+import { Plus } from "lucide-react";
+import style from "../style/BuildContainer.module.css";
+import { BuildModalType } from "../../utils";
 
 export const BuildingPage = () => {
     const [showModal, setShowModal] = useState(false);
+    const [typeModal, setTypeModal] = useState<BuildModalType>();
+
+    const handleTypeModal = (modalType: BuildModalType) => {
+        setTypeModal(modalType);
+        onOpenModal();
+    };
 
     const onOpenModal = () => {
         setShowModal(true);
     };
-
     const onCloseModal = () => {
         setShowModal(false);
     };
@@ -19,15 +25,15 @@ export const BuildingPage = () => {
             <div className={`${style.container}`}>
                 <section className={`${style.headerBuild}`}>
                     <span>Edificios</span>
-                    <button onClick={onOpenModal} className={`${style.buildButton}`}>
+                    <button onClick={() => handleTypeModal("AddBuild")} className={`${style.buildButton}`}>
                         <Plus strokeWidth={1.75} />
                         Agregar
                     </button>
                 </section>
-                <BuildContent />
+                <BuildContent setTypeModal={handleTypeModal} />
             </div>
 
-            <AddBuildModal isOpen={showModal} onClose={onCloseModal} />
+            <BuildModal isOpen={showModal} type={typeModal} onClose={onCloseModal} />
         </>
     );
 };
