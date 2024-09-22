@@ -1,24 +1,32 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import { BuildingPage } from "../pages/BuildingPage";
-import { Navbar, Sidebar } from "../../ui";
-import { Dashboard } from "../pages";
-import style from "../style/appContainer.module.css";
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { BuildingPage } from '../pages/BuildingPage'
+import { Navbar, Sidebar } from '../../ui'
+import { Dashboard } from '../pages'
+import style from '../style/appContainer.module.css'
+import { Toaster } from 'sonner'
 
 export const RouteManager = () => {
     return (
         <>
             <Sidebar />
-            <Navbar />
-
             <div className={`${style.container}`}>
+                <Toaster
+                    theme="dark"
+                    toastOptions={{
+                        style: {
+                            background: '#1D1E28',
+                        },
+                    }}
+                />
+                <Navbar />
                 <Routes>
                     <Route path="home" element={<Dashboard />} />
                     <Route path="build" element={<BuildingPage />} />
 
                     {/* DefaultRoute */}
-                    <Route path="/*" element={<Navigate to={"/home"} />} />
+                    <Route path="/*" element={<Navigate to={'/home'} />} />
                 </Routes>
             </div>
         </>
-    );
-};
+    )
+}
