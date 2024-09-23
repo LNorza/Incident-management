@@ -35,20 +35,28 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
             setSelectedType({ value: officeData.type, label: officeData.type === 'office' ? 'Oficina' : 'Salón' })
             setEdit(true)
         }
-    }, [officeData])
+    }, [officeData, setFormState])
 
     const handleTypeChange = (selectedType: { value: string; label: string }) => {
         setSelectedType(selectedType)
     }
 
     const handleSave = async () => {
+        if (!formState.name) {
+            toast.error('Ingresa un nombre')
+            return
+        }
+        if (!selectedType) {
+            toast.error('Selecciona un tipo')
+            return
+        }
         const locationData = {
             name: formState.name,
             description: formState.description,
             type: selectedType?.value,
             building_id: buildingId,
         }
-
+        console.log(locationData)
         try {
             const response = await fetch(`${API_BASE_URL}${edit ? `/locations/${officeData?._id}` : '/locations'}`, {
                 method: `${edit ? 'PUT' : 'POST'}`,

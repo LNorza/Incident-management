@@ -31,7 +31,7 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
             setFormState({ name: buildingData.name, description: buildingData.description })
             setEdit(true)
         }
-    }, [])
+    }, [buildingData, setFormState])
 
     const handleBuildingSelect = (building: { value: string; label: string }) => {
         setSelectedBuilding(building)

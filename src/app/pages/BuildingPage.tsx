@@ -37,7 +37,6 @@ export const BuildingPage = () => {
     const fetchBuildings = async () => {
         if (departmentId) {
             try {
-                console.log(departmentId)
                 const response = await fetch(`${API_BASE_URL}/buildings-search?departmentId=${departmentId}`, {
                     credentials: 'include',
                 })
@@ -70,10 +69,6 @@ export const BuildingPage = () => {
         }
         onOpenModal()
     }
-
-    useEffect(() => {
-        console.log(buildingData)
-    }, [buildingData])
 
     const onOpenModal = () => {
         setShowModal(true)
