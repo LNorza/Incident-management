@@ -14,7 +14,14 @@ interface BuildingProps {
 
 interface Props {
     building: BuildingProps
-    setTypeModal: (modalType: BuildModalType, buildingId?: string, officeData?: OfficeProps) => void
+    setTypeModal: (
+        modalType: BuildModalType,
+        buildingId?: string,
+        officeData?: OfficeProps,
+        buildingName?: string,
+        locationName?: string,
+        locationId?: string,
+    ) => void
 }
 
 export const BuildContent = ({ building, setTypeModal }: Props) => {
@@ -44,18 +51,18 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
         fetchLocations()
     }, [building])
 
-    const handleDelete = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/buildings/${building._id}`, {
-                method: 'DELETE',
-                credentials: 'include',
-            })
-            if (!response.ok) throw new Error('Error al borrar edificio')
-            console.log('Edificio borrado')
-        } catch (error) {
-            console.error(error)
-        }
-    }
+    // const handleDelete = async () => {
+    //     try {
+    //         const response = await fetch(`${API_BASE_URL}/buildings/${building._id}`, {
+    //             method: 'DELETE',
+    //             credentials: 'include',
+    //         })
+    //         if (!response.ok) throw new Error('Error al borrar edificio')
+    //         console.log('Edificio borrado')
+    //     } catch (error) {
+    //         console.error(error)
+    //     }
+    // }
 
     return (
         <section className={`${style.dropdownContainer}`}>
@@ -89,7 +96,12 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
                                 Editar edificio
                             </button>
 
-                            <button className={`${style.buildButton}`} onClick={handleDelete}>
+                            <button
+                                className={style.buildButton}
+                                onClick={() =>
+                                    setTypeModal('DeleteBuild', building._id, undefined, building.name, undefined)
+                                }
+                            >
                                 <Trash2 />
                                 Borrar edificio
                             </button>
@@ -127,7 +139,20 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
                                                     setTypeModal(type, undefined, officeData)
                                                 },
                                             },
-                                            { text: 'Borrar', icon: Trash2, onClick: () => {} },
+                                            {
+                                                text: 'Borrar',
+                                                icon: Trash2,
+                                                onClick: () => {
+                                                    setTypeModal(
+                                                        'DeleteOfficeClass',
+                                                        undefined,
+                                                        undefined,
+                                                        undefined,
+                                                        location.name,
+                                                        location._id,
+                                                    )
+                                                },
+                                            },
                                         ]}
                                     />
                                 </div>

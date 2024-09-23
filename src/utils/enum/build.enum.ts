@@ -1,4 +1,10 @@
-export type BuildModalType = 'AddBuild' | 'AddOfficeClass' | 'EditBuild' | 'EditOfficeClass'
+export type BuildModalType =
+    | 'AddBuild'
+    | 'AddOfficeClass'
+    | 'EditBuild'
+    | 'EditOfficeClass'
+    | 'DeleteBuild'
+    | 'DeleteOfficeClass'
 export interface BuildingProps {
     _id: string
     name: string

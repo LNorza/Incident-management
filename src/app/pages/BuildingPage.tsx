@@ -17,9 +17,11 @@ export const BuildingPage = () => {
     const [showModal, setShowModal] = useState(false)
     const [typeModal, setTypeModal] = useState<BuildModalType>()
     const [departmentId, setDepartmentId] = useState<string | null>(null)
-    const [currentBuildingId, setCurrentBuildingId] = useState<string>('')
+    const [currentBuildingId, setCurrentBuildingId] = useState<string | undefined>('')
     const [buildingData, setBuildingData] = useState<BuildingProps | undefined>(undefined)
     const [officeData, setOfficeData] = useState<OfficeProps | undefined>(undefined)
+    const [deleteName, setDeleteName] = useState<string>('')
+    const [deleteFunction, setDeleteFunction] = useState<() => void>(() => () => {})
 
     useEffect(() => {
         fetchDepartment()
@@ -53,10 +55,17 @@ export const BuildingPage = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [departmentId])
 
-    const handleTypeModal = (modalType: BuildModalType, buildingId?: string, officeData?: OfficeProps) => {
+    const handleTypeModal = (
+        modalType: BuildModalType,
+        buildingId?: string,
+        officeData?: OfficeProps,
+        buildingName?: string,
+        locationName?: string,
+        locationId?: string,
+    ) => {
         setTypeModal(modalType)
         if (modalType === 'AddOfficeClass') {
-            setCurrentBuildingId(buildingId || '')
+            setCurrentBuildingId(buildingId)
         }
         if (modalType === 'EditBuild' && buildingId) {
             const buildingToEdit = buildings.find((b) => b._id === buildingId)
@@ -66,6 +75,14 @@ export const BuildingPage = () => {
         }
         if (modalType === 'EditOfficeClass') {
             setOfficeData(officeData)
+        }
+        if (modalType === 'DeleteBuild') {
+            setDeleteName(buildingName || '')
+            setDeleteFunction(() => () => deleteBuilding(buildingId))
+        }
+        if (modalType === 'DeleteOfficeClass') {
+            setDeleteName(locationName || '')
+            setDeleteFunction(() => () => deleteLocation(locationId))
         }
         onOpenModal()
     }
@@ -77,6 +94,32 @@ export const BuildingPage = () => {
     const onCloseModal = () => {
         setShowModal(false)
         fetchBuildings()
+    }
+
+    const deleteBuilding = async (buildingId?: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/buildings/${buildingId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            if (!response.ok) throw new Error('Error al borrar edificio')
+            onCloseModal()
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
+    const deleteLocation = async (buildingId?: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/locations/${buildingId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            if (!response.ok) throw new Error('Error al borrar ubicación')
+            onCloseModal()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -107,6 +150,8 @@ export const BuildingPage = () => {
                 buildingId={currentBuildingId}
                 buildingData={buildingData}
                 officeData={officeData}
+                deleteFunction={deleteFunction}
+                deleteName={deleteName}
             />
         </>
     )
