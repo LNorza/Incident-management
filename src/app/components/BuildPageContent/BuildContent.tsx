@@ -73,8 +73,8 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
                         <Building strokeWidth={1.75} />
                         {building.name}
                     </span>
-                    <button className={`${style.buildButton}`}>
-                        <ChevronDown />
+                    <button className={`${style.buildButton} ${showInfo ? style.active : ''} `}>
+                        <ChevronDown className={style.arrow} />
                     </button>
                 </section>
 
@@ -85,7 +85,7 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
                 >
                     <div className={`${style.dropdownTitleOpen}`}>
                         <span className={`${style.totalDevicesText}`}>
-                            Total de Equipos: <span className={`${style.p2}`}>2</span>
+                            Total de Equipos: <span className={`${style.p2}`}>0</span>
                         </span>
                         <div className={`${style.dropdownTitleOpen}`}>
                             <button
@@ -124,7 +124,7 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
                                 {location.name}
                                 <div className={`${style.buildInfoList}`}>
                                     <span>
-                                        Equipos: <span className={`${style.p2}`}>36</span>
+                                        Equipos: <span className={`${style.p2}`}>0</span>
                                     </span>
                                     <Actions
                                         row={''}

@@ -1,101 +1,103 @@
 .select {
-	cursor: pointer;
-	position: relative; /* Mantener para que .options se posicione respecto a .select */
-	transition: all 0.3s;
-	color: white;
-	overflow: visible; /* Permitir que el contenido flotante se desborde */
-	font-size: 1.1rem;
-	font-weight: 400;
+    cursor: pointer;
+    position: relative; /* Mantener para que .options se posicione respecto a .select */
+    transition: all 0.3s;
+    color: white;
+    overflow: visible; /* Permitir que el contenido flotante se desborde */
+    font-size: 1.1rem;
+    font-weight: 400;
 }
 
 .selected {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 4px;
-	padding: 12px 16px;
-	background-color: #21222d;
-	border: 1px solid white;
-	border-radius: 8px;
-	z-index: 999;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding: 12px 16px;
+    background-color: #21222d;
+    border: 1px solid white;
+    border-radius: 8px;
+    z-index: 999;
 }
 
 .arrow {
-	position: relative;
-	height: 15px;
-	transform: rotate(-90deg);
-	width: 40px;
-	fill: white;
-	z-index: 100000;
-	transition: 300ms;
+    transform: rotate(0deg);
+    transition: 300ms;
 }
 
 .active .arrow {
-	transform: rotate(0deg);
+    transform: rotate(-180deg);
 }
 
 .options {
-	display: none;
-	flex-direction: column;
-	border-radius: 8px;
-	padding: 12px;
-	background-color: #2a2f3b;
-	position: absolute; /* Hacer que sea flotante */
-	top: 100%; /* Colocar justo debajo del .selected */
-	left: 0;
-	width: 100%; /* Asegurar que el ancho sea igual al del contenedor padre */
-	opacity: 0; /* Transición para ocultar */
-	transition: opacity 300ms;
-	z-index: 999; /* Asegurar que aparezca encima de otros elementos */
+    display: none;
+    flex-direction: column;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #2a2f3b;
+    position: absolute; /* Hacer que sea flotante */
+    top: 100%; /* Colocar justo debajo del .selected */
+    left: 0;
+    width: 100%; /* Asegurar que el ancho sea igual al del contenedor padre */
+    opacity: 0; /* Transición para ocultar */
+    transition: opacity 300ms;
+    z-index: 999; /* Asegurar que aparezca encima de otros elementos */
+}
+
+.noOptions {
+    width: 100%;
+    padding: 12px;
+    transition: 800ms;
+    font-size: 1.1rem;
 }
 
 .active + .options {
-	display: flex;
-	opacity: 1; /* Hacer visible el menú cuando está activo */
+    display: flex;
+    opacity: 1; /* Hacer visible el menú cuando está activo */
 }
 
 .option {
-	width: 100%;
-	padding: 12px;
-	transition: 800ms;
-	font-size: 1.1rem;
+    width: 100%;
+    padding: 12px;
+    transition: 800ms;
+    font-size: 1.1rem;
 }
 
 .option:hover {
-	background-color: #323741;
-	cursor: pointer;
-	border-radius: 8px;
+    background-color: #323741;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
-.options input[type="radio"] {
-	display: none;
+.options input[type='radio'] {
+    display: none;
 }
 
 .options label {
-	display: inline-block;
+    display: inline-block;
 }
 
 .options label::before {
-	content: attr(data-txt);
+    content: attr(data-txt);
 }
 
-.options input[type="radio"]:checked + label {
-	display: none;
+.options input[type='radio']:checked + label {
+    display: none;
 }
 
-.select:has(.options input[type="radio"]#all:checked) .selected::before {
-	content: attr(data-default);
+.select:has(.options input[type='radio']#all:checked) .selected::before {
+    content: attr(data-default);
 }
 
-.select:has(.options input[type="radio"]#option-1:checked) .selected::before {
-	content: attr(data-one);
+.select:has(.options input[type='radio']#option-1:checked) .selected::before {
+    content: attr(data-one);
 }
 
-.select:has(.options input[type="radio"]#option-2:checked) .selected::before {
-	content: attr(data-two);
+.select:has(.options input[type='radio']#option-2:checked) .selected::before {
+    content: attr(data-two);
 }
 
-.select:has(.options input[type="radio"]#option-3:checked) .selected::before {
-	content: attr(data-three);
+.select:has(.options input[type='radio']#option-3:checked) .selected::before {
+    content: attr(data-three);
 }

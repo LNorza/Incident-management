@@ -80,11 +80,22 @@
     color: white;
     border: 1px solid #ffffff;
     background-color: transparent;
+    transition: all 0.3s linear;
+}
+
+.cancelButton:hover {
+    background-color: #ffffff;
+    color: #21222d;
 }
 
 .saveButton {
     background-color: #a9dfd8;
     border: none;
+    transition: all 0.3s linear;
+}
+
+.saveButton:hover {
+    background-color: #8bcfc4;
 }
 
 .p1 {
