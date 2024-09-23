@@ -71,70 +71,55 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     }
 
     const handleSubmit = async () => {
+        if (!showInput && !selectedBuilding) {
+            toast.error('El edificio es requerido')
+            return
+        }
+        if (!formState.name && showInput) {
+            toast.error('El nombre es requerido')
+            return
+        }
+        let url = `${API_BASE_URL}/buildings`
+        let method = 'POST'
         const buildingDataToSend = {
             name: formState.name,
             description: formState.description,
             isShared: edit ? buildingData?.isShared : shareBuilding,
             department_id: edit ? buildingData?.department_id : departmentId,
         }
+        const departmentIdToSend = {
+            departmentId: departmentId,
+        }
+        let message = `${formState.name} agregado exitosamente`
+        let errorMsg = 'Error al agregar edificio'
+
         if (edit) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/buildings/${buildingData?._id}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(buildingDataToSend),
-                })
-                if (response.ok) {
-                    toast.success(`${formState.name} editado exitosamente`)
-                    onClose()
-                }
-            } catch (error) {
-                toast.error('Error al editar edificio')
-                console.error(error)
-                return
-            }
-        } else if (!shareBuilding || (shareBuilding && !existBuilding)) {
-            try {
-                const response = await fetch(`${API_BASE_URL}/buildings`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(buildingDataToSend),
-                })
+            url = `${API_BASE_URL}/buildings/${buildingData?._id}`
+            method = 'PUT'
+            message = `${formState.name} editado exitosamente`
+            errorMsg = 'Error al editar edificio'
+        } else if (shareBuilding && existBuilding) {
+            url = `${API_BASE_URL}/buildings-department/${selectedBuilding?.value}`
+            method = 'PUT'
+            message = `${selectedBuilding?.label} agregado exitosamente`
+            errorMsg = 'Error al agregar edificio'
+        }
 
-                if (response.ok) {
-                    toast.success(`${formState.name} agregado exitosamente`)
-                    onClose()
-                }
-            } catch (error) {
-                toast.error('Error al agregar edificio')
-                console.error(error)
+        try {
+            const response = await fetch(`${url}`, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(shareBuilding && existBuilding ? departmentIdToSend : buildingDataToSend),
+            })
+            if (response.ok) {
+                toast.success(`${message}`)
+                onClose()
             }
-        } else {
-            try {
-                const sharedBuildingData = {
-                    departmentId: departmentId,
-                }
-                const response = await fetch(`${API_BASE_URL}/buildings-department/${selectedBuilding?.value}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                    body: JSON.stringify(sharedBuildingData),
-                })
-
-                if (response.ok) {
-                    toast.success(`${selectedBuilding?.label} agregado exitosamente`)
-                    onClose()
-                }
-            } catch (error) {
-                toast.error('Error al agregar edificio')
-                console.error(error)
-            }
+        } catch (error) {
+            toast.error(`${errorMsg}`)
+            console.error(error)
+            return
         }
     }
 
