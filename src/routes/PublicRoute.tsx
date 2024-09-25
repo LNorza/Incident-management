@@ -1,10 +1,14 @@
-import {Navigate} from "react-router-dom";
+import { useContext } from "react";
+import { Navigate } from "react-router-dom";
+import { AuthContext } from "../auth/context/AuthContext";
 
 interface PublicRouteProps {
-	children: JSX.Element;
-	isAuthenticated: boolean | null;
+    children: JSX.Element;
 }
 
-export const PublicRoute = ({children, isAuthenticated}: PublicRouteProps) => {
-	return !isAuthenticated ? children : <Navigate to="/" />;
+export const PublicRoute = ({ children }: PublicRouteProps) => {
+    const authContext = useContext(AuthContext);
+    const { logged } = authContext;
+
+    return !logged ? children : <Navigate to="/" />;
 };

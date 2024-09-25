@@ -3,6 +3,9 @@ import { Lock, User } from "lucide-react";
 import style from "../style/authStyle.module.css";
 import { useForm } from "../../hooks/useForm";
 import { CustomInput } from "../../ui";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
+import { toast } from "sonner";
 
 interface LoginForm {
     username: string;
@@ -13,6 +16,9 @@ const logoLogin = "/assets/logoLogin.svg";
 
 export const Login = () => {
     const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
+
+    const { login } = authContext || {}; // Manejo de contexto
 
     const { username, password, formState, onInputChange } = useForm<LoginForm>({
         username: "",
@@ -35,13 +41,15 @@ export const Login = () => {
             const data = await response.json();
 
             if (response.ok) {
+                if (login) {
+                    login(formState);
+                }
                 navigate("/build");
-                console.log("Login exitoso");
             } else {
                 console.error("Error al iniciar sesión:", data.message);
             }
         } catch (error) {
-            console.error("Error:", error);
+            toast.error("Error al iniciar sesión");
         }
     };
 
