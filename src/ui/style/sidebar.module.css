@@ -1,63 +1,63 @@
 .sidebar {
-	width: 17%;
-	height: 100vh;
-	float: left;
-	border-right: 1px solid #2c2d33;
-	display: flex;
-	gap: 16px;
-	flex-direction: column;
-	align-items: center;
-	padding: 16px 32px;
+    width: 17%;
+    height: 100vh;
+    float: left;
+    border-right: 1px solid #2c2d33;
+    display: flex;
+    gap: 16px;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px;
 }
 
 .sidebarImage {
-	width: 100%;
-	height: 100px;
-	text-align: center;
-	user-select: none;
+    width: 100%;
+    height: 100px;
+    text-align: center;
+    user-select: none;
 }
 
 .sidebarImage img {
-	width: 85%;
-	height: 100%;
+    width: 85%;
+    height: 100%;
 }
 
 .sidebar ul {
-	width: 100%;
-	list-style-type: none;
-	text-align: left;
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
+    width: 100%;
+    list-style-type: none;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
 .sidebar ul li {
-	display: flex;
-	align-items: center;
-	padding: 8px 16px;
-	width: 100%;
-	gap: 8px;
-	user-select: none;
-	font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    padding: 8px 16px;
+    width: 100%;
+    gap: 8px;
+    user-select: none;
+    font-size: 1.35rem;
 }
 
 .nonSelected:hover {
-	border-radius: 8px;
-	background-color: #21222d;
-	cursor: pointer;
+    border-radius: 8px;
+    background-color: #21222d;
+    cursor: pointer;
 }
 
 .sidebarSelected {
-	background: linear-gradient(90deg, #a9dfd8, #59b8ac);
-	color: #242425;
-	border-radius: 8px;
-	transition: all 0.3s linear;
+    background: linear-gradient(90deg, #a9dfd8, #59b8ac);
+    color: #242425;
+    border-radius: 8px;
+    transition: all 0.3s linear;
 }
 
 .sidebarSelected:hover {
-	border-radius: 8px;
-	background: linear-gradient(90deg, #a9dfd8, #59b8ac);
-	background-color: none;
-	transform: scale(1.02);
-	transition: all 0.3s linear;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #a9dfd8, #59b8ac);
+    background-color: none;
+    transform: scale(1.02);
+    transition: all 0.3s linear;
 }

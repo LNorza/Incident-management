@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Building, ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 import style from '../../style/BuildContainer.module.css'
 import { BuildModalType, OfficeProps } from '../../../utils'
@@ -14,6 +13,7 @@ interface BuildingProps {
 
 interface Props {
     building: BuildingProps
+    updateLocations?: boolean
     setTypeModal: (
         modalType: BuildModalType,
         buildingId?: string,
@@ -24,14 +24,21 @@ interface Props {
     ) => void
 }
 
-export const BuildContent = ({ building, setTypeModal }: Props) => {
+export const BuildContent = ({ building, updateLocations, setTypeModal }: Props) => {
     const [showInfo, setShowInfo] = useState(false)
     const [locations, setLocations] = useState<OfficeProps[]>([])
     const contentRef = useRef<HTMLDivElement | null>(null)
 
     const handleShowInfo = () => {
         setShowInfo(!showInfo)
+        fetchLocations()
     }
+
+    useEffect(() => {
+        if (updateLocations) {
+            fetchLocations()
+        }
+    })
 
     const fetchLocations = async () => {
         try {
@@ -46,23 +53,6 @@ export const BuildContent = ({ building, setTypeModal }: Props) => {
             console.error(error)
         }
     }
-
-    useEffect(() => {
-        fetchLocations()
-    }, [building])
-
-    // const handleDelete = async () => {
-    //     try {
-    //         const response = await fetch(`${API_BASE_URL}/buildings/${building._id}`, {
-    //             method: 'DELETE',
-    //             credentials: 'include',
-    //         })
-    //         if (!response.ok) throw new Error('Error al borrar edificio')
-    //         console.log('Edificio borrado')
-    //     } catch (error) {
-    //         console.error(error)
-    //     }
-    // }
 
     return (
         <section className={`${style.dropdownContainer}`}>

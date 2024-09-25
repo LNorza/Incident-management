@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { BuildContent, BuildModal } from '../components'
 import { getUserDepartment } from '../../utils/api/userData'
 import { BuildModalType, BuildingProps, OfficeProps } from '../../utils'
@@ -19,6 +19,7 @@ export const BuildingPage = () => {
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [currentBuildingId, setCurrentBuildingId] = useState<string | undefined>('')
     const [buildingData, setBuildingData] = useState<BuildingProps | undefined>(undefined)
+    const [locations, setUpdateLocations] = useState<boolean | undefined>(false)
     const [officeData, setOfficeData] = useState<OfficeProps | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
     const [deleteFunction, setDeleteFunction] = useState<() => void>(() => () => {})
@@ -27,16 +28,7 @@ export const BuildingPage = () => {
         fetchDepartment()
     }, [])
 
-    const fetchDepartment = async () => {
-        try {
-            const id = await getUserDepartment()
-            setDepartmentId(id)
-        } catch (err) {
-            console.error(err)
-        }
-    }
-
-    const fetchBuildings = async () => {
+    const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
                 const response = await fetch(`${API_BASE_URL}/buildings-search?departmentId=${departmentId}`, {
@@ -48,12 +40,11 @@ export const BuildingPage = () => {
                 console.error('Error fetching buildings:', error)
             }
         }
-    }
+    }, [departmentId])
 
     useEffect(() => {
         fetchBuildings()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [departmentId])
+    }, [departmentId, fetchBuildings])
 
     const handleTypeModal = (
         modalType: BuildModalType,
@@ -89,11 +80,22 @@ export const BuildingPage = () => {
 
     const onOpenModal = () => {
         setShowModal(true)
+        setUpdateLocations(false)
     }
 
     const onCloseModal = () => {
         setShowModal(false)
         fetchBuildings()
+        setUpdateLocations(true)
+    }
+
+    const fetchDepartment = async () => {
+        try {
+            const id = await getUserDepartment()
+            setDepartmentId(id)
+        } catch (err) {
+            console.error(err)
+        }
     }
 
     const deleteBuilding = async (buildingId?: string) => {
@@ -135,7 +137,12 @@ export const BuildingPage = () => {
                 <section className={`${style.buildingsContainer}`}>
                     {buildings.length > 0 ? (
                         buildings.map((building) => (
-                            <BuildContent key={building._id} building={building} setTypeModal={handleTypeModal} />
+                            <BuildContent
+                                key={building._id}
+                                building={building}
+                                updateLocations={locations}
+                                setTypeModal={handleTypeModal}
+                            />
                         ))
                     ) : (
                         <div></div>
