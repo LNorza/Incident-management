@@ -1,10 +1,17 @@
 :root {
-	font-family: Inter, system-ui;
-	font-size: 16px;
-	line-height: 1.5;
-	font-weight: 400;
-	color: rgba(255, 255, 255, 0.87);
-	background-color: #171821;
+  --White: #ffffff;
+  --Red: #FF0505;
+  --BackgroundGray: #171821;
+	--CardGray: #21222d;
+  --ActiveCardGray: #1d1f2b;
+
+  --SidebarText: #87888C;
+  --SidebarActiveText: #242425;
+  --LineGray: #323343;
+
+  --MainGreenColor: #a9dfd8;
+  --MainGreenColorHover: #8bcfc4;
+  --GreenGradient: linear-gradient(90deg, #a9dfd8 8%, #59b8ac 92%);
 }
 
 * {
@@ -13,9 +20,18 @@
 	box-sizing: border-box;
 }
 
+body {
+  font-family: Inter, system-ui;
+	font-size: 16px;
+	line-height: 1.5;
+	font-weight: 400;
+	color: var(--White);
+  background-color: var(--BackgroundGray);
+}
+
 a {
 	text-decoration: none;
-	color: rgba(255, 255, 255, 0.87);
+	color:var(--White);
 }
 
 h1 {

@@ -16,6 +16,6 @@
 
 .container::-webkit-scrollbar-thumb {
 	background-color: #41424d;
-	width: 5px;
+	width: 1px;
 	border-radius: 5px;
 }

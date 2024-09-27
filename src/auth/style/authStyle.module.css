@@ -7,7 +7,7 @@
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
-	color: white;
+	color: var(--white);
 }
 
 .mainAuthContainer {
@@ -41,7 +41,7 @@
 .formAuth button {
 	width: 100%;
 	padding: 13px 16px;
-	background: linear-gradient(90deg, #a9dfd8, #59b8ac);
+  background: var(--GreenGradient);
 	border: none;
 	border-radius: 8px;
 	color: #000000;
@@ -57,7 +57,7 @@
 }
 
 .formButton a {
-	color: white;
+	color: var(--white);
 	display: block;
 	text-decoration: none;
 	float: right;

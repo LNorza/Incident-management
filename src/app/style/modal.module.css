@@ -22,9 +22,9 @@
     width: 500px;
     height: auto;
     border-radius: 16px;
-    background-color: #21222d;
+    background-color: var(--CardGray);
     /* box-shadow: 0px 10px 10px 0px rgba(0,0,0,0.9); */
-    color: white;
+    color: var(--White);
 }
 
 .titleModal {
@@ -33,7 +33,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 16px 16px 0 0;
-    border-bottom: 2px solid #323343;
+    border-bottom: 2px solid var(--LineGray);
     padding: 26px;
     font-size: 1.25rem;
     font-weight: 700;
@@ -77,25 +77,25 @@
 }
 
 .cancelButton {
-    color: white;
-    border: 1px solid #ffffff;
+    color: var(--White);
+    border: 1px solid var(--White);
     background-color: transparent;
     transition: all 0.3s linear;
 }
 
 .cancelButton:hover {
-    background-color: #ffffff;
-    color: #21222d;
+    background-color: var(--White);
+    color: var(--CardGray);
 }
 
 .saveButton {
-    background-color: #a9dfd8;
+    background-color: var(--MainGreenColor);
     border: none;
     transition: all 0.3s linear;
 }
 
 .saveButton:hover {
-    background-color: #8bcfc4;
+    background-color: var(--MainGreenColorHover);
 }
 
 .p1 {

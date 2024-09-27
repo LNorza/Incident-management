@@ -1,57 +1,57 @@
-import { useNavigate } from "react-router-dom";
-import { Lock, User } from "lucide-react";
-import style from "../style/authStyle.module.css";
-import { useForm } from "../../hooks/useForm";
-import { CustomInput } from "../../ui";
-import { useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
-import { toast } from "sonner";
+import { useNavigate } from 'react-router-dom'
+import { Lock, User } from 'lucide-react'
+import { useForm } from '../../hooks/useForm'
+import { CustomInput } from '../../ui'
+import { useContext } from 'react'
+import { AuthContext } from '../context/AuthContext'
+import { toast } from 'sonner'
 
+import style from '../style/authStyle.module.css'
 interface LoginForm {
-    username: string;
-    password: string;
+    username: string
+    password: string
 }
 
-const logoLogin = "/assets/logoLogin.svg";
+const logoLogin = '/assets/logoLogin.svg'
 
 export const Login = () => {
-    const navigate = useNavigate();
-    const authContext = useContext(AuthContext);
+    const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
 
-    const { login } = authContext || {}; // Manejo de contexto
+    const { login } = authContext || {} // Manejo de contexto
 
     const { username, password, formState, onInputChange } = useForm<LoginForm>({
-        username: "",
-        password: "",
-    });
+        username: '',
+        password: '',
+    })
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+        e.preventDefault()
 
         try {
-            const response = await fetch("http://localhost:3000/login", {
-                method: "POST",
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formState),
-                credentials: "include",
-            });
+                credentials: 'include',
+            })
 
-            const data = await response.json();
+            const data = await response.json()
 
             if (response.ok) {
                 if (login) {
-                    login(formState);
+                    login(formState)
                 }
-                navigate("/build");
+                navigate('/build')
             } else {
-                console.error("Error al iniciar sesión:", data.message);
+                console.error('Error al iniciar sesión:', data.message)
             }
         } catch (error) {
-            toast.error("Error al iniciar sesión");
+            toast.error('Error al iniciar sesión')
         }
-    };
+    }
 
     return (
         <div className={`${style.authContainer}`}>
@@ -90,5 +90,5 @@ export const Login = () => {
                 </form>
             </section>
         </div>
-    );
-};
+    )
+}

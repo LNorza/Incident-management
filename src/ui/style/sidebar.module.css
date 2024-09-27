@@ -2,7 +2,7 @@
     width: 17%;
     height: 100vh;
     float: left;
-    border-right: 1px solid #2c2d33;
+    border-right: 1px solid var(--LineGray);
     display: flex;
     gap: 16px;
     flex-direction: column;
@@ -43,20 +43,20 @@
 
 .nonSelected:hover {
     border-radius: 8px;
-    background-color: #21222d;
+    background-color:var(--ActiveCardGray);
     cursor: pointer;
 }
 
 .sidebarSelected {
-    background: linear-gradient(90deg, #a9dfd8, #59b8ac);
-    color: #242425;
+    background: var(--GreenGradient);
+    color: var(--SidebarActiveText);
     border-radius: 8px;
     transition: all 0.3s linear;
 }
 
 .sidebarSelected:hover {
     border-radius: 8px;
-    background: linear-gradient(90deg, #a9dfd8, #59b8ac);
+    background: var(--GreenGradient);
     background-color: none;
     transform: scale(1.02);
     transition: all 0.3s linear;
