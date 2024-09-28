@@ -1,0 +1,49 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.header article {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header article .actionSection {
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.header article div div { /*This is the div that contains the select component*/
+  width: 230px;
+  border: none;
+}
+
+.header button {
+  padding: 13px 16px;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  background-color: var(--CardGray);
+  color: var(--White);
+  border-radius: 8px;
+  font-size: 1.25rem;
+  cursor: pointer;
+  border: none;
+  gap: 8px;
+}

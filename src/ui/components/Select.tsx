@@ -8,14 +8,15 @@ interface Option {
 }
 
 interface CustomSelectProps {
+    textDefault?: string
     options: Option[]
     onSelect: (selected: Option) => void
     value?: string
 }
 
-export const CustomSelect = ({ options, onSelect, value }: CustomSelectProps) => {
+export const CustomSelect = ({ textDefault, options, onSelect, value }: CustomSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [selectedOption, setSelectedOption] = useState<string>('Seleccione una opción')
+    const [selectedOption, setSelectedOption] = useState<string>(textDefault || 'Seleccionar una opción')
 
     useEffect(() => {
         const preselectedOption = options.find((option) => option.value === value)

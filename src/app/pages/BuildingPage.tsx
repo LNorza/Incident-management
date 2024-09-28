@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { BuildContent, BuildModal } from '../components'
 import { getUserDepartment } from '../../utils/api/userData'
-import { BuildModalType, BuildingProps, OfficeProps } from '../../utils'
+import { BuildingProps, BuildModalType, OfficeProps } from '../../utils'
 import { Plus } from 'lucide-react'
 import style from '../style/BuildContainer.module.css'
 import API_BASE_URL from '../../utils/api/apiConfig'
@@ -128,7 +128,7 @@ export const BuildingPage = () => {
         <>
             <div className={`${style.container}`}>
                 <section className={`${style.headerBuild}`}>
-                    <span>Edificios</span>
+                    <h2>Edificios</h2>
                     <button onClick={() => handleTypeModal('AddBuild')} className={`${style.buildAddButton}`}>
                         <Plus strokeWidth={1.75} />
                         Agregar

@@ -1,41 +1,41 @@
-import { Building2, House, LogOut, User } from "lucide-react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import style from "../style/sidebar.module.css";
-import { useContext } from "react";
-import { AuthContext } from "../../auth/context/AuthContext";
+import { Building2, House, LogOut, User } from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import style from '../style/sidebar.module.css'
+import { useContext } from 'react'
+import { AuthContext } from '../../auth/context/AuthContext'
 
-const logo = "/assets/logoLogin.svg";
+const logo = '/assets/logoLogin.svg'
 
 export const Sidebar = () => {
-    const location = useLocation();
-    const navigate = useNavigate();
+    const location = useLocation()
+    const navigate = useNavigate()
 
-    const authContext = useContext(AuthContext);
-    const { logout } = authContext || { logged: false }; // Manejo de contexto
+    const authContext = useContext(AuthContext)
+    const { logout } = authContext || { logged: false } // Manejo de contexto
 
     const handleLogOut = async () => {
         try {
-            const response = await fetch("http://localhost:3000/logout", {
-                method: "POST",
+            const response = await fetch('http://localhost:3000/logout', {
+                method: 'POST',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
-                credentials: "include",
-            });
+                credentials: 'include',
+            })
 
             if (response.ok) {
                 if (logout) {
-                    logout();
+                    logout()
                 }
-                navigate("/login");
+                navigate('/login')
             } else {
-                const data = await response.json();
-                console.error("Error en el logout:", data.message);
+                const data = await response.json()
+                console.error('Error en el logout:', data.message)
             }
         } catch (error) {
-            console.error("Error de red o del servidor:", error);
+            console.error('Error de red o del servidor:', error)
         }
-    };
+    }
 
     return (
         <section className={`${style.sidebar}`}>
@@ -43,7 +43,7 @@ export const Sidebar = () => {
             <ul>
                 <Link
                     to="/home"
-                    className={`${location.pathname === "/home" ? style.sidebarSelected : style.nonSelected}`}
+                    className={`${location.pathname === '/home' ? style.sidebarSelected : style.nonSelected}`}
                 >
                     <li>
                         <House />
@@ -53,7 +53,7 @@ export const Sidebar = () => {
 
                 <Link
                     to="/profile"
-                    className={`${location.pathname === "/profile" ? style.sidebarSelected : style.nonSelected}`}
+                    className={`${location.pathname === '/profile' ? style.sidebarSelected : style.nonSelected}`}
                 >
                     <li>
                         <User />
@@ -63,11 +63,21 @@ export const Sidebar = () => {
 
                 <Link
                     to="/build"
-                    className={`${location.pathname === "/build" ? style.sidebarSelected : style.nonSelected}`}
+                    className={`${location.pathname === '/build' ? style.sidebarSelected : style.nonSelected}`}
                 >
                     <li>
                         <Building2 />
                         Edificios
+                    </li>
+                </Link>
+
+                <Link
+                    to="/device"
+                    className={`${location.pathname === '/device' ? style.sidebarSelected : style.nonSelected}`}
+                >
+                    <li>
+                        <Building2 />
+                        Dispositivos
                     </li>
                 </Link>
 
@@ -77,5 +87,5 @@ export const Sidebar = () => {
                 </li>
             </ul>
         </section>
-    );
-};
+    )
+}
