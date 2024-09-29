@@ -19,7 +19,7 @@ export const BuildingPage = () => {
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [currentBuildingId, setCurrentBuildingId] = useState<string | undefined>('')
     const [buildingData, setBuildingData] = useState<BuildingProps | undefined>(undefined)
-    const [locations, setUpdateLocations] = useState<boolean | undefined>(false)
+    const [locations, setUpdateLocations] = useState<boolean>(false)
     const [officeData, setOfficeData] = useState<OfficeProps | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
     const [deleteFunction, setDeleteFunction] = useState<() => void>(() => () => {})
@@ -80,7 +80,6 @@ export const BuildingPage = () => {
 
     const onOpenModal = () => {
         setShowModal(true)
-        setUpdateLocations(false)
     }
 
     const onCloseModal = () => {
@@ -142,6 +141,7 @@ export const BuildingPage = () => {
                                 building={building}
                                 updateLocations={locations}
                                 setTypeModal={handleTypeModal}
+                                setUpdateLocations={setUpdateLocations}
                             />
                         ))
                     ) : (

@@ -22,9 +22,10 @@ interface Props {
         locationName?: string,
         locationId?: string,
     ) => void
+    setUpdateLocations: (update: boolean) => void
 }
 
-export const BuildContent = ({ building, updateLocations, setTypeModal }: Props) => {
+export const BuildContent = ({ building, updateLocations, setUpdateLocations, setTypeModal }: Props) => {
     const [showInfo, setShowInfo] = useState(false)
     const [locations, setLocations] = useState<OfficeProps[]>([])
     const contentRef = useRef<HTMLDivElement | null>(null)
@@ -49,6 +50,7 @@ export const BuildContent = ({ building, updateLocations, setTypeModal }: Props)
             if (!response.ok) throw new Error('Error al obtener las ubicaciones')
             const data = await response.json()
             setLocations(data)
+            setUpdateLocations(false)
         } catch (error) {
             console.error(error)
         }
