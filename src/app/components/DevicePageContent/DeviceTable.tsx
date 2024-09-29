@@ -1,6 +1,5 @@
 import { AgGridReact } from 'ag-grid-react'
-import 'ag-grid-community/styles/ag-grid.css'
-import 'ag-grid-community/styles/ag-theme-quartz.css'
+import { myTheme } from '../../../utils/ag-grid-theme-builder'
 import { useState } from 'react'
 import { ColDef, ICellRendererParams } from 'ag-grid-community' // Importar ICellRendererParams
 
@@ -14,21 +13,20 @@ export const DeviceTable: React.FC = () => {
 
     // Define column definitions con la tipificación ColDef
     const [colDefs, setColDefs] = useState<ColDef[]>([
-        { field: 'make', headerName: 'Make', sortable: true, filter: true },
-        { field: 'model', headerName: 'Model', sortable: true, filter: true },
-        { field: 'price', headerName: 'Price', sortable: true, filter: true },
+        { field: 'make', headerName: 'Make', sortable: true },
+        { field: 'model', headerName: 'Model', sortable: true },
+        { field: 'price', headerName: 'Price', sortable: true },
         {
             field: 'electric',
             headerName: 'Electric',
             sortable: true,
-            filter: true,
             cellRenderer: (params: ICellRendererParams) => (params.value ? 'Yes' : 'No'), // Tipar params
         },
     ])
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 500 }}>
-            <AgGridReact rowData={rowData} columnDefs={colDefs} />
+            <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} />
         </div>
     )
 }
