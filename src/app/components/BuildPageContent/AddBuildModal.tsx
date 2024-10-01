@@ -4,10 +4,12 @@ import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
 import { Building } from 'lucide-react'
 import { BuildingProps } from '../../../utils'
-import style from '../../style/modal.module.css'
 import { toast } from 'sonner'
 import { getUserDepartment } from '../../../utils/api/userData'
 import API_BASE_URL from '../../../utils/api/apiConfig'
+
+import style from '../../style/modal.module.css'
+import { IOptions } from '../../../utils/interface/options'
 
 interface Props {
     onClose: () => void
@@ -20,7 +22,7 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     const [existBuilding, setExistBuilding] = useState(true)
     const showInput = !shareBuilding || (shareBuilding && !existBuilding)
     const [departmentId, setDepartmentId] = useState<string | null>(null)
-    const [sharedBuildings, setSharedBuildings] = useState<{ label: string; value: string }[]>([])
+    const [sharedBuildings, setSharedBuildings] = useState<IOptions[]>([])
     const [selectedBuilding, setSelectedBuilding] = useState<{ value: string; label: string } | null>(null)
     const [edit, setEdit] = useState(false)
 

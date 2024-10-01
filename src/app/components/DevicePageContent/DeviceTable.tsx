@@ -1,7 +1,7 @@
-import { AgGridReact } from 'ag-grid-react'
-import { myTheme } from '../../../utils/ag-grid-theme-builder'
 import { useState } from 'react'
+import { AgGridReact } from 'ag-grid-react'
 import { ColDef, ICellRendererParams } from 'ag-grid-community' // Importar ICellRendererParams
+import { myTheme } from '../../../utils'
 
 export const DeviceTable: React.FC = () => {
     // Tipar correctamente el rowData
