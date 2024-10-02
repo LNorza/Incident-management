@@ -1,4 +1,4 @@
-import { Building2, House, LogOut, User } from 'lucide-react'
+import { Building2, House, Laptop, LogOut } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import style from '../style/sidebar.module.css'
 import { useContext } from 'react'
@@ -11,7 +11,7 @@ export const Sidebar = () => {
     const navigate = useNavigate()
 
     const authContext = useContext(AuthContext)
-    const { logout } = authContext || { logged: false } // Manejo de contexto
+    const { logout } = authContext || { logged: false }
 
     const handleLogOut = async () => {
         try {
@@ -47,19 +47,19 @@ export const Sidebar = () => {
                 >
                     <li>
                         <House />
-                        Inicio
+                        <span>Inicio</span>
                     </li>
                 </Link>
-
+                {/* 
                 <Link
                     to="/profile"
                     className={`${location.pathname === '/profile' ? style.sidebarSelected : style.nonSelected}`}
                 >
                     <li>
                         <User />
-                        Perfil
+                        <span>Perfil</span>
                     </li>
-                </Link>
+                </Link> */}
 
                 <Link
                     to="/build"
@@ -76,8 +76,8 @@ export const Sidebar = () => {
                     className={`${location.pathname === '/device' ? style.sidebarSelected : style.nonSelected}`}
                 >
                     <li>
-                        <Building2 />
-                        Dispositivos
+                        <Laptop />
+                        Equipos
                     </li>
                 </Link>
 

@@ -1,5 +1,6 @@
 import { useForm } from '../../../hooks'
 import { useEffect, useState } from 'react'
+import { getUserDepartment } from '../../../utils/api/userData'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { toast } from 'sonner'
 import { OfficeProps } from '../../../utils'
@@ -27,7 +28,21 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
         { value: 'office', label: 'Oficina' },
         { value: 'classroom', label: 'Salón' },
     ]
+    const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [edit, setEdit] = useState(false)
+
+    useEffect(() => {
+        fetchDepartment()
+    }, [])
+
+    const fetchDepartment = async () => {
+        try {
+            const id = await getUserDepartment()
+            setDepartmentId(id)
+        } catch (err) {
+            console.error(err)
+        }
+    }
 
     useEffect(() => {
         if (officeData) {
@@ -55,6 +70,7 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
             description: formState.description,
             type: selectedType?.value,
             building_id: buildingId,
+            department_id: departmentId,
         }
         console.log(locationData)
         try {

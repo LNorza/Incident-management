@@ -6,14 +6,15 @@ import { Plus } from 'lucide-react'
 import { DeviceModal } from '../components/DevicePageContent/DeviceModal'
 
 export const DevicePage = () => {
-    //State de edificios temporal para el select
     const [showModal, setShowModal] = useState(false)
+    const [refreshTable, setRefreshTable] = useState(false)
 
-    const [optionTemp, setOptionTemp] = useState([
-        { label: 'Edificio 1', value: '1' },
-        { label: 'Edificio 2', value: '2' },
-        { label: 'Edificio 3', value: '3' },
-    ])
+    const optionTemp = [
+        { label: 'Todos', value: 'ALL' },
+        { label: 'Edificio A', value: 'BUILDING_A' },
+        { label: 'Edificio B', value: 'BUILDING_B' },
+        { label: 'Edificio C', value: 'BUILDING_C' },
+    ]
 
     const onOpenModal = () => {
         setShowModal(true)
@@ -21,9 +22,9 @@ export const DevicePage = () => {
 
     const onCloseModal = () => {
         setShowModal(false)
+        setRefreshTable((prev) => !prev) // Alterna el valor de refreshTable
     }
 
-    //Funcion para manejar el select (Temporal)
     const handleSelect = (selected: { label: string; value: string }) => {
         console.log(selected)
     }
@@ -36,7 +37,7 @@ export const DevicePage = () => {
                     <article>
                         <span>Edificio</span>
                         <div className={style.actionSection}>
-                            <CustomSelect textDefault="Todos" options={optionTemp} onSelect={handleSelect} />
+                            <CustomSelect value={optionTemp[0].value} options={optionTemp} onSelect={handleSelect} />
                             <button onClick={onOpenModal} className={style.button}>
                                 <Plus /> Agregar
                             </button>
@@ -45,7 +46,7 @@ export const DevicePage = () => {
                 </section>
 
                 <section>
-                    <DeviceTable />
+                    <DeviceTable refresh={refreshTable} />
                 </section>
             </div>
 

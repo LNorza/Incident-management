@@ -10,6 +10,7 @@ interface Building {
     _id: string
     name: string
     description: string
+    totalDevices: number
 }
 
 export const BuildingPage = () => {
@@ -23,6 +24,7 @@ export const BuildingPage = () => {
     const [officeData, setOfficeData] = useState<OfficeProps | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
     const [deleteFunction, setDeleteFunction] = useState<() => void>(() => () => {})
+    const [locationId, setLocationId] = useState<string | undefined>('')
 
     useEffect(() => {
         fetchDepartment()
@@ -74,6 +76,9 @@ export const BuildingPage = () => {
         if (modalType === 'DeleteOfficeClass') {
             setDeleteName(locationName || '')
             setDeleteFunction(() => () => deleteLocation(locationId))
+        }
+        if (modalType === 'DevicesList') {
+            setLocationId(locationId)
         }
         onOpenModal()
     }
@@ -140,6 +145,7 @@ export const BuildingPage = () => {
                                 key={building._id}
                                 building={building}
                                 updateLocations={locations}
+                                departmentId={departmentId}
                                 setTypeModal={handleTypeModal}
                                 setUpdateLocations={setUpdateLocations}
                             />
@@ -156,6 +162,7 @@ export const BuildingPage = () => {
                 onClose={onCloseModal}
                 buildingId={currentBuildingId}
                 buildingData={buildingData}
+                locationId={locationId}
                 officeData={officeData}
                 deleteFunction={deleteFunction}
                 deleteName={deleteName}

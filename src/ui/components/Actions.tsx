@@ -6,13 +6,13 @@ interface Action {
     text: string
     icon: LucideIcon
     color?: string
-    onClick: (row: unknown) => void
+    onClick: (row: unknown, e: React.MouseEvent<HTMLDivElement>) => void
 }
 
 interface EditActionsProps {
     row: unknown
     actions?: Action[]
-    parentRef: React.RefObject<HTMLDivElement>
+    parentRef?: React.RefObject<HTMLDivElement>
 }
 
 const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) => {
@@ -23,16 +23,14 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
 
     const toggleDropdown = (event: React.MouseEvent) => {
         event.stopPropagation()
-
+        if (!parentRef) {
+            return
+        }
         if (dropdownRef.current && parentRef.current) {
             const parentRect = parentRef.current.getBoundingClientRect()
             const buttonRect = dropdownRef.current.getBoundingClientRect()
             const dropdownHeight = 108
             const spaceBelow = parentRect.height - buttonRect.top
-
-            console.log('parentRect', parentRect.height)
-            console.log('buttonRect', buttonRect.height)
-            console.log('spaceBelow', spaceBelow)
 
             if (spaceBelow > dropdownHeight) {
                 setOpenUpwards(false)
@@ -40,6 +38,7 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
                 setOpenUpwards(true)
             }
         }
+        console.log('Action clicked')
         setIsOpen(!isOpen)
     }
 
@@ -49,10 +48,13 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
         }
     }
 
-    const handleActionClick = (actionFunction: (row: unknown) => void) => {
-        actionFunction(row)
-        setIsOpen(false)
-    }
+    // Ajuste en el tipo de evento para HTMLDivElement
+    const handleActionClick =
+        (actionFunction: (row: unknown, e: React.MouseEvent<HTMLDivElement>) => void) =>
+        (e: React.MouseEvent<HTMLDivElement>) => {
+            actionFunction(row, e)
+            setIsOpen(false)
+        }
 
     useEffect(() => {
         document.addEventListener('mousedown', handleOutsideClick)
@@ -68,7 +70,7 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
             <div
                 key={index}
                 className={`${style.editActionsItem}`}
-                onClick={() => handleActionClick(action.onClick)}
+                onClick={handleActionClick(action.onClick)} // Aquí ahora es compatible con HTMLDivElement
                 style={{ color: action.color }}
             >
                 <IconComponent />

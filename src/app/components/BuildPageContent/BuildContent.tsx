@@ -9,11 +9,13 @@ interface BuildingProps {
     _id: string
     name: string
     description: string
+    totalDevices: number
 }
 
 interface Props {
     building: BuildingProps
     updateLocations?: boolean
+    departmentId: string | null
     setTypeModal: (
         modalType: BuildModalType,
         buildingId?: string,
@@ -25,7 +27,7 @@ interface Props {
     setUpdateLocations: (update: boolean) => void
 }
 
-export const BuildContent = ({ building, updateLocations, setUpdateLocations, setTypeModal }: Props) => {
+export const BuildContent = ({ building, updateLocations, setUpdateLocations, departmentId, setTypeModal }: Props) => {
     const [showInfo, setShowInfo] = useState(false)
     const [locations, setLocations] = useState<OfficeProps[]>([])
     const contentRef = useRef<HTMLDivElement | null>(null)
@@ -43,10 +45,13 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
 
     const fetchLocations = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/locations-search?buildingId=${building._id}`, {
-                method: 'GET',
-                credentials: 'include',
-            })
+            const response = await fetch(
+                `${API_BASE_URL}/locations-with-devices?buildingId=${building._id}&&departmentId=${departmentId}`,
+                {
+                    method: 'GET',
+                    credentials: 'include',
+                },
+            )
             if (!response.ok) throw new Error('Error al obtener las ubicaciones')
             const data = await response.json()
             setLocations(data)
@@ -54,6 +59,10 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
         } catch (error) {
             console.error(error)
         }
+    }
+
+    const addDevicesListModal = (locationId: string) => () => {
+        setTypeModal('DevicesList', undefined, undefined, undefined, undefined, locationId)
     }
 
     return (
@@ -77,7 +86,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
                 >
                     <div className={`${style.dropdownTitleOpen}`}>
                         <span className={`${style.totalDevicesText}`}>
-                            Total de Equipos: <span className={`${style.p2}`}>0</span>
+                            Total de Equipos: <span className={`${style.p2}`}>{building.totalDevices}</span>
                         </span>
                         <div className={`${style.dropdownTitleOpen}`}>
                             <button
@@ -100,8 +109,8 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
                         </div>
                     </div>
 
-                    <ul className={`${style.buildInfo}`}>
-                        <li>
+                    <ul className={`${style.buildTable}`}>
+                        <li className={style.buildTableHeader}>
                             Oficinas/Salones
                             <button
                                 onClick={() => setTypeModal('AddOfficeClass', building._id)}
@@ -112,11 +121,15 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
                             </button>
                         </li>
                         {locations.map((location) => (
-                            <li key={location._id}>
+                            <li
+                                key={location._id}
+                                onClick={addDevicesListModal(location._id)}
+                                className={style.buildInfo}
+                            >
                                 {location.name}
                                 <div className={`${style.buildInfoList}`}>
                                     <span>
-                                        Equipos: <span className={`${style.p2}`}>0</span>
+                                        Equipos: <span className={`${style.p2}`}>{location.totalDevices}</span>
                                     </span>
                                     <Actions
                                         row={''}
@@ -125,7 +138,8 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
                                             {
                                                 text: 'Editar',
                                                 icon: Pencil,
-                                                onClick: () => {
+                                                onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
+                                                    e.stopPropagation()
                                                     const type = 'EditOfficeClass'
                                                     const officeData = location
                                                     setTypeModal(type, undefined, officeData)
@@ -134,7 +148,8 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, se
                                             {
                                                 text: 'Borrar',
                                                 icon: Trash2,
-                                                onClick: () => {
+                                                onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
+                                                    e.stopPropagation()
                                                     setTypeModal(
                                                         'DeleteOfficeClass',
                                                         undefined,

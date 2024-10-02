@@ -2,6 +2,7 @@ import { AddBuildModal } from './AddBuildModal'
 import { BuildModalType, BuildingProps, OfficeProps } from '../../../utils'
 import { AddOfficeClassroom } from './AddOfficeClassroom'
 import { DeleteModal } from '../../../ui/components/DeleteModal'
+import { DevicesListModal } from '../DevicePageContent/DevicesList'
 
 import style from '../../style/modal.module.css'
 
@@ -11,6 +12,7 @@ interface Props {
     buildingId?: string
     buildingData?: BuildingProps
     deleteName?: string
+    locationId?: string
     officeData?: OfficeProps
     onClose: () => void
     deleteFunction: () => void
@@ -22,6 +24,7 @@ export const BuildModal = ({
     deleteName,
     buildingId,
     buildingData,
+    locationId,
     officeData,
     deleteFunction,
     onClose,
@@ -39,6 +42,7 @@ export const BuildModal = ({
                         {(type === 'DeleteBuild' || type === 'DeleteOfficeClass') && (
                             <DeleteModal onClose={onClose} name={deleteName} deleteFunction={deleteFunction} />
                         )}
+                        {type === 'DevicesList' && <DevicesListModal locationId={locationId} onClose={onClose} />}
                     </section>
                 </div>
             )}

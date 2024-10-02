@@ -41,9 +41,16 @@
     font-size: 1.35rem;
 }
 
+.nonSelected {
+    color: var(--SidebarText);
+    text-decoration: none;
+}
+
 .nonSelected:hover {
     border-radius: 8px;
-    background-color:var(--ActiveCardGray);
+    background-color: var(--ActiveCardGray);
+    color: var(--SidebarText);
+    text-decoration: none;
     cursor: pointer;
 }
 
@@ -51,11 +58,30 @@
     background: var(--GreenGradient);
     color: var(--SidebarActiveText);
     border-radius: 8px;
+    text-decoration: none;
     transition: all 0.3s linear;
+    user-select: none;
+}
+
+.sidebarSelected:active {
+    color: var(--SidebarActiveText);
+    text-decoration: none;
+}
+
+.sidebarSelected:focus {
+    color: var(--SidebarActiveText);
+    text-decoration: none;
+}
+
+.sidebarSelected:focus-within {
+    color: var(--SidebarActiveText);
+    text-decoration: none;
 }
 
 .sidebarSelected:hover {
     border-radius: 8px;
+    color: var(--SidebarActiveText);
+    text-decoration: none;
     background: var(--GreenGradient);
     background-color: none;
     transform: scale(1.02);

@@ -1,8 +1,8 @@
 export type BuildModalType =
-  | 'AddBuild'
-  | 'AddOfficeClass'
-  | 'EditBuild'
-  | 'EditOfficeClass'
-  | 'DeleteBuild'
-  | 'DeleteOfficeClass'
-
+    | 'AddBuild'
+    | 'AddOfficeClass'
+    | 'EditBuild'
+    | 'EditOfficeClass'
+    | 'DeleteBuild'
+    | 'DeleteOfficeClass'
+    | 'DevicesList'

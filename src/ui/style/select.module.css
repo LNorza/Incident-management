@@ -1,15 +1,15 @@
 .select {
     cursor: pointer;
-    position: relative; /* Mantener para que .options se posicione respecto a .select */
+    position: relative;
     transition: all 0.3s;
     color: white;
-    overflow: visible; /* Permitir que el contenido flotante se desborde */
     font-size: 1.1rem;
     font-weight: 400;
+    width: 100%;
+    height: 100%;
 }
 
 .selected {
-    position: relative;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -19,6 +19,8 @@
     border: 1px solid white;
     border-radius: 8px;
     z-index: 999;
+    height: 100%;
+    width: 100%;
 }
 
 .arrow {
@@ -30,19 +32,40 @@
     transform: rotate(-180deg);
 }
 
+.placeholder {
+    color: #757575;
+    user-select: none;
+}
+
 .options {
     display: none;
     flex-direction: column;
     border-radius: 8px;
     padding: 12px;
     background-color: #2a2f3b;
-    position: absolute; /* Hacer que sea flotante */
-    top: 100%; /* Colocar justo debajo del .selected */
+    position: absolute;
+    top: 115%;
     left: 0;
-    width: 100%; /* Asegurar que el ancho sea igual al del contenedor padre */
-    opacity: 0; /* Transición para ocultar */
+    width: 100%;
+    opacity: 0;
     transition: opacity 300ms;
-    z-index: 999; /* Asegurar que aparezca encima de otros elementos */
+    z-index: 1000;
+    max-height: 220px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.options::-webkit-scrollbar {
+    width: 8px;
+    background-color: #252a34;
+    border-radius: 5px;
+    margin-left: 5px;
+}
+
+.options::-webkit-scrollbar-thumb {
+    background-color: #41424d;
+    width: 1px;
+    border-radius: 5px;
 }
 
 .noOptions {
@@ -54,7 +77,7 @@
 
 .active + .options {
     display: flex;
-    opacity: 1; /* Hacer visible el menú cuando está activo */
+    opacity: 1;
 }
 
 .option {
