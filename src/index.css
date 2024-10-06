@@ -81,3 +81,23 @@ li {
     border: 1px solid #a9dfd8 !important;
     box-shadow: inset 0 0 0 2px #a9dfd8 !important;
 }
+
+.ag-center-cols-viewport {
+    z-index: 0 !important;
+    overflow: visible !important;
+}
+
+.ag-center-cols-container {
+    z-index: 0 !important;
+    overflow: visible !important;
+}
+
+.ag-row {
+    z-index: 1 !important;
+    overflow: visible;
+}
+
+.ag-cell-value {
+    overflow: visible;
+    z-index: 0 !important;
+}

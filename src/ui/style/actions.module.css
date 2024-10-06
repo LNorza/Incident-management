@@ -21,7 +21,9 @@
 .editActionsBtn {
     background-color: transparent !important;
     border: none;
-    padding: 0.375rem 0.75rem !important;
+    width: fit-content;
+    height: fit-content;
+    padding: 0.5rem 0rem 0rem 0rem !important;
     cursor: pointer;
 }
 
@@ -37,8 +39,8 @@
     right: 0;
     height: fit-content;
     min-width: 200px;
-    width: fit-content + 4px;
-    z-index: 1000;
+    width: fit-content;
+    z-index: 1000000;
     font-size: 1rem;
     justify-content: center;
     animation: fadeInDown 0.15s ease-in-out;
