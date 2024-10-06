@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { LucideIcon, Ellipsis } from 'lucide-react'
+import ReactDOM from 'react-dom'
 import style from '../style/Actions.module.css'
 
 interface Action {
@@ -12,34 +13,26 @@ interface Action {
 interface EditActionsProps {
     row: unknown
     actions?: Action[]
-    parentRef?: React.RefObject<HTMLDivElement>
 }
 
-const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) => {
+const Actions: React.FC<EditActionsProps> = ({ row, actions = [] }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const dropdownRef = useRef<HTMLDivElement | null>(null)
-    const [openUpwards, setOpenUpwards] = useState<boolean>(false)
     const dropdownMenuRef = useRef<HTMLDivElement | null>(null)
+    const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
     const toggleDropdown = (event: React.MouseEvent) => {
         event.stopPropagation()
-        if (!parentRef) {
-            return
-        }
-        if (dropdownRef.current && parentRef.current) {
-            const parentRect = parentRef.current.getBoundingClientRect()
-            const buttonRect = dropdownRef.current.getBoundingClientRect()
-            const dropdownHeight = 108
-            const spaceBelow = parentRect.height - buttonRect.top
 
-            if (spaceBelow > dropdownHeight) {
-                setOpenUpwards(false)
-            } else {
-                setOpenUpwards(true)
-            }
-        }
-        console.log('Action clicked')
-        setIsOpen(!isOpen)
+        if (!dropdownRef.current) return
+
+        const rect = dropdownRef.current.getBoundingClientRect()
+        setMenuPosition({
+            top: rect.bottom,
+            left: rect.left,
+        })
+
+        setIsOpen((prev) => !prev)
     }
 
     const handleOutsideClick = (event: Event) => {
@@ -48,7 +41,6 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
         }
     }
 
-    // Ajuste en el tipo de evento para HTMLDivElement
     const handleActionClick =
         (actionFunction: (row: unknown, e: React.MouseEvent<HTMLDivElement>) => void) =>
         (e: React.MouseEvent<HTMLDivElement>) => {
@@ -56,10 +48,17 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
             setIsOpen(false)
         }
 
+    const handleScroll = () => {
+        setIsOpen(false) // Cierra el menú al hacer scroll
+    }
+
     useEffect(() => {
         document.addEventListener('mousedown', handleOutsideClick)
+        window.addEventListener('scroll', handleScroll, true) // Se agrega el evento de scroll a la ventana
+
         return () => {
             document.removeEventListener('mousedown', handleOutsideClick)
+            window.removeEventListener('scroll', handleScroll, true) // Elimina el listener al desmontar el componente
         }
     }, [])
 
@@ -69,26 +68,36 @@ const Actions: React.FC<EditActionsProps> = ({ row, parentRef, actions = [] }) =
         return (
             <div
                 key={index}
-                className={`${style.editActionsItem}`}
-                onClick={handleActionClick(action.onClick)} // Aquí ahora es compatible con HTMLDivElement
+                className={style.editActionsItem}
+                onClick={handleActionClick(action.onClick)}
                 style={{ color: action.color }}
             >
                 <IconComponent />
-                <span className={`${style.editActionsText}`}>{action.text}</span>
+                <span className={style.editActionsText}>{action.text}</span>
             </div>
         )
     }
 
     return (
-        <div className={`${style.editActions}`} ref={dropdownRef}>
-            <button className={`${style.editActionsBtn}`} onClick={toggleDropdown}>
-                <Ellipsis color="white" className={`${style.dots}`} />
+        <div className={style.editActions} ref={dropdownRef}>
+            <button className={style.editActionsBtn} onClick={toggleDropdown}>
+                <Ellipsis color="white" className={style.dots} />
             </button>
-            {isOpen && (
-                <div ref={dropdownMenuRef} className={`${style.editActionsMenu} ${openUpwards ? style.openUp : ''}`}>
-                    {actions.map((action, index) => showOrHide(action, index))}
-                </div>
-            )}
+            {isOpen &&
+                ReactDOM.createPortal(
+                    <div
+                        ref={dropdownMenuRef}
+                        className={style.editActionsMenu}
+                        style={{
+                            position: 'absolute',
+                            top: `${menuPosition.top}px`,
+                            left: '77%',
+                        }}
+                    >
+                        {actions.map((action, index) => showOrHide(action, index))}
+                    </div>,
+                    document.body,
+                )}
         </div>
     )
 }

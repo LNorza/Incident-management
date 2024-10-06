@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
-import ActionsTable from '../../../ui/components/ActionsTable'
 import { Trash2, Pencil } from 'lucide-react'
 import { myTheme } from '../../../utils'
 import API_BASE_URL from '../../../utils/api/apiConfig'
 import { getUserDepartment } from '../../../utils/api/userData'
+import Actions from '../../../ui/components/Actions'
 
 interface DeviceTableProps {
     refresh: boolean
@@ -110,7 +110,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh }) => {
         {
             field: 'actions',
             headerName: 'Acciones',
-            cellRenderer: ActionsTable,
+            cellRenderer: Actions,
             cellRendererParams: (params: ICellRendererParams) => ({
                 row: params.data,
                 parentRef: contentRef,
