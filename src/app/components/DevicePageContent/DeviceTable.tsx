@@ -113,6 +113,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh }) => {
             cellRenderer: Actions,
             cellRendererParams: (params: ICellRendererParams) => ({
                 row: params.data,
+                table: true,
                 parentRef: contentRef,
                 actions: [
                     {
@@ -141,7 +142,6 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh }) => {
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 500, width: '100%' }} ref={parentRef}>
             <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
-            <div id="portal-root"></div>
         </div>
     )
 }

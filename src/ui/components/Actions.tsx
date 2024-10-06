@@ -12,27 +12,48 @@ interface Action {
 
 interface EditActionsProps {
     row: unknown
+    table: boolean
     actions?: Action[]
+    parentRef?: React.RefObject<HTMLDivElement>
 }
 
-const Actions: React.FC<EditActionsProps> = ({ row, actions = [] }) => {
+const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = [] }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const dropdownRef = useRef<HTMLDivElement | null>(null)
     const dropdownMenuRef = useRef<HTMLDivElement | null>(null)
+    const [openUpwards, setOpenUpwards] = useState<boolean>(false)
     const [menuPosition, setMenuPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 })
 
     const toggleDropdown = (event: React.MouseEvent) => {
         event.stopPropagation()
 
         if (!dropdownRef.current) return
+        if (!parentRef) return
 
-        const rect = dropdownRef.current.getBoundingClientRect()
-        setMenuPosition({
-            top: rect.bottom,
-            left: rect.left,
-        })
+        if (table) {
+            const rect = dropdownRef.current.getBoundingClientRect()
+            setMenuPosition({
+                top: rect.bottom,
+                left: rect.left,
+            })
 
-        setIsOpen((prev) => !prev)
+            setIsOpen((prev) => !prev)
+        } else {
+            if (dropdownRef.current && parentRef.current) {
+                const parentRect = parentRef.current.getBoundingClientRect()
+                const buttonRect = dropdownRef.current.getBoundingClientRect()
+                const dropdownHeight = 108
+                const spaceBelow = parentRect.height - buttonRect.top
+
+                if (spaceBelow > dropdownHeight) {
+                    setOpenUpwards(false)
+                } else {
+                    setOpenUpwards(true)
+                }
+            }
+
+            setIsOpen((prev) => !prev)
+        }
     }
 
     const handleOutsideClick = (event: Event) => {
@@ -83,7 +104,13 @@ const Actions: React.FC<EditActionsProps> = ({ row, actions = [] }) => {
             <button className={style.editActionsBtn} onClick={toggleDropdown}>
                 <Ellipsis color="white" className={style.dots} />
             </button>
+            {isOpen && !table && (
+                <div ref={dropdownMenuRef} className={`${style.editActionsMenu} ${openUpwards ? style.openUp : ''}`}>
+                    {actions.map((action, index) => showOrHide(action, index))}
+                </div>
+            )}
             {isOpen &&
+                table &&
                 ReactDOM.createPortal(
                     <div
                         ref={dropdownMenuRef}
