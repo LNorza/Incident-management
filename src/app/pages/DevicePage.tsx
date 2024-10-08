@@ -1,14 +1,18 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CustomSelect } from '../../ui'
 import style from '../style/deviceContainer.module.css'
 import { DeviceTable } from '../components'
 import { Plus } from 'lucide-react'
+import API_BASE_URL from '../../utils/api/apiConfig'
 import { DeviceModal } from '../components/DevicePageContent/DeviceModal'
+import { DeviceModalType } from '../../utils'
 
 export const DevicePage = () => {
     const [showModal, setShowModal] = useState(false)
     const [refreshTable, setRefreshTable] = useState(false)
+    const [typeModal, setTypeModal] = useState<DeviceModalType>()
     const [deviceId, setDeviceId] = useState<string | undefined>(undefined)
+    const [deleteName, setDeleteName] = useState<string>('')
 
     const optionTemp = [
         { label: 'Todos', value: 'ALL' },
@@ -18,22 +22,54 @@ export const DevicePage = () => {
     ]
 
     const onOpenModal = () => {
+        setTypeModal('AddDevice')
         setDeviceId(undefined)
         setShowModal(true)
     }
 
-    const onCloseModal = () => {
-        setShowModal(false)
-        setRefreshTable((prev) => !prev)
-    }
-
     const handleEditModal = (deviceId: string) => {
+        setTypeModal('EditDevice')
         setDeviceId(deviceId)
+        setRefreshTable(false)
         setShowModal(true)
     }
 
+    const handleDeleteModal = (deviceId: string, deviceName: string) => {
+        setTypeModal('DeleteDevice')
+        setDeviceId(deviceId)
+        setDeleteName(deviceName)
+        setRefreshTable(false)
+        setShowModal(true)
+    }
+
+    const onCloseModal = () => {
+        setDeviceId(undefined)
+        setDeleteName('')
+        setRefreshTable(true)
+        setShowModal(false)
+    }
+
+    useEffect(() => {
+        if (refreshTable) {
+            setRefreshTable(false)
+        }
+    }, [refreshTable])
+
     const handleSelect = (selected: { label: string; value: string }) => {
         console.log(selected)
+    }
+
+    const deleteDevice = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            if (!response.ok) throw new Error('Error al borrar edificio')
+            onCloseModal()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -53,11 +89,18 @@ export const DevicePage = () => {
                 </section>
 
                 <section>
-                    <DeviceTable refresh={refreshTable} editDevice={handleEditModal} />
+                    <DeviceTable refresh={refreshTable} editDevice={handleEditModal} deleteDevice={handleDeleteModal} />
                 </section>
             </div>
 
-            <DeviceModal isOpen={showModal} deviceId={deviceId} onClose={onCloseModal} />
+            <DeviceModal
+                isOpen={showModal}
+                onClose={onCloseModal}
+                type={typeModal}
+                deviceId={deviceId}
+                deleteName={deleteName}
+                deleteFunction={deleteDevice}
+            />
         </>
     )
 }

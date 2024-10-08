@@ -1,30 +1,38 @@
 import { AddDeviceModal } from './AddDeviceModal'
+import { DeleteModal } from '../../../ui/components/DeleteModal'
+import { DeviceModalType } from '../../../utils'
 import style from '../../style/modal.module.css'
 
 interface Props {
     isOpen: boolean
     onClose: () => void
-    type?: string
+    type?: DeviceModalType
     deviceId?: string
+    deleteName?: string
+    deleteFunction: () => void
 }
 
-export const DeviceModal = ({ isOpen, deviceId, onClose }: Props) => {
+export const DeviceModal = ({ isOpen, type, deviceId, deleteName, deleteFunction, onClose }: Props) => {
     return (
         <>
-            {isOpen && !deviceId && (
+            {isOpen && (
                 <div className={style.container}>
                     <div onClick={onClose} className={style.overlay}></div>
-                    <section className={style.largeModalInfoContainer}>
-                        <AddDeviceModal onClose={onClose} />
-                    </section>
-                </div>
-            )}
-            {isOpen && deviceId && (
-                <div className={style.container}>
-                    <div onClick={onClose} className={style.overlay}></div>
-                    <section className={style.largeModalInfoContainer}>
-                        <AddDeviceModal onClose={onClose} deviceId={deviceId} />
-                    </section>
+                    {type === 'AddDevice' && (
+                        <section className={style.largeModalInfoContainer}>
+                            <AddDeviceModal onClose={onClose} />
+                        </section>
+                    )}
+                    {type === 'EditDevice' && (
+                        <section className={style.largeModalInfoContainer}>
+                            <AddDeviceModal onClose={onClose} deviceId={deviceId} />
+                        </section>
+                    )}
+                    {type === 'DeleteDevice' && (
+                        <section className={style.modalInfoContainer}>
+                            <DeleteModal onClose={onClose} name={deleteName} deleteFunction={deleteFunction} />
+                        </section>
+                    )}
                 </div>
             )}
         </>

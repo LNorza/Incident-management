@@ -10,6 +10,7 @@ import Actions from '../../../ui/components/Actions'
 interface DeviceTableProps {
     refresh: boolean
     editDevice: (deviceId: string) => void
+    deleteDevice: (deviceId: string, deleteName: string) => void
 }
 
 interface DeviceData {
@@ -22,7 +23,7 @@ interface DeviceData {
     status: string
 }
 
-export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice }) => {
+export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, deleteDevice }) => {
     const [rowData, setRowData] = useState<DeviceData[]>([])
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const contentRef = useRef<HTMLDivElement>(null)
@@ -33,7 +34,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice })
     }, [])
 
     const handleDeleteClick = useCallback((row: DeviceData) => {
-        console.log('Delete device:', row)
+        deleteDevice(row._id, row.name)
     }, [])
 
     const fetchDevices = useCallback(async () => {
@@ -48,7 +49,24 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice })
             const formattedData = data.map(({ _id, name, type, brand, specs, location_id, status }: any) => ({
                 _id,
                 name,
-                type,
+                type:
+                    type === 'LAPTOP'
+                        ? 'Laptop'
+                        : type === 'PC'
+                        ? 'Escritorio'
+                        : type === 'PRINTER'
+                        ? 'Impresora'
+                        : type === 'SWITCH'
+                        ? 'Switch'
+                        : type === 'ROUTER'
+                        ? 'Router'
+                        : type === 'PROJECTOR'
+                        ? 'Proyector'
+                        : type === 'VOLTAGE_REGULATOR'
+                        ? 'Regulador de voltaje'
+                        : type === 'NO-BREAK'
+                        ? 'No-break'
+                        : 'Desconocido',
                 brand,
                 user: specs.user_id || 'Compartido',
                 location: location_id.name,
@@ -141,7 +159,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice })
     ]
 
     return (
-        <div className="ag-theme-quartz-dark" style={{ height: 500, width: '100%' }} ref={parentRef}>
+        <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
             <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
         </div>
     )

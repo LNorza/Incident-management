@@ -47,8 +47,10 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         { label: 'Acer', value: 'ACER' },
         { label: 'Apple', value: 'APPLE' },
         { label: 'Samsung', value: 'SAMSUNG' },
-        { label: 'Sony', value: 'SONY' },
-        { label: 'Toshiba', value: 'TOSHIBA' },
+        { label: 'Cisco', value: 'CISCO' },
+        { label: 'Linksys', value: 'LINKSYS' },
+        { label: 'Koblenz', value: 'KOBLENZ' },
+        { label: 'Epson', value: 'EPSON' },
     ]
     const warrantyYearsOptions: IOptions[] = [
         { label: '1 año', value: '1' },
@@ -421,6 +423,18 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     }, [building])
 
     const saveDevice = () => {
+        if (!formState.name) {
+            toast.error('No se ha ingresado el nombre del dispositivo')
+            return
+        }
+        if (!deviceType) {
+            toast.error('No se ha seleccionado el tipo de dispositivo')
+            return
+        }
+        if (!buyDate) {
+            toast.error('No se ha ingresado la fecha de compra')
+            return
+        }
         if (!selectedDeviceType) {
             toast.error('No se ha seleccionado el tipo de dispositivo')
             return

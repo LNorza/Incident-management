@@ -10,18 +10,18 @@ export const RouteManager = () => {
     return (
         <>
             <Sidebar />
+            <Toaster
+                theme="dark"
+                toastOptions={{
+                    style: {
+                        background: '#1D1E28',
+                        color: '#fff',
+                    },
+                }}
+                duration={3000}
+                closeButton
+            />
             <div className={`${style.container}`}>
-                <Toaster
-                    theme="dark"
-                    toastOptions={{
-                        style: {
-                            background: '#1D1E28',
-                            color: '#fff',
-                        },
-                    }}
-                    duration={3000}
-                    closeButton
-                />
                 <Navbar />
                 <Routes>
                     <Route path="home" element={<Dashboard />} />
