@@ -5,11 +5,15 @@ export interface Device {
     type: string
     status: string
     specs: IComputerSpecs | ILaptop | IPrinter | ISwitch | IRouter | INoBreak | IVoltageRegulator | IProjector
-    purchaseDate: Date
+    purchaseDate: string
     warrantyYears: number
     deviceModel: string
     brand: string
-    location_id: string
+    location_id: {
+        _id: string
+        name: string
+        building_id: string
+    }
 }
 
 export interface IComputerSpecs {

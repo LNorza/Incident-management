@@ -9,6 +9,7 @@ import Actions from '../../../ui/components/Actions'
 
 interface DeviceTableProps {
     refresh: boolean
+    editDevice: (deviceId: string) => void
 }
 
 interface DeviceData {
@@ -21,14 +22,14 @@ interface DeviceData {
     status: string
 }
 
-export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh }) => {
+export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice }) => {
     const [rowData, setRowData] = useState<DeviceData[]>([])
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
     const handleEditClick = useCallback((row: DeviceData) => {
-        console.log('Edit device:', row)
+        editDevice(row._id)
     }, [])
 
     const handleDeleteClick = useCallback((row: DeviceData) => {

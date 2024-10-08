@@ -2,6 +2,17 @@ import { useEffect, useState, useCallback } from 'react'
 import { getUserDepartment } from '../../../utils/api/userData'
 import { useForm } from '../../../hooks'
 import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
+import {
+    Device,
+    IComputerSpecs,
+    ILaptop,
+    IPrinter,
+    IRouter,
+    ISwitch,
+    IProjector,
+    IVoltageRegulator,
+    INoBreak,
+} from '../../../utils/enum/device.enum'
 import { Laptop } from 'lucide-react'
 import { toast } from 'sonner'
 import style from '../../style/modal.module.css'
@@ -10,27 +21,23 @@ import { IOptions } from '../../../utils/interface/options'
 import API_BASE_URL from '../../../utils/api/apiConfig'
 
 interface Props {
+    deviceId?: string | undefined
     onClose: () => void
 }
 
-export const AddDeviceModal = ({ onClose }: Props) => {
-    const [temp1, setTemp1] = useState('') // Tipo temporal
-    const [sharedBuilding, setSharedBuilding] = useState(false)
-    const [departmentId, setDepartmentId] = useState<string | null>(null)
-    const [optionTemp] = useState<IOptions[]>([
-        { label: 'Opción 1', value: '1' },
-        { label: 'Opción 2', value: '2' },
-        { label: 'Opción 3', value: '3' },
-    ])
+export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
+    const [deviceType, setDeviceType] = useState<string | undefined>('')
+    const [isShared, setIsShared] = useState<boolean | undefined>(false)
+    const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
     const deviceTypeOptions: IOptions[] = [
         { label: 'PC', value: 'PC' },
-        { label: 'Laptop', value: 'Laptop' },
-        { label: 'Impresora', value: 'Impresora' },
-        { label: 'Switch', value: 'Switch' },
-        { label: 'Router', value: 'Router' },
-        { label: 'No-break', value: 'No-break' },
-        { label: 'Regulador', value: 'Regulador' },
-        { label: 'Proyector', value: 'Proyector' },
+        { label: 'Laptop', value: 'LAPTOP' },
+        { label: 'Impresora', value: 'PRINTER' },
+        { label: 'Switch', value: 'SWITCH' },
+        { label: 'Router', value: 'ROUTER' },
+        { label: 'Proyector', value: 'PROJECTOR' },
+        { label: 'Regulador', value: 'VOLTAGE_REGULATOR' },
+        { label: 'No-break', value: 'NO-BREAK' },
     ]
     const brandOptions: IOptions[] = [
         { label: 'HP', value: 'HP' },
@@ -68,22 +75,57 @@ export const AddDeviceModal = ({ onClose }: Props) => {
     ]
     const ramTypeOptions: IOptions[] = [
         { label: 'DDR4', value: 'DDR4' },
-        { label: 'DDR5', value: 'DDR%' },
+        { label: 'DDR5', value: 'DDR5' },
     ]
+    const [routerTypeOptions] = useState<IOptions[]>([
+        { label: 'ADSL', value: 'ADSL' },
+        { label: 'Cable', value: 'CABLE' },
+        { label: 'Fibra óptica', value: 'FIBER_OPTIC' },
+        { label: 'Satelital', value: 'SATELLITE' },
+        { label: '4G', value: '4G' },
+        { label: '5G', value: '5G' },
+    ])
+    const [connectivityRouterOptions] = useState<IOptions[]>([
+        { label: 'Inalámbrica', value: 'WIRELESS' },
+        { label: 'Cableada', value: 'WIRED' },
+    ])
+    const [routerCapacityOptions] = useState<IOptions[]>([
+        { label: '< 16 MB', value: '<16MB' },
+        { label: '16-128 MB', value: '16-128MB' },
+        { label: '128-1000 MB', value: '128-1000MB' },
+        { label: '1000MB - 4GB', value: '1000MB-4GB' },
+        { label: '4-16 GB', value: '4-16GB' },
+        { label: '16-64 GB', value: '16-64GB' },
+        { label: '>64 GB', value: '>64GB' },
+    ])
+    const [projectorResolutionOptions] = useState<IOptions[]>([
+        { label: 'SVGA (800x600)', value: 'SVGA' },
+        { label: 'XGA (1024x768)', value: 'XGA' },
+        { label: 'WXGA (1280x800)', value: 'WXGA' },
+        { label: 'HD (1366x768)', value: 'HD' },
+        { label: 'FHD (1920x1080)', value: 'FHD' },
+        { label: '4K (3840x2160)', value: '4K' },
+    ])
+    const [projectorConnectivityOptions] = useState<IOptions[]>([
+        { label: 'HDMI', value: 'HDMI' },
+        { label: 'VGA', value: 'VGA' },
+        { label: 'USB', value: 'USB' },
+    ])
 
-    const { onInputChange, formState } = useForm({
+    const { onInputChange, formState, updateFields } = useForm({
         name: '',
         model: '',
         motherBoard: '',
         processor: '',
         graphicCard: '',
         ram: '',
-        ramType: '',
         hardDrive: '',
         powerSupply: '',
         ip: '',
         mac: '',
         port: '',
+        ports: '',
+        plugs: '',
         toner: '',
         potence: '',
         backupTime: '',
@@ -102,29 +144,53 @@ export const AddDeviceModal = ({ onClose }: Props) => {
     ]
     const [buyDate, setBuyDate] = useState<Date | null>(null)
     const [selectedDeviceType, setSelectedDeviceType] = useState<IOptions | null>(null)
-    const [brand, setBrand] = useState<string | null>(null)
+    const [brand, setBrand] = useState<string | undefined>(undefined)
+    const [buildingId, setBuildingId] = useState<string | undefined>(undefined)
     const [buildingsOptions, setBuildingsOptions] = useState<IOptions[]>([])
-    const [building, setBuilding] = useState<string | null>(null)
+    const [building, setBuilding] = useState<string | undefined>(undefined)
     const [officesOptions, setOfficesOptions] = useState<IOptions[]>([])
-    const [location, setLocation] = useState<string | null>(null)
-    const [warrantyYears, setWarrantyYears] = useState<string | null>(null)
-    const [user, setUser] = useState<string | null>(null)
-    const [os, setOs] = useState<string | null>(null)
-    const [ramType, setRamType] = useState<string | null>(null)
-    const [laptopWifiConnection, setLaptopWifiConnection] = useState(false)
-    const [printerType, setPrinterType] = useState<string | null>(null)
-    const [inkType, setInkType] = useState<string | null>(null)
-    const [scanner, setScanner] = useState(false)
-    const [wifiConnection, setWifiConnection] = useState(false)
-
-    useEffect(() => {
-        fetchDepartment()
+    const [location, setLocation] = useState<string | undefined>(undefined)
+    const [warrantyYears, setWarrantyYears] = useState<string | undefined>(undefined)
+    const [user, setUser] = useState<string | undefined>(undefined)
+    const [os, setOs] = useState<string | undefined>(undefined)
+    const [ramType, setRamType] = useState<string | undefined>(undefined)
+    const [laptopWifiConnection, setLaptopWifiConnection] = useState<boolean | undefined>(false)
+    const [printerType, setPrinterType] = useState<string | undefined>(undefined)
+    const [inkType, setInkType] = useState<string | undefined>(undefined)
+    const [scanner, setScanner] = useState<boolean | undefined>(false)
+    const [printerWifiConnection, setPrinterWifiConnection] = useState<boolean | undefined>(false)
+    const [routerType, setRouterType] = useState<string | undefined>(undefined)
+    const [routerConnectivity, setRouterConnectivity] = useState<string | undefined>(undefined)
+    const [routerCapacity, setRouterCapacity] = useState<string | undefined>(undefined)
+    const [projectorResolution, setProjectorResolution] = useState<string | undefined>(undefined)
+    const [projectorConnectivity, setProjectorConnectivity] = useState<string | undefined>(undefined)
+    const [control, setControl] = useState<boolean | undefined>(false)
+    const [deviceData, setDeviceData] = useState<Device>({
+        name: '',
+        type: '',
+        status: '',
+        specs: {},
+        purchaseDate: '',
+        warrantyYears: 0,
+        deviceModel: '',
+        brand: '',
+        location_id: {
+            _id: '',
+            name: '',
+            building_id: '',
+        },
     })
+    const [locationEdit, setLocationEdit] = useState<string | undefined>(undefined)
+
+    const handleSelectType = (selected: { label: string; value: string }) => {
+        setSelectedDeviceType(selected)
+        setDeviceType(selected.value)
+    }
 
     const fetchDepartment = async () => {
         try {
             const id = await getUserDepartment()
-            setDepartmentId(id)
+            setDepartmentId(id ?? undefined)
         } catch (err) {
             console.error(err)
         }
@@ -149,18 +215,10 @@ export const AddDeviceModal = ({ onClose }: Props) => {
         }
     }, [departmentId])
 
-    useEffect(() => {
-        fetchBuildings()
-    }, [departmentId, fetchBuildings])
-
-    useEffect(() => {
-        fetchOffices()
-    }, [building])
-
     const fetchOffices = useCallback(async () => {
         if (building) {
             try {
-                const response = await fetch(`${API_BASE_URL}/locations-search?buildingId=${building}`, {
+                const response = await fetch(`${API_BASE_URL}/locations-search?buildingId=${buildingId}`, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -176,32 +234,214 @@ export const AddDeviceModal = ({ onClose }: Props) => {
         }
     }, [building])
 
-    const handleSelect = (selected: { label: string; value: string }) => {
-        console.log(selected)
+    const fetchDevice = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            setDeviceData(data)
+        } catch (error) {
+            console.error('Error fetching device:', error)
+        }
     }
 
-    const handleSelectType = (selected: { label: string; value: string }) => {
-        setSelectedDeviceType(selected)
-        setTemp1(selected.value)
-    }
+    useEffect(() => {
+        fetchDepartment()
+    }, [])
+
+    useEffect(() => {
+        fetchOffices()
+    }, [buildingId, fetchOffices])
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchBuildings()
+            if (deviceId) {
+                await fetchDevice()
+            }
+        }
+        fetchData()
+    }, [deviceId, departmentId, fetchBuildings])
+
+    useEffect(() => {
+        updateFields({
+            name: deviceData.name,
+            model: deviceData.deviceModel,
+        })
+        setSelectedDeviceType(deviceTypeOptions.find((device) => device.value === deviceData.type) || null)
+        setBrand(brandOptions.find((brand) => brand.value === deviceData.brand)?.value)
+        setBuilding(buildingsOptions.find((building) => building.value === deviceData.location_id.building_id)?.value)
+        setBuildingId(deviceData.location_id.building_id)
+        setLocation(officesOptions.find((office) => office.value === deviceData.location_id._id)?.value)
+        setLocationEdit(deviceData.location_id._id)
+        setBuyDate(new Date(deviceData.purchaseDate))
+        setWarrantyYears(
+            warrantyYearsOptions.find((years) => years.value === deviceData.warrantyYears.toString())?.value,
+        )
+        setDeviceType(deviceTypeOptions.find((device) => device.value === deviceData.type)?.value)
+        console.log(deviceData)
+        if (deviceData.type === 'PC') {
+            const pcSpecs = deviceData.specs as IComputerSpecs
+            updateFields({
+                motherBoard: pcSpecs.motherboard,
+                processor: pcSpecs.cpu,
+                graphicCard: pcSpecs.gpu,
+                ram: pcSpecs.ram,
+                hardDrive: pcSpecs.storage,
+                powerSupply: pcSpecs.powerSupply,
+                ip: pcSpecs.ipAddress,
+                mac: pcSpecs.macAddress,
+                port: pcSpecs.connectedPort,
+            })
+            setOs(osOptions.find((os) => os.value === pcSpecs.os)?.value)
+            setRamType(ramTypeOptions.find((ramType) => ramType.value === pcSpecs.ramType)?.label)
+            setIsShared(pcSpecs.isShared)
+            setUser(userOptions.find((user) => user.value === pcSpecs.user_id)?.value)
+        }
+
+        if (deviceData.type === 'LAPTOP') {
+            const laptopSpecs = deviceData.specs as ILaptop
+            updateFields({
+                processor: laptopSpecs.cpu,
+                graphicCard: laptopSpecs.gpu,
+                ram: laptopSpecs.ram,
+                hardDrive: laptopSpecs.storage,
+                ip: laptopSpecs.ipAddress,
+                mac: laptopSpecs.macAddress,
+                port: laptopSpecs.connectedPort,
+            })
+            setOs(osOptions.find((os) => os.value === laptopSpecs.os)?.value)
+            setRamType(ramTypeOptions.find((ramType) => ramType.value === laptopSpecs.ramType)?.label)
+            setLaptopWifiConnection(laptopSpecs.wifiConnection)
+            setUser(userOptions.find((user) => user.value === laptopSpecs.user_id)?.value)
+        }
+
+        if (deviceData.type === 'PRINTER') {
+            const printerSpecs = deviceData.specs as IPrinter
+            updateFields({
+                toner: printerSpecs.tonerType,
+                ip: printerSpecs.ipAddress,
+                mac: printerSpecs.macAddress,
+            })
+            setPrinterType(
+                printerTypeOptions.find((printerType) => printerType.value === printerSpecs.printerType)?.value,
+            )
+            setInkType(inkOptions.find((inkType) => inkType.value === printerSpecs.printerInk)?.value)
+            setScanner(printerSpecs.scanner)
+            setPrinterWifiConnection(printerSpecs.wifiConnection)
+        }
+
+        if (deviceData.type === 'SWITCH') {
+            const switchSpecs = deviceData.specs as ISwitch
+            updateFields({
+                ports: (switchSpecs.ports ?? '').toString(),
+                mac: switchSpecs.macAddress,
+            })
+        }
+
+        if (deviceData.type === 'ROUTER') {
+            const routerSpecs = deviceData.specs as IRouter
+            updateFields({
+                ip: routerSpecs.ipAddress,
+                mac: routerSpecs.macAddress,
+                ports: (routerSpecs.ports ?? '').toString(),
+            })
+            setRouterType(routerTypeOptions.find((routerType) => routerType.value === routerSpecs.routerType)?.value)
+            setRouterConnectivity(
+                connectivityRouterOptions.find(
+                    (routerConnectivity) => routerConnectivity.value === routerSpecs.connectivity,
+                )?.value,
+            )
+            setRouterCapacity(
+                routerCapacityOptions.find((routerCapacity) => routerCapacity.value === routerSpecs.capacity)?.value,
+            )
+        }
+
+        if (deviceData.type === 'PROJECTOR') {
+            const projectorSpecs = deviceData.specs as IProjector
+            updateFields({
+                brightness: projectorSpecs.brightness,
+                scope: projectorSpecs.scope,
+            })
+            setProjectorResolution(
+                projectorResolutionOptions.find(
+                    (projectorResolution) => projectorResolution.value === projectorSpecs.resolution,
+                )?.value,
+            )
+            setProjectorConnectivity(
+                projectorConnectivityOptions.find(
+                    (projectorConnectivity) => projectorConnectivity.value === projectorSpecs.connectivity,
+                )?.value,
+            )
+            setControl(projectorSpecs.control)
+        }
+
+        if (deviceData.type === 'NO-BREAK') {
+            const noBreakSpecs = deviceData.specs as INoBreak
+            updateFields({
+                potence: noBreakSpecs.powerCapacity,
+                plugs: (noBreakSpecs.ports ?? '').toString(),
+                backupTime: noBreakSpecs.backupTime,
+            })
+        }
+
+        if (deviceData.type === 'VOLTAGE_REGULATOR') {
+            const voltageRegulatorSpecs = deviceData.specs as IVoltageRegulator
+            updateFields({
+                potence: voltageRegulatorSpecs.powerCapacity,
+                plugs: (voltageRegulatorSpecs.ports ?? '').toString(),
+            })
+        }
+
+        if (deviceData.type === 'PROJECTOR') {
+            const projectorSpecs = deviceData.specs as IProjector
+            updateFields({
+                brightness: projectorSpecs.brightness,
+                scope: projectorSpecs.scope,
+            })
+            setProjectorResolution(
+                projectorResolutionOptions.find(
+                    (projectorResolution) => projectorResolution.value === projectorSpecs.resolution,
+                )?.value,
+            )
+            setProjectorConnectivity(
+                projectorConnectivityOptions.find(
+                    (projectorConnectivity) => projectorConnectivity.value === projectorSpecs.connectivity,
+                )?.value,
+            )
+            setControl(projectorSpecs.control)
+        }
+    }, [deviceData])
+
+    useEffect(() => {
+        if (deviceId) {
+            setLocation(locationEdit)
+        }
+    }, [building])
 
     const saveDevice = () => {
-        console.log(formState)
-
-        if (selectedDeviceType === null) {
+        if (!selectedDeviceType) {
             toast.error('No se ha seleccionado el tipo de dispositivo')
             return
         }
 
-        let deviceData = {}
-        if (selectedDeviceType.value === 'PC') {
-            deviceData = {
-                name: formState.name,
-                type: 'PC',
-                status: 'ACTIVE',
+        const commonSpecs = {
+            name: formState.name,
+            type: selectedDeviceType.value,
+            status: 'ACTIVE',
+            deviceModel: formState.model,
+            brand: brand,
+            purchaseDate: buyDate,
+            warrantyYears: warrantyYears,
+            location_id: location,
+        }
+
+        const deviceSpecsByType: { [key: string]: unknown } = {
+            PC: {
                 specs: {
                     os: os,
-                    motherBoard: formState.motherBoard,
+                    motherboard: formState.motherBoard,
                     cpu: formState.processor,
                     gpu: formState.graphicCard,
                     ram: formState.ram,
@@ -211,20 +451,11 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     ipAddress: formState.ip,
                     macAddress: formState.mac,
                     connectedPort: formState.port,
-                    isShared: sharedBuilding,
+                    isShared: isShared,
                     user_id: user,
                 },
-                deviceModel: formState.model,
-                brand: brand,
-                purchaseDate: buyDate,
-                warrantyYears: warrantyYears,
-                location_id: location,
-            }
-        } else if (selectedDeviceType.value === 'Laptop') {
-            deviceData = {
-                name: formState.name,
-                type: 'LAPTOP',
-                status: 'ACTIVE',
+            },
+            LAPTOP: {
                 specs: {
                     os: os,
                     storage: formState.hardDrive,
@@ -238,58 +469,83 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     connectedPort: formState.port,
                     user_id: user,
                 },
-                deviceModel: formState.model,
-                brand: brand,
-                purchaseDate: buyDate,
-                warrantyYears: warrantyYears,
-                location_id: location,
-            }
-        } else if (selectedDeviceType.value === 'Impresora') {
-            deviceData = {
-                name: formState.name,
-                type: 'PRINTER',
-                status: 'ACTIVE',
+            },
+            PRINTER: {
                 specs: {
                     printerType: printerType,
                     tonerType: formState.toner,
                     printerInk: inkType,
                     scanner: scanner,
-                    wifiConnection: wifiConnection,
+                    wifiConnection: printerWifiConnection,
+                    ipAddress: formState.ip,
+                    macAddress: formState.mac,
                 },
-                deviceModel: formState.model,
-                brand: brand,
-                purchaseDate: buyDate,
-                warrantyYears: warrantyYears,
-                location_id: location,
-            }
+            },
+            SWITCH: {
+                specs: {
+                    ports: formState.ports,
+                    macAddress: formState.mac,
+                },
+            },
+            ROUTER: {
+                specs: {
+                    routerType: routerType,
+                    ipAddress: formState.ip,
+                    macAddress: formState.mac,
+                    ports: formState.ports,
+                    connectivity: routerConnectivity,
+                    capacity: routerCapacity,
+                },
+            },
+            'NO-BREAK': {
+                specs: {
+                    powerCapacity: formState.potence,
+                    ports: formState.plugs,
+                    backupTime: formState.backupTime,
+                },
+            },
+            VOLTAGE_REGULATOR: {
+                specs: {
+                    powerCapacity: formState.potence,
+                    ports: formState.plugs,
+                },
+            },
+            PROJECTOR: {
+                specs: {
+                    resolution: projectorResolution,
+                    connectivity: projectorConnectivity,
+                    brightness: formState.brightness,
+                    scope: formState.scope,
+                    control: control,
+                },
+            },
         }
 
-        console.log(deviceData)
+        const deviceData = {
+            ...commonSpecs,
+            ...(deviceSpecsByType[selectedDeviceType.value] || {}),
+        }
 
         try {
-            fetch(`${API_BASE_URL}/devices`, {
-                method: 'POST',
+            const method = deviceId ? 'PUT' : 'POST'
+            const url = `${API_BASE_URL}/devices${deviceId ? `/${deviceId}` : ''}`
+
+            fetch(url, {
+                method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
                 body: JSON.stringify(deviceData),
+            }).then((response) => {
+                if (response.ok) {
+                    toast.success(`${!deviceId ? 'Dispositivo agregado' : 'Dispositivo actualizado'}`)
+                    onClose()
+                }
             })
-                .then((response) => {
-                    if (response.ok) {
-                        toast.success('Dispositivo agregado')
-                        onClose()
-                    } else {
-                        toast.error('Error al agregar el dispositivo')
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error)
-                    toast.error('Error al agregar el dispositivo')
-                })
         } catch (error) {
             console.error('Error:', error)
-            toast.error('Error al agregar el dispositivo')
+            toast.success(`${!deviceId ? 'Error al agregar el dispositivo' : 'Error al editar el dispositivo'}`)
         }
     }
 
@@ -297,7 +553,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
         <>
             <div className={style.titleModal}>
                 <Laptop size={34} />
-                <h2>Agregar Dispositivo</h2>
+                <h2>{!deviceId ? 'Agregar equipo' : 'Editar equipo'}</h2>
             </div>
             <div className={style.modalDetail}>
                 {/*-------------------- Default elements --------------------*/}
@@ -320,6 +576,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         Tipo
                         <div className={style.formInput}>
                             <CustomSelect
+                                value={selectedDeviceType?.value}
                                 placeholder="Selecciona el equipo"
                                 options={deviceTypeOptions}
                                 onSelect={handleSelectType}
@@ -347,6 +604,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         Marca
                         <div className={style.formInput}>
                             <CustomSelect
+                                value={brand}
                                 placeholder="Selecciona la Marca"
                                 options={brandOptions}
                                 onSelect={(selected: { label: string; value: string }) => {
@@ -362,9 +620,11 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         Edificio
                         <div className={style.formInput}>
                             <CustomSelect
+                                value={building}
                                 placeholder="Selecciona el edificio"
                                 options={buildingsOptions}
                                 onSelect={(selected: { label: string; value: string }) => {
+                                    setBuildingId(selected.value)
                                     setBuilding(selected.value)
                                 }}
                             />
@@ -374,6 +634,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         Oficina/Salon
                         <div className={style.formInput}>
                             <CustomSelect
+                                value={location}
                                 placeholder="Selecciona la oficina/salon"
                                 options={officesOptions}
                                 onSelect={(selected: { label: string; value: string }) => {
@@ -409,6 +670,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         Años de garantía
                         <div className={style.formInput}>
                             <CustomSelect
+                                value={warrantyYears}
                                 placeholder="Selecciona los años"
                                 options={warrantyYearsOptions}
                                 onSelect={(selected: { label: string; value: string }) => {
@@ -421,19 +683,20 @@ export const AddDeviceModal = ({ onClose }: Props) => {
 
                 {/*-------------------- elements depends of type --------------------*/}
                 {/*------------- elements depends of type -------------*/}
-                {temp1 == 'PC' && (
+                {deviceType == 'PC' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
                                 ¿Equipo compartido?
                                 <div className={style.formInput}>
-                                    <CustomCheckBox checked={sharedBuilding} setChecked={setSharedBuilding} />
+                                    <CustomCheckBox checked={isShared} setChecked={setIsShared} />
                                 </div>
                             </section>
                             <section>
                                 Usuario
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={user}
                                         placeholder="Selecciona al usuario"
                                         options={userOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -449,6 +712,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Sistema Operativo
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={os}
                                         placeholder="Selecciona el sistema operativo"
                                         options={osOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -512,7 +776,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                         isFormInput
                                         name="ram"
                                         value={formState.ram}
-                                        placeholder="Ingresa el ramo de RAM"
+                                        placeholder="Ingresa la RAM"
                                         type="text"
                                         onChange={onInputChange}
                                         autoComplete="ramDevice"
@@ -523,7 +787,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Tipo de RAM
                                 <div className={style.formInput}>
                                     <CustomSelect
-                                        placeholder="Selecciona tipo de RAM"
+                                        value={ramType}
                                         options={ramTypeOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setRamType(selected.value)
@@ -613,13 +877,14 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                         </div>
                     </>
                 )}
-                {temp1 == 'Laptop' && (
+                {deviceType == 'LAPTOP' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
                                 Sistema Operativo
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={os}
                                         placeholder="Selecciona el sistema operativo"
                                         options={osOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -683,7 +948,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                         isFormInput
                                         name="ram"
                                         value={formState.ram}
-                                        placeholder="Ingresa el ramo de RAM"
+                                        placeholder="Ingresa la RAM"
                                         type="text"
                                         onChange={onInputChange}
                                         autoComplete="ramDevice"
@@ -694,6 +959,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Tipo de RAM
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={ramType}
                                         placeholder="Selecciona tipo de RAM"
                                         options={ramTypeOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -765,6 +1031,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Usuario
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={user}
                                         placeholder="Selecciona al usuario"
                                         options={userOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -777,14 +1044,15 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     </>
                 )}
 
-                {temp1 == 'Impresora' && (
+                {deviceType == 'PRINTER' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
                                 Tipo de impresora
                                 <div className={style.formInput}>
                                     <CustomSelect
-                                        placeholder="Selecciona tipo de impresora"
+                                        value={printerType}
+                                        placeholder="Selecciona el tipo"
                                         options={printerTypeOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setPrinterType(selected.value)
@@ -813,6 +1081,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Tinta
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={inkType}
                                         placeholder="Selecciona Tinta"
                                         options={inkOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
@@ -833,14 +1102,49 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                             <section>
                                 Conexión inalambrica
                                 <div className={style.formInput}>
-                                    <CustomCheckBox checked={wifiConnection} setChecked={setWifiConnection} />
+                                    <CustomCheckBox
+                                        checked={printerWifiConnection}
+                                        setChecked={setPrinterWifiConnection}
+                                    />
                                 </div>
                             </section>
                         </div>
+                        {printerWifiConnection && (
+                            <div className={style.rowModal}>
+                                <section>
+                                    Dirección IP
+                                    <div className={style.formInput}>
+                                        <CustomInput
+                                            isFormInput
+                                            name="ip"
+                                            value={formState.ip}
+                                            placeholder="Ingresa el Dirección IP"
+                                            type="text"
+                                            onChange={onInputChange}
+                                            autoComplete="ipDevice"
+                                        />
+                                    </div>
+                                </section>
+                                <section>
+                                    Dirección MAC
+                                    <div className={style.formInput}>
+                                        <CustomInput
+                                            isFormInput
+                                            name="mac"
+                                            value={formState.mac}
+                                            placeholder="Ingresa la Dirección MAC"
+                                            type="text"
+                                            onChange={onInputChange}
+                                            autoComplete="macDevice"
+                                        />
+                                    </div>
+                                </section>
+                            </div>
+                        )}
                     </>
                 )}
 
-                {temp1 == 'Switch' && (
+                {deviceType == 'SWITCH' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
@@ -863,7 +1167,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                     <CustomInput
                                         isFormInput
                                         name="port"
-                                        value={formState.port}
+                                        value={formState.ports}
                                         placeholder="Ingresa el puerto"
                                         type="text"
                                         onChange={onInputChange}
@@ -875,16 +1179,19 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     </>
                 )}
 
-                {temp1 == 'Router' && (
+                {deviceType == 'ROUTER' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
-                                Tipo de Router
+                                Tipo de router
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={routerType}
                                         placeholder="Selecciona tipo de router"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                        options={routerTypeOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setRouterType(selected.value)
+                                        }}
                                     />
                                 </div>
                             </section>
@@ -912,7 +1219,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                         isFormInput
                                         name="mac"
                                         value={formState.mac}
-                                        placeholder="Ingresa la Dirección MAC"
+                                        placeholder="Ingresa la dirección MAC"
                                         type="text"
                                         onChange={onInputChange}
                                         autoComplete="macDevice"
@@ -925,7 +1232,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                     <CustomInput
                                         isFormInput
                                         name="port"
-                                        value={formState.port}
+                                        value={formState.ports}
                                         placeholder="Ingresa el puerto"
                                         type="text"
                                         onChange={onInputChange}
@@ -940,9 +1247,12 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Conectividad
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={routerConnectivity}
                                         placeholder="Selecciona tipo de conectividad"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                        options={connectivityRouterOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setRouterConnectivity(selected.value)
+                                        }}
                                     />
                                 </div>
                             </section>
@@ -950,9 +1260,12 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Capacidad
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={routerCapacity}
                                         placeholder="Selecciona rango de capacidad"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                        options={routerCapacityOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setRouterCapacity(selected.value)
+                                        }}
                                     />
                                 </div>
                             </section>
@@ -960,7 +1273,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     </>
                 )}
 
-                {temp1 == 'No-break' && (
+                {deviceType == 'NO-BREAK' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
@@ -980,10 +1293,14 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                             <section>
                                 Cantidad de enchufes
                                 <div className={style.formInput}>
-                                    <CustomSelect
-                                        placeholder="Selecciona la cantidad"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                    <CustomInput
+                                        isFormInput
+                                        name="plugs"
+                                        value={formState.plugs}
+                                        placeholder="Ingresa la cantidad"
+                                        type="text"
+                                        onChange={onInputChange}
+                                        autoComplete="plugsQuantity"
                                     />
                                 </div>
                             </section>
@@ -1008,7 +1325,7 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     </>
                 )}
 
-                {temp1 == 'Regulador' && (
+                {deviceType == 'VOLTAGE_REGULATOR' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
@@ -1028,10 +1345,14 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                             <section>
                                 Cantidad de enchufes
                                 <div className={style.formInput}>
-                                    <CustomSelect
-                                        placeholder="Selecciona la cantidad"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                    <CustomInput
+                                        isFormInput
+                                        name="plugs"
+                                        value={formState.plugs}
+                                        placeholder="Ingresa la cantidad"
+                                        type="text"
+                                        onChange={onInputChange}
+                                        autoComplete="plugsQuantity"
                                     />
                                 </div>
                             </section>
@@ -1039,16 +1360,19 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                     </>
                 )}
 
-                {temp1 == 'Proyector' && (
+                {deviceType == 'PROJECTOR' && (
                     <>
                         <div className={style.rowModal}>
                             <section>
                                 Resolución
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={projectorResolution}
                                         placeholder="Selecciona la resolución"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                        options={projectorResolutionOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setProjectorResolution(selected.value)
+                                        }}
                                     />
                                 </div>
                             </section>
@@ -1056,9 +1380,12 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                 Conectividad
                                 <div className={style.formInput}>
                                     <CustomSelect
+                                        value={projectorConnectivity}
                                         placeholder="Selecciona la conectividad"
-                                        options={optionTemp}
-                                        onSelect={handleSelect}
+                                        options={projectorConnectivityOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setProjectorConnectivity(selected.value)
+                                        }}
                                     />
                                 </div>
                             </section>
@@ -1091,6 +1418,14 @@ export const AddDeviceModal = ({ onClose }: Props) => {
                                         onChange={onInputChange}
                                         autoComplete="scopeDevice"
                                     />
+                                </div>
+                            </section>
+                        </div>
+                        <div className={style.rowModal}>
+                            <section>
+                                Control
+                                <div className={style.formInput}>
+                                    <CustomCheckBox checked={control} setChecked={setControl} />
                                 </div>
                             </section>
                         </div>

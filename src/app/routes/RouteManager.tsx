@@ -16,8 +16,11 @@ export const RouteManager = () => {
                     toastOptions={{
                         style: {
                             background: '#1D1E28',
+                            color: '#fff',
                         },
                     }}
+                    duration={3000}
+                    closeButton
                 />
                 <Navbar />
                 <Routes>

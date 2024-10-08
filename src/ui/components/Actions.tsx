@@ -30,20 +30,29 @@ const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = 
         if (!dropdownRef.current) return
         if (!parentRef) return
 
+        const rect = dropdownRef.current.getBoundingClientRect()
+        const dropdownHeight = 220
+        const dropdownTableHeight = 108
         if (table) {
-            const rect = dropdownRef.current.getBoundingClientRect()
-            setMenuPosition({
-                top: rect.bottom,
-                left: rect.left,
-            })
+            const spaceBelow = window.innerHeight - rect.bottom
+            const spaceAbove = rect.top
+            if (spaceBelow < dropdownTableHeight && spaceAbove > dropdownTableHeight) {
+                setMenuPosition({
+                    top: rect.top - dropdownTableHeight,
+                    left: rect.left,
+                })
+            } else {
+                setMenuPosition({
+                    top: rect.bottom,
+                    left: rect.left,
+                })
+            }
 
             setIsOpen((prev) => !prev)
         } else {
             if (dropdownRef.current && parentRef.current) {
                 const parentRect = parentRef.current.getBoundingClientRect()
-                const buttonRect = dropdownRef.current.getBoundingClientRect()
-                const dropdownHeight = 108
-                const spaceBelow = parentRect.height - buttonRect.top
+                const spaceBelow = parentRect.height - rect.top
 
                 if (spaceBelow > dropdownHeight) {
                     setOpenUpwards(false)

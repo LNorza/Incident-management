@@ -8,6 +8,7 @@ import { DeviceModal } from '../components/DevicePageContent/DeviceModal'
 export const DevicePage = () => {
     const [showModal, setShowModal] = useState(false)
     const [refreshTable, setRefreshTable] = useState(false)
+    const [deviceId, setDeviceId] = useState<string | undefined>(undefined)
 
     const optionTemp = [
         { label: 'Todos', value: 'ALL' },
@@ -17,12 +18,18 @@ export const DevicePage = () => {
     ]
 
     const onOpenModal = () => {
+        setDeviceId(undefined)
         setShowModal(true)
     }
 
     const onCloseModal = () => {
         setShowModal(false)
-        setRefreshTable((prev) => !prev) // Alterna el valor de refreshTable
+        setRefreshTable((prev) => !prev)
+    }
+
+    const handleEditModal = (deviceId: string) => {
+        setDeviceId(deviceId)
+        setShowModal(true)
     }
 
     const handleSelect = (selected: { label: string; value: string }) => {
@@ -46,11 +53,11 @@ export const DevicePage = () => {
                 </section>
 
                 <section>
-                    <DeviceTable refresh={refreshTable} />
+                    <DeviceTable refresh={refreshTable} editDevice={handleEditModal} />
                 </section>
             </div>
 
-            <DeviceModal isOpen={showModal} onClose={onCloseModal} />
+            <DeviceModal isOpen={showModal} deviceId={deviceId} onClose={onCloseModal} />
         </>
     )
 }

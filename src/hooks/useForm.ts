@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-export const useForm = <T>(initialForm: T) => {
+export const useForm = <T extends object>(initialForm: T) => {
     const [formState, setFormState] = useState<T>(initialForm)
 
     const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,11 +15,20 @@ export const useForm = <T>(initialForm: T) => {
         setFormState(initialForm)
     }
 
+    // Función para actualizar campos específicos
+    const updateFields = (updatedFields: Partial<T>) => {
+        setFormState((prevState) => ({
+            ...prevState,
+            ...updatedFields,
+        }))
+    }
+
     return {
         ...formState,
         formState,
         onInputChange,
         onResetForm,
         setFormState,
+        updateFields,
     }
 }
