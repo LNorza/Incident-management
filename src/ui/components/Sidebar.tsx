@@ -10,30 +10,12 @@ export const Sidebar = () => {
     const location = useLocation()
     const navigate = useNavigate()
 
-    const authContext = useContext(AuthContext)
-    const { logout } = authContext || { logged: false }
+    const { logout } = useContext(AuthContext)
 
     const handleLogOut = async () => {
-        try {
-            const response = await fetch('http://localhost:3000/logout', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                credentials: 'include',
-            })
-
-            if (response.ok) {
-                if (logout) {
-                    logout()
-                }
-                navigate('/login')
-            } else {
-                const data = await response.json()
-                console.error('Error en el logout:', data.message)
-            }
-        } catch (error) {
-            console.error('Error de red o del servidor:', error)
+        if (logout) {
+            await logout() // Llama a la función logout del contexto
+            navigate('/login') // Redirige al login después del logout
         }
     }
 
@@ -50,16 +32,6 @@ export const Sidebar = () => {
                         <span>Inicio</span>
                     </li>
                 </Link>
-                {/* 
-                <Link
-                    to="/profile"
-                    className={`${location.pathname === '/profile' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <User />
-                        <span>Perfil</span>
-                    </li>
-                </Link> */}
 
                 <Link
                     to="/build"

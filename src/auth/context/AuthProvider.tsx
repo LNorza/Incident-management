@@ -1,37 +1,71 @@
-import React, { ReactNode, useReducer } from "react";
-import { AuthContext } from "./AuthContext";
-import { AuthReducer } from "./authReducer";
-import { IUser } from "../../utils/interface/user";
-import { types } from "./types";
+import React, { ReactNode, useReducer } from 'react'
+import { AuthContext } from './AuthContext'
+import { AuthReducer } from './authReducer'
+import { IUser } from '../../utils/interface/user'
+import { types } from './types'
+import { toast } from 'sonner'
 
 // Define las props del AuthProvider
 interface AuthProviderProps {
-    children: ReactNode;
+    children: ReactNode
 }
 
-// Inicializa el estado desde localStorage
+// Inicializa el estado sin localStorage
 const init = () => {
-    const userString = localStorage.getItem("user");
-    const user = userString ? JSON.parse(userString) : null;
-
     return {
-        user: user || { username: "", password: "" },
-        logged: !!user,
-    };
-};
+        user: { username: '', password: '' },
+        logged: false,
+    }
+}
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [authState, dispatch] = useReducer(AuthReducer, init());
+    const [authState, dispatch] = useReducer(AuthReducer, init())
 
-    const login = (user: IUser) => {
-        localStorage.setItem("user", JSON.stringify(user)); // Almacena el usuario en localStorage
-        dispatch({ type: types.login, payload: user });
-    };
+    const login = async (user: IUser) => {
+        try {
+            const response = await fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(user),
+                credentials: 'include',
+            })
 
-    const logout = () => {
-        dispatch({ type: types.logout });
-        localStorage.removeItem("user"); // Elimina el usuario de localStorage
-    };
+            const data = await response.json()
 
-    return <AuthContext.Provider value={{ ...authState, login, logout }}>{children}</AuthContext.Provider>;
-};
+            if (response.ok) {
+                dispatch({ type: types.login, payload: data.user })
+                toast.success('Login exitoso')
+            } else {
+                toast.error(`Error: ${data.message}`)
+            }
+        } catch (error) {
+            toast.error('Error al conectar con el servidor')
+        }
+    }
+
+    const logout = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include', // Envío de cookies o tokens si es necesario
+            })
+
+            if (response.ok) {
+                dispatch({ type: types.logout })
+                toast.success('Logout exitoso')
+            } else {
+                const data = await response.json()
+                toast.error(`Error al cerrar sesión: ${data.message}`)
+            }
+        } catch (error) {
+            toast.error('Error al conectar con el servidor')
+        }
+    }
+
+    return <AuthContext.Provider value={{ ...authState, login, logout }}>{children}</AuthContext.Provider>
+}

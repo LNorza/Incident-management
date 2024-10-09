@@ -4,13 +4,13 @@ import { types } from "./types";
 // Define la interfaz para el estado
 interface AuthState {
   logged: boolean;
-  user: IUser; // Cambia a un tipo más específico si tienes una estructura de usuario
+  user: IUser;
 }
 
 // Define la interfaz para la acción
 interface Action {
   type: string;
-  payload?: any; // Cambia a un tipo más específico si es necesario
+  payload?: any;
 }
 
 // Valor inicial del estado

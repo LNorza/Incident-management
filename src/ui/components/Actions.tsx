@@ -12,7 +12,7 @@ interface Action {
 
 interface EditActionsProps {
     row: unknown
-    table: boolean
+    table?: boolean
     actions?: Action[]
     parentRef?: React.RefObject<HTMLDivElement>
 }

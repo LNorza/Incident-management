@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Device } from '../../../utils/enum/device.enum'
-import style from '../../style/modal.module.css'
 import API_BASE_URL from '../../../utils/api/apiConfig'
 
+import style from '../../style/modal.module.css'
 interface Props {
     onClose: () => void
     locationId?: string
@@ -25,6 +25,8 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
         } catch (err) {
             console.error(err)
         }
+
+        console.log('Device: ', devices)
     }
 
     return (
@@ -43,7 +45,7 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
 
                         {devices.length > 0 ? (
                             devices.map((device) => (
-                                <div key={device._id} className={style.deviceTableRow}>
+                                <div key={device.location_id._id} className={style.deviceTableRow}>
                                     <div className={style.deviceTableName}>{device.name}</div>
                                     <div className={style.deviceTableType}>{device.type}</div>
                                     <div className={style.deviceTableBrand}>{device.brand}</div>
