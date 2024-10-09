@@ -36,7 +36,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         { label: 'Switch', value: 'SWITCH' },
         { label: 'Router', value: 'ROUTER' },
         { label: 'Proyector', value: 'PROJECTOR' },
-        { label: 'Regulador', value: 'VOLTAGE_REGULATOR' },
+        { label: 'Regulador', value: 'VOLTAGE-REGULATOR' },
         { label: 'No-break', value: 'NO-BREAK' },
     ]
     const brandOptions: IOptions[] = [
@@ -388,7 +388,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
             })
         }
 
-        if (deviceData.type === 'VOLTAGE_REGULATOR') {
+        if (deviceData.type === 'VOLTAGE-REGULATOR') {
             const voltageRegulatorSpecs = deviceData.specs as IVoltageRegulator
             updateFields({
                 potence: voltageRegulatorSpecs.powerCapacity,
@@ -518,7 +518,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     backupTime: formState.backupTime,
                 },
             },
-            VOLTAGE_REGULATOR: {
+            'VOLTAGE-REGULATOR': {
                 specs: {
                     powerCapacity: formState.potence,
                     ports: formState.plugs,
@@ -570,7 +570,6 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                 <h2>{!deviceId ? 'Agregar equipo' : 'Editar equipo'}</h2>
             </div>
             <div className={style.modalDetail}>
-                {/*-------------------- Default elements --------------------*/}
                 <div className={style.rowModal}>
                     <section>
                         Nombre
@@ -663,15 +662,6 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     <section>
                         Fecha de compra
                         <div className={style.formInput}>
-                            {/* <CustomInput
-                                isFormInput
-                                name="buyDate"
-                                value={formState.buyDate}
-                                placeholder="Introduce la fecha"
-                                type="text"
-                                onChange={onInputChange}
-                                autoComplete="buyDate"
-                            /> */}
                             <DateInput
                                 value={buyDate}
                                 onChange={(value: Date | null) => {
@@ -695,8 +685,6 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     </section>
                 </div>
 
-                {/*-------------------- elements depends of type --------------------*/}
-                {/*------------- elements depends of type -------------*/}
                 {deviceType == 'PC' && (
                     <>
                         <div className={style.rowModal}>
@@ -706,9 +694,9 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                                     <CustomCheckBox checked={isShared} setChecked={setIsShared} />
                                 </div>
                             </section>
-                            <section>
+                            <section className={`${isShared ? style.disabled : ''}`}>
                                 Usuario
-                                <div className={style.formInput}>
+                                <div className={`${style.formInput}`}>
                                     <CustomSelect
                                         value={user}
                                         placeholder="Selecciona al usuario"
@@ -1339,7 +1327,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     </>
                 )}
 
-                {deviceType == 'VOLTAGE_REGULATOR' && (
+                {deviceType == 'VOLTAGE-REGULATOR' && (
                     <>
                         <div className={style.rowModal}>
                             <section>

@@ -62,7 +62,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, d
                         ? 'Router'
                         : type === 'PROJECTOR'
                         ? 'Proyector'
-                        : type === 'VOLTAGE_REGULATOR'
+                        : type === 'VOLTAGE-REGULATOR'
                         ? 'Regulador de voltaje'
                         : type === 'NO-BREAK'
                         ? 'No-break'
