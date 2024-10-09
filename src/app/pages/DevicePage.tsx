@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { CustomSelect } from '../../ui'
 import style from '../style/deviceContainer.module.css'
 import { DeviceTable } from '../components'
@@ -6,6 +6,7 @@ import { Plus } from 'lucide-react'
 import API_BASE_URL from '../../utils/api/apiConfig'
 import { DeviceModal } from '../components/DevicePageContent/DeviceModal'
 import { DeviceModalType } from '../../utils'
+import { getUserDepartment } from '../../utils/api/userData'
 
 export const DevicePage = () => {
     const [showModal, setShowModal] = useState(false)
@@ -13,13 +14,46 @@ export const DevicePage = () => {
     const [typeModal, setTypeModal] = useState<DeviceModalType>()
     const [deviceId, setDeviceId] = useState<string | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
+    const [departmentId, setDepartmentId] = useState<string | null>(null)
+    const [buildingsOptions, setBuildingsOptions] = useState<{ label: string; value: string }[]>([])
+    const [building, setBuilding] = useState<string>('ALL')
 
-    const optionTemp = [
-        { label: 'Todos', value: 'ALL' },
-        { label: 'Edificio A', value: 'BUILDING_A' },
-        { label: 'Edificio B', value: 'BUILDING_B' },
-        { label: 'Edificio C', value: 'BUILDING_C' },
-    ]
+    const fetchDepartment = async () => {
+        try {
+            const id = await getUserDepartment()
+            setDepartmentId(id)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchDepartment()
+    }, [])
+
+    const fetchBuildings = useCallback(async () => {
+        if (departmentId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?departmentId=${departmentId}`, {
+                    credentials: 'include',
+                })
+                const data = await response.json()
+                setBuildingsOptions([
+                    { label: 'Todos', value: '' },
+                    ...data.map((building: { _id: string; name: string }) => ({
+                        label: building.name,
+                        value: building._id,
+                    })),
+                ])
+            } catch (error) {
+                console.error('Error fetching buildings:', error)
+            }
+        }
+    }, [departmentId])
+
+    useEffect(() => {
+        fetchBuildings()
+    }, [departmentId, fetchBuildings])
 
     const onOpenModal = () => {
         setTypeModal('AddDevice')
@@ -57,7 +91,13 @@ export const DevicePage = () => {
 
     const handleSelect = (selected: { label: string; value: string }) => {
         console.log(selected)
+        setBuilding(selected.value)
+        setRefreshTable(true)
     }
+
+    useEffect(() => {
+        console.log('building', building)
+    }, [building])
 
     const deleteDevice = async () => {
         try {
@@ -80,7 +120,11 @@ export const DevicePage = () => {
                     <article>
                         <span>Edificio</span>
                         <div className={style.actionSection}>
-                            <CustomSelect value={optionTemp[0].value} options={optionTemp} onSelect={handleSelect} />
+                            <CustomSelect
+                                initialValue={buildingsOptions[0]}
+                                options={buildingsOptions}
+                                onSelect={handleSelect}
+                            />
                             <button onClick={onOpenModal} className={style.button}>
                                 <Plus /> Agregar
                             </button>
@@ -89,7 +133,12 @@ export const DevicePage = () => {
                 </section>
 
                 <section>
-                    <DeviceTable refresh={refreshTable} editDevice={handleEditModal} deleteDevice={handleDeleteModal} />
+                    <DeviceTable
+                        refresh={refreshTable}
+                        building={building}
+                        editDevice={handleEditModal}
+                        deleteDevice={handleDeleteModal}
+                    />
                 </section>
             </div>
 

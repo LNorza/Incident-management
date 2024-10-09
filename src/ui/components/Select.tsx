@@ -12,21 +12,28 @@ interface CustomSelectProps {
     options: Option[]
     onSelect: (selected: Option) => void
     value?: string
+    initialValue?: Option // Cambiado a tipo Option
 }
 
-export const CustomSelect = ({ placeholder, options, onSelect, value }: CustomSelectProps) => {
+export const CustomSelect = ({ placeholder, options, onSelect, value, initialValue }: CustomSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [openDirection, setOpenDirection] = useState<'up' | 'down'>('down')
-    const [selectedOption, setSelectedOption] = useState<string>(placeholder || 'Seleccionar una opción')
+
+    // Usar el initialValue si está presente, o el placeholder
+    const [selectedOption, setSelectedOption] = useState<Option | null>(
+        initialValue || (placeholder ? { label: placeholder, value: '' } : options.length > 0 ? options[0] : null),
+    )
 
     const selectRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         const preselectedOption = options.find((option) => option.value === value)
         if (preselectedOption) {
-            setSelectedOption(preselectedOption.label)
+            setSelectedOption(preselectedOption)
+        } else if (initialValue) {
+            setSelectedOption(initialValue)
         }
-    }, [value, options])
+    }, [value, options, initialValue])
 
     const toggleOptions = () => {
         if (selectRef.current) {
@@ -44,7 +51,7 @@ export const CustomSelect = ({ placeholder, options, onSelect, value }: CustomSe
     }
 
     const handleOptionClick = (option: Option) => {
-        setSelectedOption(option.label)
+        setSelectedOption(option)
         onSelect(option)
         setIsOpen(false)
     }
@@ -68,12 +75,14 @@ export const CustomSelect = ({ placeholder, options, onSelect, value }: CustomSe
         }
     }, [isOpen])
 
-    const isPlaceholder = selectedOption === placeholder || selectedOption === 'Seleccionar una opción'
+    const isPlaceholder = !selectedOption || (placeholder && selectedOption.label === placeholder)
 
     return (
         <div ref={selectRef} className={style.select}>
             <div className={`${style.selected} ${isOpen ? style.active : ''}`} onClick={toggleOptions}>
-                <span className={isPlaceholder ? style.placeholder : ''}>{selectedOption}</span>
+                <span className={isPlaceholder ? style.placeholder : ''}>
+                    {selectedOption ? selectedOption.label : 'Selecciona'}
+                </span>
                 <ChevronDown size={20} className={style.arrow} />
             </div>
 

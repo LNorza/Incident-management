@@ -67,6 +67,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         { label: 'Usuario 5', value: '5' },
     ]
     const osOptions: IOptions[] = [
+        { label: 'Windows 11', value: 'WINDOWS_11' },
         { label: 'Windows 10', value: 'WINDOWS_10' },
         { label: 'Windows 8', value: 'WINDOWS_8' },
         { label: 'Windows 7', value: 'WINDOWS_7' },

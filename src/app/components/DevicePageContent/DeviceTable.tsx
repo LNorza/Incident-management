@@ -9,6 +9,7 @@ import Actions from '../../../ui/components/Actions'
 
 interface DeviceTableProps {
     refresh: boolean
+    building: string
     editDevice: (deviceId: string) => void
     deleteDevice: (deviceId: string, deleteName: string) => void
 }
@@ -23,7 +24,7 @@ interface DeviceData {
     status: string
 }
 
-export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, deleteDevice }) => {
+export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
     const [rowData, setRowData] = useState<DeviceData[]>([])
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const contentRef = useRef<HTMLDivElement>(null)
@@ -39,34 +40,20 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, d
 
     const fetchDevices = useCallback(async () => {
         if (!departmentId) return
-
+        console.log('fetching devices', building)
         try {
-            const response = await fetch(`${API_BASE_URL}/devices-by-department/${departmentId}`, {
-                credentials: 'include',
-            })
+            const response = await fetch(
+                `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`,
+                {
+                    credentials: 'include',
+                },
+            )
             const data = await response.json()
 
             const formattedData = data.map(({ _id, name, type, brand, specs, location_id, status }: any) => ({
                 _id,
                 name,
-                type:
-                    type === 'LAPTOP'
-                        ? 'Laptop'
-                        : type === 'PC'
-                        ? 'Escritorio'
-                        : type === 'PRINTER'
-                        ? 'Impresora'
-                        : type === 'SWITCH'
-                        ? 'Switch'
-                        : type === 'ROUTER'
-                        ? 'Router'
-                        : type === 'PROJECTOR'
-                        ? 'Proyector'
-                        : type === 'VOLTAGE-REGULATOR'
-                        ? 'Regulador de voltaje'
-                        : type === 'NO-BREAK'
-                        ? 'No-break'
-                        : 'Desconocido',
+                type,
                 brand,
                 user: specs.user_id || 'Compartido',
                 location: location_id.name,
@@ -76,7 +63,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, d
         } catch (err) {
             console.error(err)
         }
-    }, [departmentId])
+    }, [departmentId, building])
 
     useEffect(() => {
         const fetchDepartment = async () => {
@@ -92,12 +79,74 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, editDevice, d
 
     useEffect(() => {
         fetchDevices()
-    }, [departmentId, refresh, fetchDevices])
+    }, [departmentId, refresh, fetchDevices, building])
 
     const colDefs: ColDef[] = [
         { field: 'name', headerName: 'Nombre de equipo', sortable: true, width: 270 }, // Usa flex
-        { field: 'type', headerName: 'Tipo', sortable: true, flex: 1 },
-        { field: 'brand', headerName: 'Marca', sortable: true, flex: 1 },
+        {
+            field: 'type',
+            headerName: 'Tipo',
+            sortable: true,
+            flex: 1,
+            cellRenderer: (params: ICellRendererParams) => {
+                switch (params.value) {
+                    case 'LAPTOP':
+                        return 'Laptop'
+                    case 'PC':
+                        return 'Escritorio'
+                    case 'PRINTER':
+                        return 'Impresora'
+                    case 'SWITCH':
+                        return 'Switch'
+                    case 'ROUTER':
+                        return 'Router'
+                    case 'PROJECTOR':
+                        return 'Proyector'
+                    case 'VOLTAGE-REGULATOR':
+                        return 'Regulador de voltaje'
+                    case 'NO-BREAK':
+                        return 'No-break'
+                    default:
+                        return 'Desconocido'
+                }
+            },
+        },
+        {
+            field: 'brand',
+            headerName: 'Marca',
+            sortable: true,
+            flex: 1,
+            cellRenderer: (params: ICellRendererParams) => {
+                switch (params.value) {
+                    case 'HP':
+                        return 'HP'
+                    case 'DELL':
+                        return 'Dell'
+                    case 'LENOVO':
+                        return 'Lenovo'
+                    case 'ACER':
+                        return 'Acer'
+                    case 'ASUS':
+                        return 'Asus'
+                    case 'APPLE':
+                        return 'Apple'
+                    case 'SAMSUNG':
+                        return 'Samsung'
+                    case 'EPSON':
+                        return 'Epson'
+                    case 'CISCO':
+                        return 'Cisco'
+                    case 'LINKSYS':
+                        return 'Linksys'
+                    case 'KOBLENZ':
+                        return 'Koblenz'
+                    case 'OTHER':
+                        return 'Otra'
+                    default:
+                        return 'Desconocida'
+                }
+            },
+        },
         { field: 'user', headerName: 'Usuario', sortable: true, flex: 1 },
         { field: 'location', headerName: 'Locación', sortable: true, flex: 1 },
         {
