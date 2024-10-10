@@ -221,9 +221,12 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const fetchOffices = useCallback(async () => {
         if (building) {
             try {
-                const response = await fetch(`${API_BASE_URL}/locations-search?buildingId=${buildingId}`, {
-                    credentials: 'include',
-                })
+                const response = await fetch(
+                    `${API_BASE_URL}/locations-search?buildingId=${buildingId}&departmentId=${departmentId}`,
+                    {
+                        credentials: 'include',
+                    },
+                )
                 const data = await response.json()
                 setOfficesOptions(
                     data.map((office: { _id: string; name: string }) => ({
@@ -1014,7 +1017,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                                     />
                                 </div>
                             </section>
-                            <section>
+                            <section className={` ${laptopWifiConnection ? style.disabled : ''}`}>
                                 Puerto al que está conectado
                                 <div className={style.formInput}>
                                     <CustomInput
@@ -1169,12 +1172,12 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                                 <div className={style.formInput}>
                                     <CustomInput
                                         isFormInput
-                                        name="port"
+                                        name="ports"
                                         value={formState.ports}
                                         placeholder="Ingresa el puerto"
                                         type="text"
                                         onChange={onInputChange}
-                                        autoComplete="portDevice"
+                                        autoComplete="portsDevice"
                                     />
                                 </div>
                             </section>
@@ -1234,12 +1237,12 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                                 <div className={style.formInput}>
                                     <CustomInput
                                         isFormInput
-                                        name="port"
+                                        name="ports"
                                         value={formState.ports}
                                         placeholder="Ingresa el puerto"
                                         type="text"
                                         onChange={onInputChange}
-                                        autoComplete="portDevice"
+                                        autoComplete="portsDevice"
                                     />
                                 </div>
                             </section>

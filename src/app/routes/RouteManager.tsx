@@ -14,11 +14,10 @@ export const RouteManager = () => {
                 theme="dark"
                 toastOptions={{
                     style: {
-                        background: '#1D1E28',
                         color: '#fff',
                     },
                 }}
-                duration={3000}
+                duration={300000}
                 closeButton
             />
             <div className={`${style.container}`}>

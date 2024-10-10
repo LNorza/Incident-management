@@ -87,3 +87,11 @@ li {
     color: var(--White) !important;
     border-radius: 100% !important;
 }
+
+:where([data-sonner-toast][data-mounted='true']) {
+    height: 40px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding-left: 16px !important;
+    background-color: var(--BackgroundGray) !important;
+}
