@@ -1,9 +1,9 @@
 import { createContext } from 'react'
-import { IUser } from '../../utils/interface/user'
+import { IUserLogin } from '../../utils/interface/user'
 
 // Define la interfaz para el contexto de autenticación
 interface AuthContextType {
-    user: IUser
+    user: IUserLogin
     logged: boolean
     login: (user: any) => void
     logout: () => void

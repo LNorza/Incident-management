@@ -1,10 +1,10 @@
-import { IUser } from "../../utils/interface/user";
+import { IUserLogin } from "../../utils/interface/user";
 import { types } from "./types";
 
 // Define la interfaz para el estado
 interface AuthState {
   logged: boolean;
-  user: IUser;
+  user: IUserLogin;
 }
 
 // Define la interfaz para la acción

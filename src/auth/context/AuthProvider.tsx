@@ -1,7 +1,7 @@
 import React, { ReactNode, useReducer } from 'react'
 import { AuthContext } from './AuthContext'
 import { AuthReducer } from './authReducer'
-import { IUser } from '../../utils/interface/user'
+import { IUserLogin } from '../../utils/interface/user'
 import { types } from './types'
 import { toast } from 'sonner'
 
@@ -22,7 +22,7 @@ const init = () => {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [authState, dispatch] = useReducer(AuthReducer, {}, init)
 
-    const login = async (user: IUser) => {
+    const login = async (user: IUserLogin) => {
         try {
             const response = await fetch('http://localhost:3000/login', {
                 method: 'POST',

@@ -15,27 +15,29 @@ export const Dashboard = () => {
                 const userData = await getUserData()
                 setUserData(userData)
 
-                await fetchDevicesNumber()
+                if (userData) {
+                    console.log('id', userData.department_id)
+
+                    await fetchDevicesNumber(userData.department_id)
+                }
             } catch (error) {
                 console.error('Error fetching data:', error)
             }
         }
         fetchData()
-    })
+    }, []) // Agregamos las dependencias adecuadas
 
-    const fetchDevicesNumber = async () => {
+    const fetchDevicesNumber = async (departmentId: string) => {
         try {
-            if (userData) {
-                const response = await fetch(`${API_BASE_URL}/number-devices-by-department/${userData.department_id}`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    credentials: 'include',
-                })
-                const devicesNumber = await response.json()
-                setDevicesNumber(devicesNumber)
-            }
+            const response = await fetch(`${API_BASE_URL}/number-devices-by-department/${departmentId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            const devicesNumber = await response.json()
+            setDevicesNumber(devicesNumber)
         } catch (error) {
             console.error(error)
         }
