@@ -25,14 +25,14 @@ export const AuthReducer = (state: AuthState = initialState, action: Action): Au
       return {
         ...state,
         logged: true,
-        user: action.payload,
+        user: state.user, // No se actualiza el usuario, ya que no es necesario almacenarlo
       };
 
     case types.logout:
       return {
         ...state,
         logged: false,
-        user: initialState.user,
+        user: initialState.user, // Se mantiene como en el estado inicial
       };
 
     default:

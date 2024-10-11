@@ -10,16 +10,17 @@ interface AuthProviderProps {
     children: ReactNode
 }
 
-// Inicializa el estado sin localStorage
+// Inicializa el estado con sessionStorage (si está disponible)
 const init = () => {
+    const token = sessionStorage.getItem('token')
     return {
-        user: { username: '', password: '' },
-        logged: false,
+        user: { username: '', password: '' }, // Puedes tener un usuario vacío, ya que no necesitas los detalles
+        logged: !!token, // Si hay un token, el usuario está logueado
     }
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-    const [authState, dispatch] = useReducer(AuthReducer, init())
+    const [authState, dispatch] = useReducer(AuthReducer, {}, init)
 
     const login = async (user: IUser) => {
         try {
@@ -35,7 +36,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const data = await response.json()
 
             if (response.ok) {
-                dispatch({ type: types.login, payload: data.user })
+                // Guarda el token en sessionStorage
+                sessionStorage.setItem('token', data.token)
+                dispatch({ type: types.login })
                 toast.success('Login exitoso')
             } else {
                 toast.error(`Error: ${data.message}`)
@@ -52,10 +55,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include', // Envío de cookies o tokens si es necesario
+                credentials: 'include', // Para enviar cookies o tokens si es necesario
             })
 
             if (response.ok) {
+                // Eliminar el token de sessionStorage al hacer logout
+                sessionStorage.removeItem('token')
                 dispatch({ type: types.logout })
                 toast.success('Logout exitoso')
             } else {
