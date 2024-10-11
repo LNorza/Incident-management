@@ -8,6 +8,7 @@
     --SidebarText: #87888c;
     --SidebarActiveText: #242425;
     --LineGray: #323343;
+    --LineLightGray: #41424d;
 
     --MainGreenColor: #a9dfd8;
     --MainGreenColorHover: #85c6bb;
@@ -52,6 +53,7 @@ h3 {
 h4 {
     font-size: 1em !important;
     line-height: 1.5 !important;
+    font-weight: 400 !important;
 }
 
 li {

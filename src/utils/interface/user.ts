@@ -1,9 +1,13 @@
 export interface ISignin {
-  access_token: string;
-  user: IUser;
+    access_token: string
+    user: IUser
 }
 
 export interface IUser {
-  username: string;
-  password: string;
+    id: number
+    name: string
+    position: string
+    username?: string
+    password?: string
+    department_id: string
 }

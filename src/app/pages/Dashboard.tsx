@@ -1,8 +1,46 @@
-import { CalendarRange, UserRound } from "lucide-react";
-import { AreaChart, IncidentsOfMonth, SemiCircleChart } from "../components";
-import style from "../style/cardContainer.module.css";
+import { useState, useEffect } from 'react'
+import { getUserData } from '../../utils/api/userData'
+import { AreaChart, IncidentsOfMonth, SemiCircleChart } from '../components'
+import { IUser } from '../../utils/interface/user'
+import API_BASE_URL from '../../utils/api/apiConfig'
+import style from '../style/cardContainer.module.css'
 
 export const Dashboard = () => {
+    const [userData, setUserData] = useState<IUser | null>(null)
+    const [devicesNumber, setDevicesNumber] = useState<number | null>(0)
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userData = await getUserData()
+                setUserData(userData)
+
+                await fetchDevicesNumber()
+            } catch (error) {
+                console.error('Error fetching data:', error)
+            }
+        }
+        fetchData()
+    })
+
+    const fetchDevicesNumber = async () => {
+        try {
+            if (userData) {
+                const response = await fetch(`${API_BASE_URL}/number-devices-by-department/${userData.department_id}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                })
+                const devicesNumber = await response.json()
+                setDevicesNumber(devicesNumber)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+
     return (
         <>
             <section className={`${style.container} animate__animated animate__fadeInDown`}>
@@ -22,23 +60,21 @@ export const Dashboard = () => {
                     </div>
 
                     <div className={`${style.smallCard}`}>
-                        <div className={`${style.smallCardUser}`}>
-                            <div className={`${style.smallCardUserIcon}`}>
-                                <UserRound color="#feaf5a" size={64} />
-                            </div>
-
+                        <div className={`${style.smallCardContent}`}>
                             <div>
-                                <h4>Usuario</h4>
-                                <p className={`${style.pSubTitle}`}>Lionel Andrés Messi Cuccittini</p>
+                                <h3 className={style.p4}>Usuario</h3>
+                                <p className={`${style.pSubTitle}`}>{userData ? userData.name : ''}</p>
                             </div>
                         </div>
-                        <div className={`${style.smallCardPeriod}`}>
-                            <div className={`${style.smallCardPeriodIcon}`}>
-                                <CalendarRange color="#feaf5a" size={64} />
-                            </div>
-
+                        <div className={`${style.smallCardContent}`}>
                             <div>
-                                <h4>Periodo</h4>
+                                <h3 className={style.p4}>Puesto</h3>
+                                <p className={`${style.pSubTitle}`}>{userData ? userData.position : ''}</p>
+                            </div>
+                        </div>
+                        <div className={`${style.smallCardContent}`}>
+                            <div>
+                                <h3 className={style.p4}>Periodo</h3>
                                 <p className={`${style.pSubTitle} ${style.pSmall}`}>AGO-DEC 2024</p>
                             </div>
                         </div>
@@ -51,7 +87,7 @@ export const Dashboard = () => {
                     <div>
                         <h2>Equipos</h2>
                         <p className={`${style.pSubTitle}`}>Total de equipos</p>
-                        <h1 className={`${style.p2}`}>235</h1>
+                        <h1 className={`${style.p2}`}>{devicesNumber ? devicesNumber : 0}</h1>
                         <p className={`${style.pMiddleSubTitle}`}>Equipos funcionando</p>
                     </div>
                     <SemiCircleChart />
@@ -65,5 +101,5 @@ export const Dashboard = () => {
                 </section>
             </section>
         </>
-    );
-};
+    )
+}

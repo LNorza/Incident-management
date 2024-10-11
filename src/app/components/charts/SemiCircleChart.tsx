@@ -1,11 +1,11 @@
-import ReactApexChart from "react-apexcharts";
+import ReactApexChart from 'react-apexcharts'
 
 export const SemiCircleChart = () => {
-    const series = [76];
+    const series = [100]
 
     const options: ApexCharts.ApexOptions = {
         chart: {
-            type: "radialBar",
+            type: 'radialBar',
             toolbar: {
                 show: false, // Opcional, oculta la barra de herramientas del gráfico
             },
@@ -15,8 +15,8 @@ export const SemiCircleChart = () => {
                 startAngle: -90,
                 endAngle: 90,
                 track: {
-                    background: "#2B2B36",
-                    strokeWidth: "90%", // Aumenta el grosor de la barra radial
+                    background: '#2B2B36',
+                    strokeWidth: '90%', // Aumenta el grosor de la barra radial
                     margin: 1, // Espacio entre la barra y el fondo
                 },
                 dataLabels: {
@@ -24,14 +24,14 @@ export const SemiCircleChart = () => {
                         show: false,
                     },
                     value: {
-                        fontSize: "20px",
-                        color: "#FFFFFF",
+                        fontSize: '20px',
+                        color: '#FFFFFF',
                     },
                 },
             },
         },
         fill: {
-            colors: ["#a9dfd8"],
+            colors: ['#a9dfd8'],
         },
         grid: {
             padding: {
@@ -41,11 +41,11 @@ export const SemiCircleChart = () => {
                 right: 0,
             },
         },
-    };
+    }
 
     return (
-        <div id="chart" style={{ display: "flex", justifyContent: "center" }}>
+        <div id="chart" style={{ display: 'flex', justifyContent: 'center' }}>
             <ReactApexChart options={options} series={series} type="radialBar" width={400} height={340} />
         </div>
-    );
-};
+    )
+}
