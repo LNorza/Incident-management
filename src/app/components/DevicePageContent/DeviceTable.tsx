@@ -203,7 +203,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                 ],
             }),
             autoHeight: true,
-            flex: 1, // Usa flex para las acciones
+            flex: 0.7, // Usa flex para las acciones
         },
     ]
 

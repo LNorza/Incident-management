@@ -127,7 +127,7 @@ const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = 
                         style={{
                             position: 'absolute',
                             top: `${menuPosition.top}px`,
-                            left: '77%',
+                            left: '80%',
                         }}
                     >
                         {actions.map((action, index) => showOrHide(action, index))}
