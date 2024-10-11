@@ -12,7 +12,7 @@ import {
     IProjector,
     IVoltageRegulator,
     INoBreak,
-} from '../../../utils/enum/device.enum'
+} from '../../../utils'
 import { Laptop } from 'lucide-react'
 import { toast } from 'sonner'
 import style from '../../style/modal.module.css'
@@ -290,7 +290,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         if (deviceData.type === 'PC') {
             const pcSpecs = deviceData.specs as IComputerSpecs
             updateFields({
-                motherBoard: pcSpecs.motherboard,
+                motherBoard: pcSpecs.motherBoard,
                 processor: pcSpecs.cpu,
                 graphicCard: pcSpecs.gpu,
                 ram: pcSpecs.ram,
@@ -459,7 +459,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
             PC: {
                 specs: {
                     os: os,
-                    motherboard: formState.motherBoard,
+                    motherBoard: formState.motherBoard,
                     cpu: formState.processor,
                     gpu: formState.graphicCard,
                     ram: formState.ram,
