@@ -290,7 +290,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         if (deviceData.type === 'PC') {
             const pcSpecs = deviceData.specs as IComputerSpecs
             updateFields({
-                motherBoard: pcSpecs.motherBoard,
+                motherBoard: pcSpecs.motherboard,
                 processor: pcSpecs.cpu,
                 graphicCard: pcSpecs.gpu,
                 ram: pcSpecs.ram,
@@ -459,7 +459,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
             PC: {
                 specs: {
                     os: os,
-                    motherBoard: formState.motherBoard,
+                    motherboard: formState.motherBoard,
                     cpu: formState.processor,
                     gpu: formState.graphicCard,
                     ram: formState.ram,
