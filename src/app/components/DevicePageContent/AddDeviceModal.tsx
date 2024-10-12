@@ -794,6 +794,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                                 <div className={style.formInput}>
                                     <CustomSelect
                                         value={ramType}
+                                        placeholder="Selecciona tipo de RAM"
                                         options={ramTypeOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setRamType(selected.value)
