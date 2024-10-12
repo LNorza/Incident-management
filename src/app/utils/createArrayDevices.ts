@@ -9,10 +9,8 @@ import {
   IProjector,
   INoBreak,
   IVoltageRegulator,
-  IDeviceInfo,
   getStatusTranslation,
 } from '../../utils'
-import { useState } from 'react'
 import { dateFormatter } from '../../utils/formatter/date.formatter'
 
 export const HeadersPC = [
@@ -162,11 +160,6 @@ export const headerDevices = (type: string) => {
       return 'Tipo de dispositivo no soportado'
   }
 }
-
-
-// const projectorSpecs = device.specs as IProjector
-// const noBreakSpecs = device.specs as INoBreak
-// const voltageRegulatorSpecs = device.specs as IVoltageRegulator
 
 export const createArrayDevices = (device: Device): string[] | null => {
   let deviceInfo = [device.name ?? '', device.type ?? '', device.brand ?? '', device.deviceModel ?? '']

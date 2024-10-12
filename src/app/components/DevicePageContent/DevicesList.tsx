@@ -64,7 +64,8 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
                     <h2>Equipos</h2>
                 </div>
                 {getDeviceInfo && (
-                    <div className={style.deviceInfoContainer}>
+                    // <div className={style.deviceInfoContainer}>
+                    <div className={style.devicesListContainer}>
                         <div className={style.deviceGetInfoContainer}>
                             {device.map((info, index) => (
                                 <section key={index}>
