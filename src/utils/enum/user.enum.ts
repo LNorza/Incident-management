@@ -1,0 +1,1 @@
+export type UserModalType = 'AddUser' | 'EditUser' | 'DeleteUser'
