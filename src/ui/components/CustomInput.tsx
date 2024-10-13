@@ -14,8 +14,8 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 
 export const CustomInput = ({ icon, isFormInput, ...props }: Props) => {
     return (
-        <div className={styles.inputContainer}>
-            <span className={styles.inputIcon}>{icon}</span>
+        <div className={` ${styles.inputContainer}  ${icon ? styles.icon : ''}`}>
+            {icon && <span className={`${styles.inputIcon} ${icon ? styles.icon : ''}`}>{icon}</span>}
             <input {...props} className={`${styles.inputField} ${isFormInput ? styles.form : ''}`} />
         </div>
     )
