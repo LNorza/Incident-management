@@ -12,7 +12,7 @@ interface Props {
 
 export const DevicesListModal = ({ locationId, onClose }: Props) => {
     const [devices, setDevices] = useState<Device[]>([])
-    const [device, setDevice] = useState<string[]>([]) // Cambiado a un arreglo de strings
+    const [device, setDevice] = useState<string[]>([])
     const [getDeviceInfo, setGetDeviceInfo] = useState(false)
     const [deviceHeadersInfo, setDeviceHeadersInfo] = useState<string[]>([])
 
@@ -68,7 +68,12 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
                             {device.map((info, index) => (
                                 <section key={index}>
                                     <div className={style.deviceInfoTitle}>{deviceHeadersInfo[index]}</div>
-                                    <div className={style.deviceInfoContent}>
+                                    <div
+                                        className={`
+                                        ${index >= device.length - 2 ? `${style.deviceInfoContent}` : ''}
+                                        ${info === 'Expirada' ? `${style.expired}` : ''}
+                                        `}
+                                    >
                                         {info} {/* Renderiza la información del dispositivo */}
                                     </div>
                                 </section>

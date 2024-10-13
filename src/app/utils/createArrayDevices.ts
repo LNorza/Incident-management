@@ -174,13 +174,12 @@ export const createArrayDevices = (device: Device): string[] | null => {
     return new Date(device.purchaseDate) >= currentDate ? 'Vigente' : 'Expirada';
   };
 
-  console.log('DEvice', device);
-  // Llamar a la función después de su declaración
+  const deviceBoolean = (value: boolean | undefined): string => {
+    return value ? 'Si' : 'No'
+  }
+
   const deviceWarranty = warrantyValue();
   if (!device) return null
-
-  // Datos generales del dispositivo, con valores por defecto si están indefinidos
-
 
   switch (device.type) {
     case 'PC':
@@ -228,8 +227,8 @@ export const createArrayDevices = (device: Device): string[] | null => {
         printerSpecs.printerType ?? '',
         printerSpecs.tonerType ?? '',
         printerSpecs.printerInk ?? '',
-        String(printerSpecs.scanner) ?? '', // Convertir a string
-        String(printerSpecs.wifiConnection) ?? '', // Convertir a string
+        deviceBoolean(printerSpecs.scanner),
+        deviceBoolean(printerSpecs.wifiConnection),
         printerSpecs.ipAddress ?? '',
         printerSpecs.macAddress ?? '',
         deviceDate,
@@ -283,7 +282,7 @@ export const createArrayDevices = (device: Device): string[] | null => {
         projectorSpecs.connectivity ?? '',
         projectorSpecs.brightness ?? '',
         projectorSpecs.scope ?? '',
-        String(projectorSpecs.control) ?? '',
+        deviceBoolean(projectorSpecs.control),
         deviceDate,
         deviceWarranty,
         deviceStatus,
