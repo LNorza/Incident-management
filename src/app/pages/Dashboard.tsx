@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
-import { IncidentsOfMonth, SemiCircleChart } from '../components'
+import { AreaChart, IncidentsOfMonth, SemiCircleChart } from '../components'
 import { API_BASE_URL, getUserData } from '../../utils/api'
 import { IUser } from '../../utils'
-import { AreaChart } from 'lucide-react'
 import style from '../style/cardContainer.module.css'
 
 export const Dashboard = () => {
