@@ -30,6 +30,9 @@ export const getUserData = async (): Promise<IUser | null> => {
                     ? 'Docente'
                     : 'Desconocido',
             department_id: user.department_id.toString(),
+            role: user.role,
+            email: user.email,
+            username: user.username,
             imageUrl: user.imageUrl,
         }
 

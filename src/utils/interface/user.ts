@@ -6,9 +6,11 @@ export interface ISignin {
 export interface IUser {
     id: number
     name: string
-    position: string
+    email: string
     username?: string
     password?: string
+    position: string
+    role: string
     department_id: string
     imageUrl?: string
 }
