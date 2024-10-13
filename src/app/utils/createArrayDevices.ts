@@ -167,12 +167,17 @@ export const createArrayDevices = (device: Device): string[] | null => {
   const deviceDate = dateFormatter(new Date(device.purchaseDate))
 
   const warrantyValue = (): string => {
-    const aux = new Date();
-    const currentDate = aux; // Se compara directamente como objetos Date
+    const currentDate = new Date(); // Fecha actual
+    const purchaseDate = new Date(device.purchaseDate); // Convertir string a Date
+    const warrantyEndDate = new Date(purchaseDate); // Crear una copia de la fecha de compra
 
-    // Compara directamente las fechas
-    return new Date(device.purchaseDate) >= currentDate ? 'Vigente' : 'Expirada';
+    // Sumar los años de garantía a la fecha de compra
+    warrantyEndDate.setFullYear(purchaseDate.getFullYear() + device.warrantyYears);
+
+    // Compara la fecha actual con la fecha de fin de garantía
+    return currentDate <= warrantyEndDate ? 'Vigente' : 'Expirada';
   };
+
 
   const deviceBoolean = (value: boolean | undefined): string => {
     return value ? 'Si' : 'No'
