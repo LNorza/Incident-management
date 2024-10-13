@@ -1,14 +1,22 @@
 .navbar {
-	position: relative;
-	height: fit-content;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	z-index: 1000;
+    position: relative;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 1000;
 }
 
 .navbarIcons {
-	display: flex;
-	gap: 16px;
-	align-items: center;
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.userImage {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center;
 }

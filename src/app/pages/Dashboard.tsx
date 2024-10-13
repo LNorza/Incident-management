@@ -16,8 +16,6 @@ export const Dashboard = () => {
                 setUserData(userData)
 
                 if (userData) {
-                    console.log('id', userData.department_id)
-
                     await fetchDevicesNumber(userData.department_id)
                 }
             } catch (error) {
