@@ -1,5 +1,5 @@
-import API_BASE_URL from './apiConfig'
 import { IUser } from '../interface'
+import { API_BASE_URL } from './apiConfig'
 
 export const getUserData = async (): Promise<IUser | null> => {
   try {

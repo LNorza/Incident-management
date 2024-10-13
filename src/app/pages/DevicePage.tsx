@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
+import { DeviceModal, DeviceTable } from '../components'
+import { API_BASE_URL, getUserDepartment } from '../../utils/api'
 import { CustomSelect } from '../../ui'
-import style from '../style/deviceContainer.module.css'
-import { DeviceTable } from '../components'
+import { DeviceModalType, IOptions } from '../../utils'
 import { Plus } from 'lucide-react'
-import API_BASE_URL from '../../utils/api/apiConfig'
-import { DeviceModal } from '../components/DevicePageContent/DeviceModal'
-import { DeviceModalType } from '../../utils'
-import { getUserDepartment } from '../../utils/api/userData'
+import style from '../style/deviceContainer.module.css'
 
 export const DevicePage = () => {
     const [showModal, setShowModal] = useState(false)
@@ -15,7 +13,7 @@ export const DevicePage = () => {
     const [deviceId, setDeviceId] = useState<string | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
     const [departmentId, setDepartmentId] = useState<string | null>(null)
-    const [buildingsOptions, setBuildingsOptions] = useState<{ label: string; value: string }[]>([])
+    const [buildingsOptions, setBuildingsOptions] = useState<IOptions[]>([])
     const [building, setBuilding] = useState<string>('ALL')
 
     const fetchDepartment = async () => {
