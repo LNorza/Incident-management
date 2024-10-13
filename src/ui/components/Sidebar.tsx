@@ -1,4 +1,4 @@
-import { Building2, House, Laptop, LogOut } from 'lucide-react'
+import { Building2, House, Laptop, LogOut, Users } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import style from '../style/sidebar.module.css'
 import { useContext } from 'react'
@@ -30,6 +30,16 @@ export const Sidebar = () => {
                     <li>
                         <House />
                         <span>Inicio</span>
+                    </li>
+                </Link>
+
+                <Link
+                    to="/user"
+                    className={`${location.pathname === '/user' ? style.sidebarSelected : style.nonSelected}`}
+                >
+                    <li>
+                        <Users />
+                        <span>Usuarios</span>
                     </li>
                 </Link>
 

@@ -17,7 +17,7 @@ interface EditActionsProps {
     parentRef?: React.RefObject<HTMLDivElement>
 }
 
-const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = [] }) => {
+export const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = [] }) => {
     const [isOpen, setIsOpen] = useState<boolean>(false)
     const dropdownRef = useRef<HTMLDivElement | null>(null)
     const dropdownMenuRef = useRef<HTMLDivElement | null>(null)
@@ -137,5 +137,3 @@ const Actions: React.FC<EditActionsProps> = ({ row, table, parentRef, actions = 
         </div>
     )
 }
-
-export default Actions

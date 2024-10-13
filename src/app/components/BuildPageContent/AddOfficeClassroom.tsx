@@ -1,11 +1,10 @@
-import { useForm } from '../../../hooks'
 import { useEffect, useState } from 'react'
-import { getUserDepartment } from '../../../utils/api/userData'
-import { CustomInput, CustomSelect, CustomCheckBox } from '../../../ui'
-import { toast } from 'sonner'
 import { OfficeProps } from '../../../utils'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { CustomInput, CustomSelect, CustomCheckBox } from '../../../ui'
+import { useForm } from '../../../hooks'
+import { toast } from 'sonner'
 import { Building } from 'lucide-react'
-import API_BASE_URL from '../../../utils/api/apiConfig'
 import style from '../../style/modal.module.css'
 
 interface Props {

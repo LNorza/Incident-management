@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
-import { Trash2, Pencil } from 'lucide-react'
 import { myTheme } from '../../../utils'
-import API_BASE_URL from '../../../utils/api/apiConfig'
-import { getUserDepartment } from '../../../utils/api/userData'
-import Actions from '../../../ui/components/Actions'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { Actions } from '../../../ui'
+import { Trash2, Pencil } from 'lucide-react'
+import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 
 interface DeviceTableProps {
     refresh: boolean

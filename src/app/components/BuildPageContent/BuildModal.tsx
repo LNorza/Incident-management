@@ -1,10 +1,10 @@
 import { AddBuildModal } from './AddBuildModal'
 import { BuildModalType, BuildingProps, OfficeProps } from '../../../utils'
-import { AddOfficeClassroom } from './AddOfficeClassroom'
-import { DeleteModal } from '../../../ui/components/DeleteModal'
 import { DevicesListModal } from '../DevicePageContent/DevicesList'
+import { AddOfficeClassroom } from './AddOfficeClassroom'
 
 import style from '../../style/modal.module.css'
+import { DeleteModal } from '../../../ui/components/DeleteModal'
 
 interface Props {
     isOpen: boolean

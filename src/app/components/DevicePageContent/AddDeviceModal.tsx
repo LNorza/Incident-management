@@ -1,7 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getUserDepartment } from '../../../utils/api/userData'
-import { useForm } from '../../../hooks'
-import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
 import {
     Device,
     IComputerSpecs,
@@ -12,13 +9,15 @@ import {
     IProjector,
     IVoltageRegulator,
     INoBreak,
+    IOptions,
 } from '../../../utils'
-import { Laptop } from 'lucide-react'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
+import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
-import style from '../../style/modal.module.css'
 import { DateInput } from 'rsuite'
-import { IOptions } from '../../../utils/interface/options'
-import API_BASE_URL from '../../../utils/api/apiConfig'
+import { Laptop } from 'lucide-react'
+import style from '../../style/modal.module.css'
 
 interface Props {
     deviceId?: string | undefined

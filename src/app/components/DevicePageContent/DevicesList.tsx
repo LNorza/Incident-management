@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Device } from '../../../utils'
-import API_BASE_URL from '../../../utils/api/apiConfig'
-
-import style from '../../style/modal.module.css'
+import { API_BASE_URL } from '../../../utils/api'
 import { createArrayDevices, headerDevices } from '../../utils/createArrayDevices'
 import { toast } from 'sonner'
+import style from '../../style/modal.module.css'
 
 interface Props {
     onClose: () => void

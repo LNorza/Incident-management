@@ -1,14 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState, useEffect } from 'react'
+import { BuildingProps, IOptions } from '../../../utils'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
-import { Building } from 'lucide-react'
-import { BuildingProps } from '../../../utils'
 import { toast } from 'sonner'
-import { getUserDepartment } from '../../../utils/api/userData'
-import API_BASE_URL from '../../../utils/api/apiConfig'
+import { Building } from 'lucide-react'
 import style from '../../style/modal.module.css'
-import { IOptions } from '../../../utils/interface/options'
 
 interface Props {
     onClose: () => void

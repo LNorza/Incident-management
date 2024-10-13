@@ -1,6 +1,6 @@
-import { AddDeviceModal } from './AddDeviceModal'
-import { DeleteModal } from '../../../ui/components/DeleteModal'
 import { DeviceModalType } from '../../../utils'
+import { DeleteModal } from '../../../ui'
+import { AddDeviceModal } from './AddDeviceModal'
 import style from '../../style/modal.module.css'
 
 interface Props {

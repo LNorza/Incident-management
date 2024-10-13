@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
+import { BuildModalType, OfficeProps } from '../../../utils'
+import { API_BASE_URL } from '../../../utils/api'
+import { Actions } from '../../../ui'
 import { Building, ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 import style from '../../style/BuildContainer.module.css'
-import { BuildModalType, OfficeProps } from '../../../utils'
-import API_BASE_URL from '../../../utils/api/apiConfig'
-import Actions from '../../../ui/components/Actions'
 
 interface BuildingProps {
     _id: string
