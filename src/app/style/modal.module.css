@@ -19,7 +19,7 @@
 
 .modalInfoContainer {
     position: absolute;
-    width: 500px;
+    width: 550px;
     height: auto;
     border-radius: 16px;
     background-color: var(--CardGray);
@@ -173,6 +173,12 @@
     cursor: pointer;
 }
 
+.modalDeleteText {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
 .devicesListContainer {
     display: flex;
     flex-direction: column;
@@ -270,6 +276,14 @@
     width: 200px;
 }
 
+.modalButtonContainer.delete {
+    justify-content: space-around;
+}
+
+.modalButtonContainer.delete button {
+    width: 180px;
+}
+
 .cancelButton {
     color: var(--White);
     border: 1px solid var(--White);
@@ -296,6 +310,14 @@
 .p1 {
     font-size: 1.25rem;
     font-weight: 400;
+    text-align: center;
+}
+
+.p2 {
+    font-size: 1.1rem;
+    color: var(--Subtext);
+    font-weight: 400;
+    text-align: center;
 }
 
 .disabled {
