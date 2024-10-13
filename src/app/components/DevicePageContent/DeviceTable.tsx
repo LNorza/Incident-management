@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { myTheme } from '../../../utils'
+import { IDevice, myTheme } from '../../../utils'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
@@ -13,27 +13,17 @@ interface DeviceTableProps {
     deleteDevice: (deviceId: string, deleteName: string) => void
 }
 
-interface DeviceData {
-    _id: string
-    name: string
-    type: string
-    brand: string
-    user: string
-    location: string
-    status: string
-}
-
 export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
-    const [rowData, setRowData] = useState<DeviceData[]>([])
+    const [rowData, setRowData] = useState<IDevice[]>([])
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
-    const handleEditClick = useCallback((row: DeviceData) => {
+    const handleEditClick = useCallback((row: IDevice) => {
         editDevice(row._id)
     }, [])
 
-    const handleDeleteClick = useCallback((row: DeviceData) => {
+    const handleDeleteClick = useCallback((row: IDevice) => {
         deleteDevice(row._id, row.name)
     }, [])
 
@@ -186,7 +176,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                     {
                         text: 'Editar',
                         icon: Pencil,
-                        onClick: (row: DeviceData, e: React.MouseEvent<HTMLDivElement>) => {
+                        onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation()
                             handleEditClick(row)
                         },
@@ -194,7 +184,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                     {
                         text: 'Borrar',
                         icon: Trash2,
-                        onClick: (row: DeviceData, e: React.MouseEvent<HTMLDivElement>) => {
+                        onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation()
                             handleDeleteClick(row)
                         },
