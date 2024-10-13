@@ -21,6 +21,8 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [sharedBuildings, setSharedBuildings] = useState<IOptions[]>([])
     const [selectedBuilding, setSelectedBuilding] = useState<{ value: string; label: string } | undefined>(undefined)
+    const [userOptions, setUserOptions] = useState<IOptions[]>([])
+    const [user, setUser] = useState<string | undefined>(undefined)
     const [edit, setEdit] = useState(false)
 
     useEffect(() => {
@@ -28,6 +30,7 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
         fetchSharedBuildings()
         if (buildingData) {
             setFormState({ name: buildingData.name, description: buildingData.description })
+            setUser(buildingData.build_manager?._id)
             setEdit(true)
         }
     }, [buildingData, setFormState])
@@ -41,6 +44,8 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
         try {
             const id = await getUserDepartment()
             setDepartmentId(id)
+
+            await fetchUsers(id)
         } catch (err) {
             console.error(err)
         }
@@ -70,6 +75,29 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
         }
     }
 
+    const fetchUsers = async (id: string | null) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users-options-department/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            if (!response.ok) {
+                throw new Error('Error al obtener usuarios')
+            }
+            const data = await response.json()
+            const mappedUserOptions = data.map((user: any) => ({
+                value: user._id,
+                label: user.name,
+            }))
+            setUserOptions(mappedUserOptions)
+        } catch (error) {
+            console.error('Error al obtener usuarios', error)
+        }
+    }
+
     const handleSubmit = async () => {
         if (!showInput && !selectedBuilding) {
             toast.error('El edificio es requerido')
@@ -86,6 +114,7 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
             description: formState.description,
             isShared: edit ? buildingData?.isShared : shareBuilding,
             department_id: edit ? buildingData?.department_id : departmentId,
+            build_manager: user,
         }
         const departmentIdToSend = {
             departmentId: departmentId,
@@ -190,9 +219,12 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
                             Responsable
                             <div className={style.formInput}>
                                 <CustomSelect
+                                    value={user}
                                     placeholder="Selecciona al responsable"
-                                    options={[]}
-                                    onSelect={() => {}}
+                                    options={userOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setUser(selected.value)
+                                    }}
                                 />
                             </div>
                         </section>

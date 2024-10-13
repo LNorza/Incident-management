@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useCallback } from 'react'
 import {
     Device,
@@ -18,6 +19,19 @@ import { toast } from 'sonner'
 import { DateInput } from 'rsuite'
 import { Laptop } from 'lucide-react'
 import style from '../../style/modal.module.css'
+import {
+    getBrandOptions,
+    getConnectivityRouterOptions,
+    getDeviceTypeOptions,
+    getInkOptions,
+    getOsOptions,
+    getPrinterTypeOptions,
+    getProjectorResolutionOptions,
+    getRamTypeOptions,
+    getRouterCapacityOptions,
+    getRouterTypeOptions,
+    getWarrantyYearsOptions,
+} from '../../../utils/selectOptions/deviceOptions'
 
 interface Props {
     deviceId?: string | undefined
@@ -28,92 +42,18 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const [deviceType, setDeviceType] = useState<string | undefined>('')
     const [isShared, setIsShared] = useState<boolean | undefined>(false)
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const deviceTypeOptions: IOptions[] = [
-        { label: 'PC', value: 'PC' },
-        { label: 'Laptop', value: 'LAPTOP' },
-        { label: 'Impresora', value: 'PRINTER' },
-        { label: 'Switch', value: 'SWITCH' },
-        { label: 'Router', value: 'ROUTER' },
-        { label: 'Proyector', value: 'PROJECTOR' },
-        { label: 'Regulador', value: 'VOLTAGE-REGULATOR' },
-        { label: 'No-break', value: 'NO-BREAK' },
-    ]
-    const brandOptions: IOptions[] = [
-        { label: 'HP', value: 'HP' },
-        { label: 'Dell', value: 'DELL' },
-        { label: 'Lenovo', value: 'LENOVO' },
-        { label: 'Asus', value: 'ASUS' },
-        { label: 'Acer', value: 'ACER' },
-        { label: 'Apple', value: 'APPLE' },
-        { label: 'Samsung', value: 'SAMSUNG' },
-        { label: 'Cisco', value: 'CISCO' },
-        { label: 'Linksys', value: 'LINKSYS' },
-        { label: 'Koblenz', value: 'KOBLENZ' },
-        { label: 'Epson', value: 'EPSON' },
-    ]
-    const warrantyYearsOptions: IOptions[] = [
-        { label: '1 año', value: '1' },
-        { label: '2 años', value: '2' },
-        { label: '3 años', value: '3' },
-        { label: '4 años', value: '4' },
-        { label: '5 años', value: '5' },
-    ]
-    const userOptions: IOptions[] = [
-        { label: 'Usuario 1', value: '1' },
-        { label: 'Usuario 2', value: '2' },
-        { label: 'Usuario 3', value: '3' },
-        { label: 'Usuario 4', value: '4' },
-        { label: 'Usuario 5', value: '5' },
-    ]
-    const osOptions: IOptions[] = [
-        { label: 'Windows 11', value: 'WINDOWS_11' },
-        { label: 'Windows 10', value: 'WINDOWS_10' },
-        { label: 'Windows 8', value: 'WINDOWS_8' },
-        { label: 'Windows 7', value: 'WINDOWS_7' },
-        { label: 'Windows XP', value: 'WINDOWS_XP' },
-        { label: 'Windows Vista', value: 'WINDOWS_VISTA' },
-        { label: 'Linux', value: 'LINUX' },
-        { label: 'Mac OS', value: 'MAC_OS' },
-    ]
-    const ramTypeOptions: IOptions[] = [
-        { label: 'DDR4', value: 'DDR4' },
-        { label: 'DDR5', value: 'DDR5' },
-    ]
-    const [routerTypeOptions] = useState<IOptions[]>([
-        { label: 'ADSL', value: 'ADSL' },
-        { label: 'Cable', value: 'CABLE' },
-        { label: 'Fibra óptica', value: 'FIBER_OPTIC' },
-        { label: 'Satelital', value: 'SATELLITE' },
-        { label: '4G', value: '4G' },
-        { label: '5G', value: '5G' },
-    ])
-    const [connectivityRouterOptions] = useState<IOptions[]>([
-        { label: 'Inalámbrica', value: 'WIRELESS' },
-        { label: 'Cableada', value: 'WIRED' },
-    ])
-    const [routerCapacityOptions] = useState<IOptions[]>([
-        { label: '< 16 MB', value: '<16MB' },
-        { label: '16-128 MB', value: '16-128MB' },
-        { label: '128-1000 MB', value: '128-1000MB' },
-        { label: '1000MB - 4GB', value: '1000MB-4GB' },
-        { label: '4-16 GB', value: '4-16GB' },
-        { label: '16-64 GB', value: '16-64GB' },
-        { label: '>64 GB', value: '>64GB' },
-    ])
-    const [projectorResolutionOptions] = useState<IOptions[]>([
-        { label: 'SVGA (800x600)', value: 'SVGA' },
-        { label: 'XGA (1024x768)', value: 'XGA' },
-        { label: 'WXGA (1280x800)', value: 'WXGA' },
-        { label: 'HD (1366x768)', value: 'HD' },
-        { label: 'FHD (1920x1080)', value: 'FHD' },
-        { label: '4K (3840x2160)', value: '4K' },
-    ])
-    const [projectorConnectivityOptions] = useState<IOptions[]>([
-        { label: 'HDMI', value: 'HDMI' },
-        { label: 'VGA', value: 'VGA' },
-        { label: 'USB', value: 'USB' },
-    ])
-
+    const deviceTypeOptions: IOptions[] = getDeviceTypeOptions
+    const brandOptions: IOptions[] = getBrandOptions
+    const warrantyYearsOptions: IOptions[] = getWarrantyYearsOptions
+    const osOptions: IOptions[] = getOsOptions
+    const ramTypeOptions: IOptions[] = getRamTypeOptions
+    const routerTypeOptions: IOptions[] = getRouterTypeOptions
+    const connectivityRouterOptions: IOptions[] = getConnectivityRouterOptions
+    const routerCapacityOptions: IOptions[] = getRouterCapacityOptions
+    const projectorResolutionOptions: IOptions[] = getProjectorResolutionOptions
+    const projectorConnectivityOptions: IOptions[] = getConnectivityRouterOptions
+    const printerTypeOptions: IOptions[] = getPrinterTypeOptions
+    const inkOptions: IOptions[] = getInkOptions
     const { onInputChange, formState, updateFields } = useForm({
         name: '',
         model: '',
@@ -134,16 +74,6 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         brightness: '',
         scope: '',
     })
-    const printerTypeOptions: IOptions[] = [
-        { label: 'Laser', value: 'LASER' },
-        { label: 'Inyección de tinta', value: 'INKJET' },
-        { label: 'Matriz de punto', value: 'DOT_MATRIX' },
-    ]
-    const inkOptions: IOptions[] = [
-        { label: 'Tinta a base de agua', value: 'WATER_BASED_INK' },
-        { label: 'Tinta a base de aceite', value: 'OIL_BASED_INK' },
-        { label: 'Tinta a base de solvente', value: 'SOLVENT_BASED_INK' },
-    ]
     const [buyDate, setBuyDate] = useState<Date | null>(null)
     const [selectedDeviceType, setSelectedDeviceType] = useState<IOptions | null>(null)
     const [brand, setBrand] = useState<string | undefined>(undefined)
@@ -153,6 +83,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const [officesOptions, setOfficesOptions] = useState<IOptions[]>([])
     const [location, setLocation] = useState<string | undefined>(undefined)
     const [warrantyYears, setWarrantyYears] = useState<string | undefined>(undefined)
+    const [userOptions, setUserOptions] = useState<IOptions[]>([])
     const [user, setUser] = useState<string | undefined>(undefined)
     const [os, setOs] = useState<string | undefined>(undefined)
     const [ramType, setRamType] = useState<string | undefined>(undefined)
@@ -193,8 +124,33 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         try {
             const id = await getUserDepartment()
             setDepartmentId(id ?? undefined)
+
+            await fetchUsers(id)
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    const fetchUsers = async (id: string | null) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users-options-department/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            if (!response.ok) {
+                throw new Error('Error al obtener usuarios')
+            }
+            const data = await response.json()
+            const mappedUserOptions = data.map((user: any) => ({
+                value: user._id,
+                label: user.name,
+            }))
+            setUserOptions(mappedUserOptions)
+        } catch (error) {
+            console.error('Error al obtener usuarios', error)
         }
     }
 
@@ -285,7 +241,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
             warrantyYearsOptions.find((years) => years.value === deviceData.warrantyYears.toString())?.value,
         )
         setDeviceType(deviceTypeOptions.find((device) => device.value === deviceData.type)?.value)
-        console.log(deviceData)
+
         if (deviceData.type === 'PC') {
             const pcSpecs = deviceData.specs as IComputerSpecs
             updateFields({
@@ -469,7 +425,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     macAddress: formState.mac,
                     connectedPort: formState.port,
                     isShared: isShared,
-                    user_id: user,
+                    user_id: user === undefined ? '' : user,
                 },
             },
             LAPTOP: {
@@ -694,7 +650,15 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                             <section>
                                 ¿Equipo compartido?
                                 <div className={style.formInput}>
-                                    <CustomCheckBox checked={isShared} setChecked={setIsShared} />
+                                    <CustomCheckBox
+                                        checked={isShared}
+                                        setChecked={() => {
+                                            if (!isShared) {
+                                                setUser(undefined)
+                                            }
+                                            setIsShared(!isShared)
+                                        }}
+                                    />
                                 </div>
                             </section>
                             <section className={`${isShared ? style.disabled : ''}`}>

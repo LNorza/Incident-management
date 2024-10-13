@@ -25,6 +25,10 @@
     transition: all 0.3s;
 }
 
+.selected:hover {
+    filter: brightness(1.1);
+}
+
 .selected.colorBorder {
     border: 1px solid #a9dfd8;
     box-shadow: inset 0 0 0 2px #a9dfd8;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IDevice, myTheme } from '../../../utils'
+import { DeviceProps, IDevice, myTheme } from '../../../utils'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
@@ -27,9 +27,22 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
         deleteDevice(row._id, row.name)
     }, [])
 
+    const getUserName = async (userId: string) => {
+        if (userId === '') return 'Compartido'
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            return `${data.name}`
+        } catch (err) {
+            console.error(err)
+            return 'Desconocido'
+        }
+    }
+
     const fetchDevices = useCallback(async () => {
         if (!departmentId) return
-        console.log('fetching devices', building)
         try {
             const response = await fetch(
                 `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`,
@@ -39,15 +52,22 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
             )
             const data = await response.json()
 
-            const formattedData = data.map(({ _id, name, type, brand, specs, location_id, status }: any) => ({
-                _id,
-                name,
-                type,
-                brand,
-                user: specs.user_id || 'Compartido',
-                location: location_id.name,
-                status,
-            }))
+            const formattedData = await Promise.all(
+                data.map(async ({ _id, name, type, brand, specs, location_id, status }: DeviceProps) => {
+                    const userName = await getUserName(specs?.user_id ? specs.user_id : '')
+                    return {
+                        _id,
+                        name,
+                        type,
+                        brand,
+                        specs,
+                        user: userName,
+                        location: location_id.name,
+                        status,
+                    }
+                }),
+            )
+
             setRowData(formattedData)
         } catch (err) {
             console.error(err)

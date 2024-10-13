@@ -5,15 +5,8 @@ import { API_BASE_URL, getUserDepartment } from '../../utils/api'
 import { Plus } from 'lucide-react'
 import style from '../style/BuildContainer.module.css'
 
-interface Building {
-    _id: string
-    name: string
-    description: string
-    totalDevices: number
-}
-
 export const BuildingPage = () => {
-    const [buildings, setBuildings] = useState<Building[]>([])
+    const [buildings, setBuildings] = useState<BuildingProps[]>([])
     const [showModal, setShowModal] = useState(false)
     const [typeModal, setTypeModal] = useState<BuildModalType>()
     const [departmentId, setDepartmentId] = useState<string | null>(null)

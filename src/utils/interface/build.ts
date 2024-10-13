@@ -4,6 +4,10 @@ export interface BuildingProps {
     description: string
     isShared?: boolean
     department_id?: string
+    build_manager?: {
+        _id: string
+        name: string
+    }
     totalDevices: number
 }
 
@@ -14,5 +18,9 @@ export interface OfficeProps {
     building_id: string
     type: string
     department_id: string
+    location_manager: {
+        _id: string
+        name: string
+    }
     totalDevices: number
 }

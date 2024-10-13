@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { Device } from '../../../utils'
 import { API_BASE_URL } from '../../../utils/api'
 import { createArrayDevices, headerDevices } from '../../utils/createArrayDevices'
@@ -16,9 +16,28 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
     const [getDeviceInfo, setGetDeviceInfo] = useState(false)
     const [deviceHeadersInfo, setDeviceHeadersInfo] = useState<string[]>([])
 
+    const modalRef = useRef<HTMLDivElement>(null)
+
     useEffect(() => {
         fetchDevices()
     }, [locationId])
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+                // Si se hace clic fuera del modal, cerrar o regresar
+                getDeviceInfo ? setGetDeviceInfo(false) : onClose()
+            }
+        }
+
+        // Añadir evento al hacer clic
+        document.addEventListener('mousedown', handleClickOutside)
+
+        // Limpiar el evento al desmontar
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [getDeviceInfo, onClose])
 
     const handleDeviceInfo = (deviceId?: string) => {
         if (!getDeviceInfo) {
@@ -58,7 +77,7 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
 
     return (
         <div className={style.container}>
-            <div className={style.largeModalInfoContainer}>
+            <div className={style.largeModalInfoContainer} ref={modalRef}>
                 <div className={style.titleModal}>
                     <h2>{!getDeviceInfo ? 'Equipos' : 'Información del dispositivo'}</h2>
                 </div>

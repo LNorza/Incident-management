@@ -114,7 +114,7 @@ export const DevicePage = () => {
                     <article>
                         <span>Edificio</span>
                         <div className={style.actionSection}>
-                            <CustomSelect value={building} options={buildingsOptions} onSelect={handleSelect} />
+                            <CustomSelect menu value={building} options={buildingsOptions} onSelect={handleSelect} />
                             <button onClick={onOpenModal} className={style.button}>
                                 <Plus /> Agregar
                             </button>

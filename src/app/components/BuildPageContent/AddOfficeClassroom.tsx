@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from 'react'
-import { OfficeProps } from '../../../utils'
+import { OfficeProps, IOptions } from '../../../utils'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { CustomInput, CustomSelect, CustomCheckBox } from '../../../ui'
 import { useForm } from '../../../hooks'
@@ -29,7 +30,8 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
     ]
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [needManager, setNeedManager] = useState(false)
-    // const [manager, setManager] = useState<string | null>(null)
+    const [userOptions, setUserOptions] = useState<IOptions[]>([])
+    const [user, setUser] = useState<string | undefined>(undefined)
     const [edit, setEdit] = useState(false)
 
     useEffect(() => {
@@ -40,8 +42,33 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
         try {
             const id = await getUserDepartment()
             setDepartmentId(id)
+
+            await fetchUsers(id)
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    const fetchUsers = async (id: string | null) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users-options-department/${id}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            })
+            if (!response.ok) {
+                throw new Error('Error al obtener usuarios')
+            }
+            const data = await response.json()
+            const mappedUserOptions = data.map((user: any) => ({
+                value: user._id,
+                label: user.name,
+            }))
+            setUserOptions(mappedUserOptions)
+        } catch (error) {
+            console.error('Error al obtener usuarios', error)
         }
     }
 
@@ -49,6 +76,10 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
         if (officeData) {
             setFormState({ name: officeData.name, description: officeData.description })
             setSelectedType({ value: officeData.type, label: officeData.type === 'office' ? 'Oficina' : 'Salón' })
+            if (officeData.location_manager?._id) {
+                setNeedManager(true)
+                setUser(officeData.location_manager?._id)
+            }
             setEdit(true)
         }
     }, [officeData, setFormState])
@@ -72,6 +103,7 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
             type: selectedType?.value,
             building_id: buildingId,
             department_id: departmentId,
+            location_manager: needManager ? user : undefined,
         }
         console.log(locationData)
         try {
@@ -158,9 +190,12 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
                             Responsable
                             <div className={style.formInput}>
                                 <CustomSelect
+                                    value={user}
                                     placeholder="Selecciona al responsable"
-                                    options={[]}
-                                    onSelect={() => {}}
+                                    options={userOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setUser(selected.value)
+                                    }}
                                 />
                             </div>
                         </section>

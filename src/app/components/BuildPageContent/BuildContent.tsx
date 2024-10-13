@@ -1,16 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
-import { BuildModalType, OfficeProps } from '../../../utils'
+import { BuildModalType, OfficeProps, BuildingProps } from '../../../utils'
 import { API_BASE_URL } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Building, ChevronDown, Pencil, Plus, Trash2 } from 'lucide-react'
 import style from '../../style/BuildContainer.module.css'
-
-interface BuildingProps {
-    _id: string
-    name: string
-    description: string
-    totalDevices: number
-}
 
 interface Props {
     building: BuildingProps
@@ -86,7 +79,10 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                 >
                     <div className={`${style.dropdownTitleOpen}`}>
                         <span className={`${style.totalDevicesText}`}>
-                            Responsable: <span className={`${style.p2}`}>Marisol Manjarrez Beltran</span>
+                            Responsable:
+                            <span className={`${style.p2}`}>
+                                {` ${building.build_manager?.name ? building.build_manager.name : ''}`}
+                            </span>
                         </span>
                         <div className={`${style.dropdownTitleOpen}`}>
                             <button
