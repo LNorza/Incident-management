@@ -1,7 +1,7 @@
 import { useForm } from '../../../hooks'
 import { useEffect, useState } from 'react'
 import { getUserDepartment } from '../../../utils/api/userData'
-import { CustomInput, CustomSelect } from '../../../ui'
+import { CustomInput, CustomSelect, CustomCheckBox } from '../../../ui'
 import { toast } from 'sonner'
 import { OfficeProps } from '../../../utils'
 import { Building } from 'lucide-react'
@@ -29,6 +29,8 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
         { value: 'classroom', label: 'Salón' },
     ]
     const [departmentId, setDepartmentId] = useState<string | null>(null)
+    const [needManager, setNeedManager] = useState(false)
+    // const [manager, setManager] = useState<string | null>(null)
     const [edit, setEdit] = useState(false)
 
     useEffect(() => {
@@ -97,42 +99,75 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
         <>
             <div className={style.titleModal}>
                 <Building size={30} />
-                <h2>{edit ? 'Editar oficina/salón' : 'Agregar oficina/salón'}</h2>
+                <h2>{edit ? 'Editar sublocalización' : 'Agregar sublocalización'}</h2>
             </div>
+            <div className={style.modalBody}>
+                <div className={style.modalBodyForms}>
+                    <div className={style.rowModal}>
+                        <section>
+                            Nombre de la sublocalización
+                            <div className={style.formInput}>
+                                <CustomInput
+                                    isFormInput
+                                    name="name"
+                                    value={formState.name}
+                                    placeholder="Ingresa el nombre"
+                                    type="text"
+                                    onChange={onInputChange}
+                                    autoComplete="nameOffice"
+                                />
+                            </div>
+                        </section>
 
-            <div className={style.modalDetail}>
-                <section>
-                    Nombre
-                    <CustomInput
-                        isFormInput
-                        name="name"
-                        value={formState.name}
-                        placeholder="Escribe el nombre aqui..."
-                        type="text"
-                        onChange={onInputChange}
-                        autoComplete="nameOffice"
-                    />
-                </section>
+                        <section>
+                            Tipo
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    options={typesOptions}
+                                    onSelect={handleTypeChange}
+                                    value={selectedType?.value}
+                                    placeholder="Selecciona el tipo"
+                                />
+                            </div>
+                        </section>
+                    </div>
 
-                <section>
-                    Tipo
-                    <CustomSelect options={typesOptions} onSelect={handleTypeChange} value={selectedType?.value} />
-                </section>
+                    <div className={style.rowModal}>
+                        <section>
+                            Descripción
+                            <div className={style.formInput}>
+                                <CustomInput
+                                    isFormInput
+                                    name="description"
+                                    value={formState.description}
+                                    placeholder="Ingresa la descripción"
+                                    type="text"
+                                    onChange={onInputChange}
+                                    autoComplete="descriptionOffice"
+                                />
+                            </div>
+                        </section>
+                    </div>
 
-                <section>
-                    Descripción
-                    <CustomInput
-                        isFormInput
-                        name="description"
-                        value={formState.description}
-                        placeholder="Escribe la descripción aqui..."
-                        type="text"
-                        onChange={onInputChange}
-                        autoComplete="descriptionOffice"
-                    />
-                </section>
+                    <div className={style.rowModal}>
+                        <section>
+                            ¿La sublocalización tiene responsable?
+                            <CustomCheckBox checked={needManager} setChecked={setNeedManager} />
+                        </section>
 
-                <div className={style.modalButtonContainer}>
+                        <section className={`${needManager ? '' : style.disabled}`}>
+                            Responsable
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    placeholder="Selecciona al responsable"
+                                    options={[]}
+                                    onSelect={() => {}}
+                                />
+                            </div>
+                        </section>
+                    </div>
+                </div>
+                <div className={`${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>

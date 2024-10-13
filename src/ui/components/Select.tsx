@@ -12,28 +12,29 @@ interface CustomSelectProps {
     options: Option[]
     onSelect: (selected: Option) => void
     value?: string
-    initialValue?: Option // Cambiado a tipo Option
+    initialValue?: Option
 }
 
 export const CustomSelect = ({ placeholder, options, onSelect, value, initialValue }: CustomSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [openDirection, setOpenDirection] = useState<'up' | 'down'>('down')
 
-    // Usar el initialValue si está presente, o el placeholder
-    const [selectedOption, setSelectedOption] = useState<Option | null>(
-        initialValue || (placeholder ? { label: placeholder, value: '' } : options.length > 0 ? options[0] : null),
-    )
+    // No seleccionar valor por defecto si `value` es undefined
+    const [selectedOption, setSelectedOption] = useState<Option | null>(initialValue || null)
 
     const selectRef = useRef<HTMLDivElement>(null)
 
+    // Actualizar el valor del select cuando el prop `value` cambie
     useEffect(() => {
-        const preselectedOption = options.find((option) => option.value === value)
-        if (preselectedOption) {
-            setSelectedOption(preselectedOption)
-        } else if (initialValue) {
-            setSelectedOption(initialValue)
+        if (value === undefined) {
+            setSelectedOption(null) // No seleccionar ninguna opción
+        } else {
+            const preselectedOption = options.find((option) => option.value === value)
+            if (preselectedOption) {
+                setSelectedOption(preselectedOption)
+            }
         }
-    }, [value, options, initialValue])
+    }, [value, options])
 
     const toggleOptions = () => {
         if (selectRef.current) {
@@ -69,19 +70,18 @@ export const CustomSelect = ({ placeholder, options, onSelect, value, initialVal
             document.removeEventListener('mousedown', handleClickOutside)
         }
 
-        // Cleanup listener on component unmount
         return () => {
             document.removeEventListener('mousedown', handleClickOutside)
         }
     }, [isOpen])
 
-    const isPlaceholder = !selectedOption || (placeholder && selectedOption.label === placeholder)
+    const isPlaceholder = placeholder && (!selectedOption || selectedOption.label === placeholder)
 
     return (
         <div ref={selectRef} className={style.select}>
             <div className={`${style.selected} ${isOpen ? style.active : ''}`} onClick={toggleOptions}>
                 <span className={isPlaceholder ? style.placeholder : ''}>
-                    {selectedOption ? selectedOption.label : 'Selecciona'}
+                    {selectedOption ? selectedOption.label : placeholder || ''}
                 </span>
                 <ChevronDown size={20} className={style.arrow} />
             </div>

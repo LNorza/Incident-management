@@ -17,7 +17,7 @@ export const RouteManager = () => {
                         color: '#fff',
                     },
                 }}
-                duration={300000}
+                duration={3000}
                 closeButton
             />
             <div className={`${style.container}`}>

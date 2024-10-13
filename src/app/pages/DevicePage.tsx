@@ -39,7 +39,7 @@ export const DevicePage = () => {
                 })
                 const data = await response.json()
                 setBuildingsOptions([
-                    { label: 'Todos', value: '' },
+                    { label: 'Todos', value: 'ALL' },
                     ...data.map((building: { _id: string; name: string }) => ({
                         label: building.name,
                         value: building._id,
@@ -120,11 +120,7 @@ export const DevicePage = () => {
                     <article>
                         <span>Edificio</span>
                         <div className={style.actionSection}>
-                            <CustomSelect
-                                initialValue={buildingsOptions[0]}
-                                options={buildingsOptions}
-                                onSelect={handleSelect}
-                            />
+                            <CustomSelect value={building} options={buildingsOptions} onSelect={handleSelect} />
                             <button onClick={onOpenModal} className={style.button}>
                                 <Plus /> Agregar
                             </button>

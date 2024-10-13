@@ -61,11 +61,10 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
         <div className={style.container}>
             <div className={style.largeModalInfoContainer}>
                 <div className={style.titleModal}>
-                    <h2>Equipos</h2>
+                    <h2>{!getDeviceInfo ? 'Equipos' : 'Información del dispositivo'}</h2>
                 </div>
-                {getDeviceInfo && (
-                    // <div className={style.deviceInfoContainer}>
-                    <div className={style.devicesListContainer}>
+                <div className={style.devicesListContainer}>
+                    {getDeviceInfo && (
                         <div className={style.deviceGetInfoContainer}>
                             {device.map((info, index) => (
                                 <section key={index}>
@@ -76,17 +75,9 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
                                 </section>
                             ))}
                         </div>
+                    )}
 
-                        <div className={style.modalButtonDeviceContainer}>
-                            <button onClick={() => setGetDeviceInfo(false)} className={style.saveButton}>
-                                Regresar
-                            </button>
-                        </div>
-                    </div>
-                )}
-
-                {!getDeviceInfo && (
-                    <div className={style.devicesListContainer}>
+                    {!getDeviceInfo && (
                         <div className={style.deviceTableContainer}>
                             <div className={style.deviceTableHeader}>
                                 <div className={style.deviceTableName}>Nombre del equipo</div>
@@ -112,14 +103,18 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
                                 </div>
                             )}
                         </div>
-
-                        <div className={` ${style.modalButtonContainer} ${style.add}`}>
-                            <button onClick={onClose} className={style.saveButton}>
-                                Aceptar
-                            </button>
-                        </div>
+                    )}
+                    <div className={` ${style.modalButtonContainer} ${style.add}`}>
+                        <button
+                            onClick={() => {
+                                getDeviceInfo ? setGetDeviceInfo(false) : onClose()
+                            }}
+                            className={style.saveButton}
+                        >
+                            {getDeviceInfo ? 'Regresar' : 'Cerrar'}
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
         </div>
     )

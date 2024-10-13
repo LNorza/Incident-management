@@ -7,7 +7,6 @@ import { BuildingProps } from '../../../utils'
 import { toast } from 'sonner'
 import { getUserDepartment } from '../../../utils/api/userData'
 import API_BASE_URL from '../../../utils/api/apiConfig'
-
 import style from '../../style/modal.module.css'
 import { IOptions } from '../../../utils/interface/options'
 
@@ -19,11 +18,11 @@ interface Props {
 export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     const { onInputChange, formState, setFormState } = useForm({ name: '', description: '' })
     const [shareBuilding, setShareBuilding] = useState(false)
-    const [existBuilding, setExistBuilding] = useState(true)
+    const [existBuilding, setExistBuilding] = useState(false)
     const showInput = !shareBuilding || (shareBuilding && !existBuilding)
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [sharedBuildings, setSharedBuildings] = useState<IOptions[]>([])
-    const [selectedBuilding, setSelectedBuilding] = useState<{ value: string; label: string } | null>(null)
+    const [selectedBuilding, setSelectedBuilding] = useState<{ value: string; label: string } | undefined>(undefined)
     const [edit, setEdit] = useState(false)
 
     useEffect(() => {
@@ -36,6 +35,7 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     }, [buildingData, setFormState])
 
     const handleBuildingSelect = (building: { value: string; label: string }) => {
+        setExistBuilding(true)
         setSelectedBuilding(building)
     }
 
@@ -131,44 +131,76 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
                 <Building size={30} />
                 {edit ? <h2>Editar edificio</h2> : <h2>Agregar edificio</h2>}
             </div>
-            <div className={style.modalDetail}>
-                {!edit && (
-                    <section>
-                        ¿El edificio comparte departamento?
-                        <CustomCheckBox checked={shareBuilding} setChecked={setShareBuilding} />
-                    </section>
-                )}
+            <div className={style.modalBody}>
+                <div className={style.modalBodyForms}>
+                    {!edit && (
+                        <div className={style.rowModal}>
+                            <section>
+                                ¿El edificio comparte departamento?
+                                <CustomCheckBox checked={shareBuilding} setChecked={setShareBuilding} />
+                            </section>
+                        </div>
+                    )}
 
-                {shareBuilding && (
-                    <>
-                        <section>
-                            Edificio
-                            <CustomSelect options={sharedBuildings} onSelect={handleBuildingSelect} />
+                    {shareBuilding && (
+                        <div className={style.rowModal}>
+                            <>
+                                <section>
+                                    <div className={style.formText}>Edificio</div>
+                                    <div className={style.formInput}>
+                                        <CustomSelect
+                                            value={selectedBuilding?.value}
+                                            options={sharedBuildings}
+                                            onSelect={handleBuildingSelect}
+                                            placeholder="Selecciona el edificio"
+                                        />
+                                    </div>
+                                </section>
+
+                                <section>
+                                    ¿El edificio se encuentra en las opciones?
+                                    <CustomCheckBox
+                                        checked={existBuilding}
+                                        setChecked={() => {
+                                            if (existBuilding) {
+                                                setSelectedBuilding(undefined)
+                                            }
+                                            setExistBuilding(!existBuilding)
+                                        }}
+                                    />
+                                </section>
+                            </>
+                        </div>
+                    )}
+
+                    <div className={style.rowModal}>
+                        <section className={`${existBuilding && shareBuilding ? style.disabled : ''} `}>
+                            Nombre del edificio
+                            <div className={style.formInput}>
+                                <CustomInput
+                                    isFormInput
+                                    name="name"
+                                    value={formState.name}
+                                    placeholder="Ingresa el nombre"
+                                    type="text"
+                                    onChange={onInputChange}
+                                    autoComplete="nameBuilding"
+                                />
+                            </div>
                         </section>
-
                         <section>
-                            ¿El edificio se encuentra en las opciones?
-                            <CustomCheckBox checked={existBuilding} setChecked={setExistBuilding} />
+                            Responsable
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    placeholder="Selecciona al responsable"
+                                    options={[]}
+                                    onSelect={() => {}}
+                                />
+                            </div>
                         </section>
-                    </>
-                )}
-
-                {showInput && (
-                    <section>
-                        Nombre
-                        <CustomInput
-                            isFormInput
-                            name="name"
-                            value={formState.name}
-                            placeholder="Escribe nombre aquí..."
-                            type="text"
-                            onChange={onInputChange}
-                            autoComplete="nameBuilding"
-                        />
-                    </section>
-                )}
-
-                <div className={style.modalButtonContainer}>
+                    </div>
+                </div>
+                <div className={`${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>

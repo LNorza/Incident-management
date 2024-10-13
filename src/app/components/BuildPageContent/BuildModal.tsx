@@ -34,7 +34,13 @@ export const BuildModal = ({
             {isOpen && (
                 <div className={style.container}>
                     <div onClick={onClose} className={style.overlay}></div>
-                    <section className={style.modalInfoContainer}>
+                    <section
+                        className={`${
+                            type !== 'DeleteBuild' && type !== 'DeleteOfficeClass' && type !== 'DevicesList'
+                                ? style.largeModalBuildContainer
+                                : style.modalInfoContainer
+                        }`}
+                    >
                         {type === 'AddBuild' && <AddBuildModal onClose={onClose} />}
                         {type === 'AddOfficeClass' && <AddOfficeClassroom onClose={onClose} buildingId={buildingId} />}
                         {type === 'EditBuild' && <AddBuildModal onClose={onClose} buildingData={buildingData} />}

@@ -21,6 +21,10 @@
     font-weight: 500;
 }
 
+.arrowButton {
+    background-color: transparent;
+}
+
 .buildButton {
     display: flex;
     align-items: center;
@@ -58,6 +62,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    padding: 8px 0px;
 }
 
 .dropdownTitle:hover {
@@ -97,7 +102,7 @@
 
 /* Clase para mostrar el contenido con animación */
 .showInfo {
-    padding: 24px 28px;
+    padding: 0px 28px 24px 28px;
     opacity: 1; /* Totalmente opaco */
     height: auto;
     transition: all 0.3s ease; /* Transición suave */
@@ -124,10 +129,28 @@
 .buildTableHeader {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-weight: 500;
     padding: 16px 28px;
     border-bottom: 1px solid var(--LineGray);
+}
+
+.buildTableHeaderName {
+    width: 80%;
+}
+
+.buildTableHeaderActions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 20%;
+}
+
+.buildTableActions {
+    width: 80px;
+}
+
+.buildTableHeaderText {
+    font-weight: 500;
+    font-size: 1.25rem;
 }
 
 .buildInfo {

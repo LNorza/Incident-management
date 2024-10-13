@@ -74,7 +74,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                         <Building strokeWidth={1.75} />
                         {building.name}
                     </span>
-                    <button className={`${style.buildButton} ${showInfo ? style.active : ''} `}>
+                    <button className={`${style.arrowButton} ${showInfo ? style.active : ''} `}>
                         <ChevronDown className={style.arrow} />
                     </button>
                 </section>
@@ -86,7 +86,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                 >
                     <div className={`${style.dropdownTitleOpen}`}>
                         <span className={`${style.totalDevicesText}`}>
-                            Total de Equipos: <span className={`${style.p2}`}>{building.totalDevices}</span>
+                            Responsable: <span className={`${style.p2}`}>Marisol Manjarrez Beltran</span>
                         </span>
                         <div className={`${style.dropdownTitleOpen}`}>
                             <button
@@ -109,16 +109,31 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                         </div>
                     </div>
 
-                    <ul className={`${style.buildTable}`}>
-                        <li className={style.buildTableHeader}>
-                            Oficinas/Salones
+                    <div className={`${style.dropdownTitleOpen}`}>
+                        <span className={`${style.totalDevicesText}`}>
+                            Total de Equipos: <span className={`${style.p2}`}>{building.totalDevices}</span>
+                        </span>
+                        <div className={`${style.dropdownTitleOpen}`}>
                             <button
                                 onClick={() => setTypeModal('AddOfficeClass', building._id)}
                                 className={`${style.buildButton}`}
                             >
                                 <Plus />
-                                Agregar oficina/salon
+                                Agregar sublocalización
                             </button>
+                        </div>
+                    </div>
+
+                    <ul className={`${style.buildTable}`}>
+                        <li className={style.buildTableHeader}>
+                            <div className={style.buildTableHeaderName}>
+                                <span className={style.buildTableHeaderText}>Sublocalizaciones</span>
+                            </div>
+
+                            <div className={style.buildTableHeaderActions}>
+                                <span className={style.buildTableHeaderText}>Equipos</span>
+                                <span className={style.buildTableHeaderText}>Acciones</span>
+                            </div>
                         </li>
                         {locations.map((location) => (
                             <li
@@ -127,41 +142,43 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                                 className={style.buildInfo}
                             >
                                 {location.name}
-                                <div className={`${style.buildInfoList}`}>
+                                <div className={`${style.buildTableHeaderActions}`}>
                                     <span>
                                         Equipos: <span className={`${style.p2}`}>{location.totalDevices}</span>
                                     </span>
-                                    <Actions
-                                        row={''}
-                                        parentRef={contentRef}
-                                        actions={[
-                                            {
-                                                text: 'Editar',
-                                                icon: Pencil,
-                                                onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
-                                                    e.stopPropagation()
-                                                    const type = 'EditOfficeClass'
-                                                    const officeData = location
-                                                    setTypeModal(type, undefined, officeData)
+                                    <div className={style.buildTableActions}>
+                                        <Actions
+                                            row={''}
+                                            parentRef={contentRef}
+                                            actions={[
+                                                {
+                                                    text: 'Editar',
+                                                    icon: Pencil,
+                                                    onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
+                                                        e.stopPropagation()
+                                                        const type = 'EditOfficeClass'
+                                                        const officeData = location
+                                                        setTypeModal(type, undefined, officeData)
+                                                    },
                                                 },
-                                            },
-                                            {
-                                                text: 'Borrar',
-                                                icon: Trash2,
-                                                onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
-                                                    e.stopPropagation()
-                                                    setTypeModal(
-                                                        'DeleteOfficeClass',
-                                                        undefined,
-                                                        undefined,
-                                                        undefined,
-                                                        location.name,
-                                                        location._id,
-                                                    )
+                                                {
+                                                    text: 'Borrar',
+                                                    icon: Trash2,
+                                                    onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
+                                                        e.stopPropagation()
+                                                        setTypeModal(
+                                                            'DeleteOfficeClass',
+                                                            undefined,
+                                                            undefined,
+                                                            undefined,
+                                                            location.name,
+                                                            location._id,
+                                                        )
+                                                    },
                                                 },
-                                            },
-                                        ]}
-                                    />
+                                            ]}
+                                        />
+                                    </div>
                                 </div>
                             </li>
                         ))}
