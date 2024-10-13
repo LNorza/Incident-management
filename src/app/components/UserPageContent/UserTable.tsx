@@ -1,81 +1,85 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { IUser, myTheme } from '../../../utils'
+import { formatUserPositions, formatUserRoles } from '../../../utils/selectOptions/userOptions'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
-import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 
 interface UserTableProps {
     refresh: boolean
-    building: string
-    editDevice: (deviceId: string) => void
-    deleteDevice: (deviceId: string, deleteName: string) => void
+    positionFilter: string
+    editUser: (userData: IUser) => void
+    deleteUser: (userId: string, userName: string) => void
 }
-export const UserTable: React.FC<UserTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
+export const UserTable: React.FC<UserTableProps> = ({ refresh, positionFilter, editUser, deleteUser }) => {
     const [rowData, setRowData] = useState<IUser[]>([])
     const [departmentId, setDepartmentId] = useState<string | null>(null)
-    const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
-    const handleEditClick = useCallback((row: IUser) => {
-        editDevice(row.id)
-    }, [])
+    const handleEditClick = (row: IUser) => {
+        editUser(row)
+    }
 
-    const handleDeleteClick = useCallback((row: IUser) => {
-        deleteDevice(row.id, row.name)
-    }, [])
+    const handleDeleteClick = (row: IUser) => {
+        deleteUser(row._id, row.name)
+    }
 
-    //Checar ALAN
-    const fetchDevices = useCallback(async () => {
+    const fetchUsers = useCallback(async () => {
         if (!departmentId) return
-        console.log('fetching devices', building)
         try {
             const response = await fetch(
-                `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`,
+                `${API_BASE_URL}/users-search?department_id=${departmentId}&position=${positionFilter}`,
                 {
                     credentials: 'include',
                 },
             )
             const data = await response.json()
 
-            const formattedData = data.map(({ _id, name, type, brand, specs, location_id, status }: any) => ({
-                _id,
-                name,
-                type,
-                brand,
-                user: specs.user_id || 'Compartido',
-                location: location_id.name,
-                status,
-            }))
+            const formattedData = data.map(
+                ({ _id, name, email, username, password, position, role, department_id, imageUrl }: IUser) => ({
+                    _id,
+                    name,
+                    email,
+                    username,
+                    password,
+                    position: formatUserPositions(position),
+                    role: formatUserRoles(role),
+                    department_id,
+                    imageUrl,
+                }),
+            )
             setRowData(formattedData)
         } catch (err) {
             console.error(err)
         }
-    }, [departmentId, building])
+    }, [departmentId, positionFilter])
 
     useEffect(() => {
         const fetchDepartment = async () => {
             try {
                 const id = await getUserDepartment()
                 setDepartmentId(id)
+
+                await fetchUsers()
             } catch (err) {
                 console.error(err)
             }
         }
         fetchDepartment()
-    }, [])
+    }, [fetchUsers])
 
     useEffect(() => {
-        fetchDevices()
-    }, [departmentId, refresh, fetchDevices, building])
+        fetchUsers()
+    }, [departmentId, refresh, fetchUsers])
 
     const colDefs: ColDef[] = [
-        { field: 'name', headerName: 'Nombre completo', sortable: true, width: 270 }, // Usa flex
-        { field: 'username', headerName: 'Usuario', sortable: true, width: 270 }, // Usa flex
-        { field: 'email', headerName: 'Correo', sortable: true, width: 270 }, // Usa flex
-        { field: 'position', headerName: 'Puesto', sortable: true, width: 270 }, // Usa flexx
-        { field: 'Rol', headerName: 'Rol', sortable: true, width: 270 }, // Usa flexx
+        { field: 'name', headerName: 'Nombre completo', sortable: true, flex: 1 },
+        { field: 'username', headerName: 'Usuario', sortable: true, flex: 1 },
+        { field: 'email', headerName: 'Correo', sortable: true, flex: 1 },
+        { field: 'position', headerName: 'Puesto', sortable: true, flex: 1 },
+        { field: 'role', headerName: 'Rol', sortable: true, flex: 1 },
         {
             field: 'actions',
             headerName: 'Acciones',
@@ -83,7 +87,7 @@ export const UserTable: React.FC<UserTableProps> = ({ refresh, building, editDev
             cellRendererParams: (params: ICellRendererParams) => ({
                 row: params.data,
                 table: true,
-                parentRef: contentRef,
+                parentRef: parentRef,
                 actions: [
                     {
                         text: 'Editar',
@@ -104,7 +108,7 @@ export const UserTable: React.FC<UserTableProps> = ({ refresh, building, editDev
                 ],
             }),
             autoHeight: true,
-            flex: 0.7, // Usa flex para las acciones
+            flex: 0.7,
         },
     ]
 

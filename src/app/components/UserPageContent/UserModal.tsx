@@ -1,18 +1,18 @@
-import { UserModalType } from '../../../utils'
+import { IUser, UserModalType } from '../../../utils'
 import style from '../../style/modal.module.css'
-import { AddDeviceModal } from '../DevicePageContent'
 import { AddUserModal } from './AddUserModal'
+import { DeleteModal } from '../../../ui'
 
 interface Props {
     isOpen: boolean
     onClose: () => void
     type?: UserModalType
-    deviceId?: string
+    userData?: IUser
     deleteName?: string
-    // deleteFunction: () => void
+    deleteFunction: () => void
 }
 
-export const UserModal = ({ isOpen, type, deviceId, deleteName, onClose }: Props) => {
+export const UserModal = ({ isOpen, type, userData, deleteName, deleteFunction, onClose }: Props) => {
     return (
         <>
             {isOpen && (
@@ -25,7 +25,12 @@ export const UserModal = ({ isOpen, type, deviceId, deleteName, onClose }: Props
                     )}
                     {type === 'EditUser' && (
                         <section className={style.largeModalInfoContainer}>
-                            <AddDeviceModal onClose={onClose} deviceId={deviceId} />
+                            <AddUserModal onClose={onClose} userData={userData} />
+                        </section>
+                    )}
+                    {type === 'DeleteUser' && (
+                        <section className={style.modalInfoContainer}>
+                            <DeleteModal name={deleteName} deleteFunction={deleteFunction} onClose={onClose} />
                         </section>
                     )}
                 </div>

@@ -16,10 +16,9 @@ export const getUserData = async (): Promise<IUser | null> => {
         }
 
         const user = await response.json()
-        console.log('Datos del usuario recibidos:', user) // Imprime la respuesta de la API para debug
 
         const userData: IUser = {
-            id: user.id,
+            _id: user._id,
             name: user.name,
             position:
                 user.position === 'HEAD_SYSTEMS_DEPARTMENT'

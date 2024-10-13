@@ -13,7 +13,6 @@ export const Navbar = () => {
             try {
                 const userData = await getUserData()
                 setUserData(userData)
-                console.log('userData navbar', userData)
             } catch (error) {
                 console.error('Error fetching data:', error)
             }

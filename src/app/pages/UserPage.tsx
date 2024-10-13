@@ -1,50 +1,67 @@
 import { useState } from 'react'
-import { IOptions, UserModalType } from '../../utils'
+import { IOptions, IUser, UserModalType } from '../../utils'
 import { CustomSelect } from '../../ui'
-import style from '../style/deviceContainer.module.css'
+import { API_BASE_URL } from '../../utils/api'
 import { Plus } from 'lucide-react'
 import { UserTable } from '../components'
 import { UserModal } from '../components/UserPageContent/UserModal'
+import style from '../style/deviceContainer.module.css'
+import { getUserPositionOptions } from '../../utils/selectOptions/userOptions'
 
 export const UserPage = () => {
-    const [users, setUsers] = useState<string>('ALL')
     const [showModal, setShowModal] = useState(false)
     const [typeModal, setTypeModal] = useState<UserModalType>('AddUser')
     const [userId, setUserId] = useState<string | undefined>(undefined)
+    const [userName, setUserName] = useState<string | undefined>(undefined)
+    const [userData, setUserData] = useState<IUser | undefined>(undefined)
     const [refreshTable, setRefreshTable] = useState(false)
-    const [usersOptions, setUsersOptions] = useState<IOptions[]>([])
+    const [position, setPosition] = useState<string>('ALL')
+    const [usersOptions] = useState<IOptions[]>([{ label: 'Todos', value: 'ALL' }, ...getUserPositionOptions])
 
     const handleSelect = (selected: { label: string; value: string }) => {
-        setUsers(selected.value)
+        setPosition(selected.value)
         setRefreshTable(true)
     }
 
     const onOpenModal = () => {
-        // setTypeModal('Agrega el tipo si es que hay')
-        // setDeviceId(undefined)
+        setTypeModal('AddUser')
         setShowModal(true)
     }
 
     const onCloseModal = () => {
-        // setDeviceId(undefined)
-        // setDeleteName('')
+        setUserData(undefined)
+        setUserId(undefined)
+        setUserName(undefined)
         setRefreshTable(true)
         setShowModal(false)
     }
 
-    const handleEditModal = (deviceId: string) => {
-        // setTypeModal('EditDevice')
-        // setDeviceId(deviceId)
+    const handleEditModal = (userData: IUser) => {
+        setTypeModal('EditUser')
+        setUserData(userData)
         setRefreshTable(false)
         setShowModal(true)
     }
 
-    const handleDeleteModal = (deviceId: string, deviceName: string) => {
-        // setTypeModal('DeleteDevice')
-        // setDeviceId(deviceId)
-        // setDeleteName(deviceName)
+    const handleDeleteModal = (userId: string, userName: string) => {
+        setTypeModal('DeleteUser')
+        setUserId(userId)
+        setUserName(userName)
         setRefreshTable(false)
         setShowModal(true)
+    }
+
+    const deleteUser = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            if (!response.ok) throw new Error('Error al borrar el usuario')
+            onCloseModal()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -53,14 +70,9 @@ export const UserPage = () => {
                 <section className={style.header}>
                     <h2>Usuarios</h2>
                     <article>
-                        <span>Edificio</span>
+                        <span>Puesto</span>
                         <div className={style.actionSection}>
-                            <CustomSelect
-                                value={users}
-                                options={usersOptions}
-                                onSelect={handleSelect}
-                                placeholder="Todos"
-                            />
+                            <CustomSelect menu value={position} options={usersOptions} onSelect={handleSelect} />
                             <button onClick={onOpenModal} className={style.button}>
                                 <Plus /> Agregar
                             </button>
@@ -71,9 +83,9 @@ export const UserPage = () => {
                 <section>
                     <UserTable
                         refresh={refreshTable}
-                        building={users}
-                        editDevice={handleEditModal}
-                        deleteDevice={handleDeleteModal}
+                        positionFilter={position}
+                        editUser={handleEditModal}
+                        deleteUser={handleDeleteModal}
                     />
                 </section>
             </div>
@@ -82,9 +94,9 @@ export const UserPage = () => {
                 isOpen={showModal}
                 onClose={onCloseModal}
                 type={typeModal}
-                // deviceId={deviceId}
-                // deleteName={deleteName}
-                // deleteFunction={deleteDevice}
+                userData={userData}
+                deleteName={userName}
+                deleteFunction={deleteUser}
             />
         </>
     )

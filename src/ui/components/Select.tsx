@@ -13,9 +13,10 @@ interface CustomSelectProps {
     onSelect: (selected: Option) => void
     value?: string
     initialValue?: Option
+    menu?: boolean
 }
 
-export const CustomSelect = ({ placeholder, options, onSelect, value, initialValue }: CustomSelectProps) => {
+export const CustomSelect = ({ placeholder, options, onSelect, value, initialValue, menu }: CustomSelectProps) => {
     const [isOpen, setIsOpen] = useState(false)
     const [openDirection, setOpenDirection] = useState<'up' | 'down'>('down')
 
@@ -79,7 +80,12 @@ export const CustomSelect = ({ placeholder, options, onSelect, value, initialVal
 
     return (
         <div ref={selectRef} className={style.select}>
-            <div className={`${style.selected} ${isOpen ? style.active : ''}`} onClick={toggleOptions}>
+            <div
+                className={`${style.selected} ${isOpen ? style.active : ''} ${
+                    isOpen && !menu ? style.colorBorder : ''
+                }`}
+                onClick={toggleOptions}
+            >
                 <span className={isPlaceholder ? style.placeholder : ''}>
                     {selectedOption ? selectedOption.label : placeholder || ''}
                 </span>

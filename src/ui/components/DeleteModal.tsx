@@ -30,8 +30,8 @@ export const DeleteModal = ({ onClose, name, deleteFunction }: Props) => {
                     <Trash2 size={100} color="#A9DFD8" />
                 </div>
                 <div className={style.modalDeleteText}>
-                    <span className={style.p1}>¿Estás seguro de que deseas eliminar el {name}?</span>
-                    <span className={style.p2}>Si eliminas el {name} se borrará permanentemente</span>
+                    <span className={style.p1}>¿Estás seguro de que deseas eliminar {name}?</span>
+                    <span className={style.p2}>Si eliminas {name} se borrará permanentemente</span>
                 </div>
 
                 <div className={`${style.modalButtonContainer}  ${style.delete}`}>

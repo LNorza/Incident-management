@@ -93,10 +93,6 @@ export const DevicePage = () => {
         setRefreshTable(true)
     }
 
-    useEffect(() => {
-        console.log('building', building)
-    }, [building])
-
     const deleteDevice = async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
