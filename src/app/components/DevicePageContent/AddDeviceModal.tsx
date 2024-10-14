@@ -381,27 +381,143 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         }
     }, [building])
 
-    const saveDevice = () => {
+    const validateFields = () => {
         if (!formState.name) {
             toast.error('No se ha ingresado el nombre del dispositivo')
-            return
+            return false
         }
         if (!deviceType) {
             toast.error('No se ha seleccionado el tipo de dispositivo')
-            return
+            return false
         }
         if (!buyDate) {
             toast.error('No se ha ingresado la fecha de compra')
-            return
+            return false
         }
         if (!selectedDeviceType) {
             toast.error('No se ha seleccionado el tipo de dispositivo')
+            return false
+        }
+
+        if (selectedDeviceType.value === 'PC') {
+            if (!os) {
+                toast.error('No se ha seleccionado el sistema operativo')
+                return false
+            }
+            if (!formState.motherBoard) {
+                toast.error('No se ha ingresado la tarjeta madre')
+                return false
+            }
+            if (!formState.processor) {
+                toast.error('No se ha ingresado el procesador')
+                return false
+            }
+            if (!formState.ram) {
+                toast.error('No se ha ingresado la RAM')
+                return false
+            }
+            if (!formState.hardDrive) {
+                toast.error('No se ha ingresado el disco duro')
+                return false
+            }
+            if (!formState.powerSupply) {
+                toast.error('No se ha ingresado la fuente de poder')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'LAPTOP') {
+            if (!os) {
+                toast.error('No se ha seleccionado el sistema operativo')
+                return false
+            }
+            if (!formState.processor) {
+                toast.error('No se ha ingresado el procesador')
+                return false
+            }
+            if (!formState.ram) {
+                toast.error('No se ha ingresado la RAM')
+                return false
+            }
+            if (!formState.hardDrive) {
+                toast.error('No se ha ingresado el disco duro')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'PRINTER') {
+            if (!printerType) {
+                toast.error('No se ha seleccionado el tipo de impresora')
+                return false
+            }
+            if (!scanner) {
+                toast.error('No se ha seleccionado si tiene scanner')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'SWITCH') {
+            if (!formState.ports) {
+                toast.error('No se ha ingresado el número de puertos')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'ROUTER') {
+            if (!routerType) {
+                toast.error('No se ha seleccionado el tipo de router')
+                return false
+            }
+            if (!formState.ports) {
+                toast.error('No se ha ingresado el número de puertos')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'NO-BREAK') {
+            if (!formState.potence) {
+                toast.error('No se ha ingresado la capacidad de potencia')
+                return false
+            }
+            if (!formState.plugs) {
+                toast.error('No se ha ingresado el número de enchufes')
+                return false
+            }
+            if (!formState.backupTime) {
+                toast.error('No se ha ingresado el tiempo de respaldo')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'VOLTAGE-REGULATOR') {
+            if (!formState.potence) {
+                toast.error('No se ha ingresado la capacidad de potencia')
+                return false
+            }
+            if (!formState.plugs) {
+                toast.error('No se ha ingresado el número de enchufes')
+                return false
+            }
+        }
+
+        if (selectedDeviceType.value === 'PROJECTOR') {
+            if (!formState.brightness) {
+                toast.error('No se ha ingresado el brillo')
+                return false
+            }
+        }
+
+        return true
+    }
+
+    const saveDevice = () => {
+        if (!validateFields()) {
             return
         }
 
         const commonSpecs = {
             name: formState.name,
-            type: selectedDeviceType.value,
+            type: selectedDeviceType?.value,
             status: 'ACTIVE',
             deviceModel: formState.model,
             brand: brand,
@@ -496,7 +612,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
 
         const deviceData = {
             ...commonSpecs,
-            ...(deviceSpecsByType[selectedDeviceType.value] || {}),
+            ...(selectedDeviceType ? deviceSpecsByType[selectedDeviceType.value] || {} : {}),
         }
 
         try {
