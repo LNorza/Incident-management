@@ -34,7 +34,12 @@ export const Dashboard = () => {
                 credentials: 'include',
             })
             const devicesNumber = await response.json()
-            setDevicesNumber(devicesNumber)
+
+            if (devicesNumber) {
+                setDevicesNumber(devicesNumber.totalDevices)
+            } else {
+                setDevicesNumber(0)
+            }
         } catch (error) {
             console.error(error)
         }

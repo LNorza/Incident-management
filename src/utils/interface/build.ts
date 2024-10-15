@@ -3,11 +3,15 @@ export interface BuildingProps {
     name: string
     description: string
     isShared?: boolean
-    department_id?: string
-    build_manager?: {
-        _id: string
-        name: string
-    }
+    departments: [
+        {
+            department_id?: string
+            build_manager?: {
+                _id: string
+                name: string
+            }
+        },
+    ]
     totalDevices: number
 }
 

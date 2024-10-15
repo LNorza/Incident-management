@@ -39,7 +39,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
     const fetchLocations = async () => {
         try {
             const response = await fetch(
-                `${API_BASE_URL}/locations-with-devices?buildingId=${building._id}&&departmentId=${departmentId}`,
+                `${API_BASE_URL}/locations-with-devices?building_id=${building._id}&department_id=${departmentId}`,
                 {
                     method: 'GET',
                     credentials: 'include',
@@ -57,6 +57,8 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
     const addDevicesListModal = (locationId: string) => () => {
         setTypeModal('DevicesList', undefined, undefined, undefined, undefined, locationId)
     }
+
+    const currentDepartment = building.departments?.find((dept) => dept.department_id === departmentId)
 
     return (
         <section className={`${style.dropdownContainer}`}>
@@ -81,7 +83,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                         <span className={`${style.totalDevicesText}`}>
                             Responsable:
                             <span className={`${style.p2}`}>
-                                {` ${building.build_manager?.name ? building.build_manager.name : ''}`}
+                                {` ${currentDepartment?.build_manager?.name}` || 'Sin responsable asignado'}
                             </span>
                         </span>
                         <div className={`${style.dropdownTitleOpen}`}>

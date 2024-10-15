@@ -32,7 +32,7 @@ export const DevicePage = () => {
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?departmentId=${departmentId}`, {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
                     credentials: 'include',
                 })
                 const data = await response.json()

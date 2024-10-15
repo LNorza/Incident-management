@@ -157,7 +157,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?departmentId=${departmentId}`, {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -177,7 +177,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         if (building) {
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/locations-search?buildingId=${buildingId}&departmentId=${departmentId}`,
+                    `${API_BASE_URL}/locations-search?building_id=${buildingId}&department_id=${departmentId}`,
                     {
                         credentials: 'include',
                     },

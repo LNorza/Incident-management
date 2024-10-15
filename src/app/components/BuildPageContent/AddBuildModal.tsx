@@ -25,30 +25,9 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
     const [user, setUser] = useState<string | undefined>(undefined)
     const [edit, setEdit] = useState(false)
 
-    useEffect(() => {
-        fetchDepartment()
-        fetchSharedBuildings()
-        if (buildingData) {
-            setFormState({ name: buildingData.name, description: buildingData.description })
-            setUser(buildingData.build_manager?._id)
-            setEdit(true)
-        }
-    }, [buildingData, setFormState])
-
     const handleBuildingSelect = (building: { value: string; label: string }) => {
         setExistBuilding(true)
         setSelectedBuilding(building)
-    }
-
-    const fetchDepartment = async () => {
-        try {
-            const id = await getUserDepartment()
-            setDepartmentId(id)
-
-            await fetchUsers(id)
-        } catch (err) {
-            console.error(err)
-        }
     }
 
     const fetchSharedBuildings = async () => {
@@ -68,12 +47,37 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
                 value: building._id,
                 label: building.name,
             }))
-
             setSharedBuildings(mappedBuildings)
         } catch (error) {
             console.error('Error al obtener edificios compartidos', error)
         }
     }
+
+    useEffect(() => {
+        const fetchDepartment = async () => {
+            try {
+                const id = await getUserDepartment()
+                setDepartmentId(id)
+
+                await fetchUsers(id)
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        const fetchData = async () => {
+            await fetchDepartment()
+            await fetchSharedBuildings()
+        }
+        fetchData()
+
+        if (buildingData) {
+            const currentDepartment = buildingData.departments?.find((dept) => dept.department_id === departmentId)
+            setFormState({ name: buildingData.name, description: buildingData.description })
+            setUser(currentDepartment?.build_manager?._id)
+            setEdit(true)
+        }
+    }, [buildingData, setFormState, departmentId])
 
     const fetchUsers = async (id: string | null) => {
         try {
@@ -98,26 +102,40 @@ export const AddBuildModal = ({ buildingData, onClose }: Props) => {
         }
     }
 
-    const handleSubmit = async () => {
+    const validateForm = () => {
         if (!showInput && !selectedBuilding) {
             toast.error('El edificio es requerido')
-            return
+            return false
         }
         if (!formState.name && showInput) {
             toast.error('El nombre es requerido')
-            return
+            return false
         }
+
+        if (!user) {
+            toast.error('El responsable es requerido')
+            return false
+        }
+        return true
+    }
+
+    const handleSubmit = async () => {
+        if (!validateForm()) return
+
         let url = `${API_BASE_URL}/buildings`
         let method = 'POST'
         const buildingDataToSend = {
             name: formState.name,
             description: formState.description,
             isShared: edit ? buildingData?.isShared : shareBuilding,
-            department_id: edit ? buildingData?.department_id : departmentId,
-            build_manager: user,
+            departments: {
+                department_id: departmentId,
+                build_manager: user,
+            },
         }
         const departmentIdToSend = {
-            departmentId: departmentId,
+            department_id: departmentId,
+            build_manager: user,
         }
         let message = `${formState.name} agregado exitosamente`
         let errorMsg = 'Error al agregar edificio'
