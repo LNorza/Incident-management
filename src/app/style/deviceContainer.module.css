@@ -12,13 +12,17 @@
     font-weight: 500;
 }
 
-.header article {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.actionArticle {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 8px;
 }
 
-.header article .actionSection {
+.hideText {
+  color: var(--BackgroundGray);
+}
+
+.actionSection {
     display: flex;
     align-items: center;
     flex-direction: row;

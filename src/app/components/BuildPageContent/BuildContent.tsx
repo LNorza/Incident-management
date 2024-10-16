@@ -38,13 +38,10 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
 
     const fetchLocations = async () => {
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/locations-with-devices?building_id=${building._id}&department_id=${departmentId}`,
-                {
-                    method: 'GET',
-                    credentials: 'include',
-                },
-            )
+            const response = await fetch(`${API_BASE_URL}/locations-with-devices?building_id=${building._id}`, {
+                method: 'GET',
+                credentials: 'include',
+            })
             if (!response.ok) throw new Error('Error al obtener las ubicaciones')
             const data = await response.json()
             setLocations(data)
