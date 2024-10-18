@@ -13,7 +13,6 @@ export const Dashboard = () => {
             try {
                 const userData = await getUserData()
                 setUserData(userData)
-
                 if (userData) {
                     await fetchDevicesNumber(userData.department_id)
                 }

@@ -5,4 +5,4 @@ export type IncicentState =
   | 'Asignado'
   | 'Liberado'
   | 'Rechazado'
-export type IncidentModalType = 'AddDevice' | 'EditDevice' | 'DeleteDevice'
+export type IncidentModalType = 'AddIncident' | 'EditIncident' | 'DeleteIncident'
