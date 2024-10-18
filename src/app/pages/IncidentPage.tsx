@@ -5,6 +5,7 @@ import style from '../style/deviceContainer.module.css'
 import { IncidentModalType, IOptions } from '../../utils'
 import { Plus } from 'lucide-react'
 import { IncidentModal } from '../components/IncidentPageContent/IncidentModal'
+import { getUserRole } from '../../utils/api'
 
 export const IncidentPage = () => {
     const [incident, setIncident] = useState<string>('ALL')
@@ -69,7 +70,13 @@ export const IncidentPage = () => {
                         <div className={style.actioncontainer}>
                             <span>Edificio</span>
                             <div>
-                                <CustomSelect menu value={incident} options={incidentOptions} onSelect={handleSelect} />
+                                <CustomSelect
+                                    menu
+                                    value={incident}
+                                    options={incidentOptions}
+                                    onSelect={handleSelect}
+                                    placeholder="Todos"
+                                />
                             </div>
                         </div>
                         <div className={style.actioncontainer}>
@@ -81,6 +88,7 @@ export const IncidentPage = () => {
                                         value={incident}
                                         options={incidentOptions}
                                         onSelect={handleSelect}
+                                        placeholder="Todos"
                                     />
                                 </div>
                             </div>
