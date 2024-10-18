@@ -67,3 +67,30 @@ export const getUserDepartment = async (): Promise<string | null> => {
         return null
     }
 }
+
+export const getUserRole = async (): Promise<string | null> => {
+    try {
+        const response = await fetch(`${API_BASE_URL}/info`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+        })
+
+        if (!response.ok) {
+            throw new Error('Error fetching user data')
+        }
+
+        const user = await response.json()
+
+        if (user && user.role) {
+            return user.role
+        }
+
+        return null
+    } catch (error) {
+        console.error('Error fetching user role:', error)
+        return null
+    }
+}

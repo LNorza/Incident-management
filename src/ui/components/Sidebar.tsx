@@ -1,17 +1,60 @@
-import { Building2, CircleX, House, Laptop, LogOut, Users } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { House, Users, Building2, Laptop } from 'lucide-react'
 import style from '../style/sidebar.module.css'
-import { useContext } from 'react'
+import { getUserRole } from '../../utils/api/userData'
+import { ISidebar } from '../../utils/interface/sidebar'
+import { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../../auth/context/AuthContext'
+import { API_BASE_URL } from '../../utils/api'
 
 const logo = '/assets/logoLogin.svg'
+const iconMap = {
+    House: House,
+    Users: Users,
+    Building2: Building2,
+    Laptop: Laptop,
+}
 
 export const Sidebar = () => {
     const location = useLocation()
     const navigate = useNavigate()
-
     const { logout } = useContext(AuthContext)
+    const [routes, setRoutes] = useState<[ISidebar] | []>([]) // Estado para guardar las rutas
+    const [userRole, setUserRole] = useState<string | null>(null)
 
+    useEffect(() => {
+        const fetchRole = async () => {
+            const role = await getUserRole() // Obtener el rol del usuario
+            setUserRole(role) // Guardar el rol en el estado
+        }
+
+        fetchRole()
+    }, [])
+
+    useEffect(() => {
+        const fetchNavbarRoutes = async () => {
+            if (userRole) {
+                try {
+                    const response = await fetch(`${API_BASE_URL}/sidebar/${userRole}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                    })
+                    const data = await response.json() // Convertir la respuesta a JSON
+                    setRoutes(data) // Guardar las rutas en el estado
+                } catch (error) {
+                    console.error('Error fetching navbar routes:', error)
+                }
+            }
+        }
+
+        fetchNavbarRoutes()
+    }, [userRole]) // Ejecutar cada vez que `userRole` cambie
+
+    // Función para el logout
     const handleLogOut = async () => {
         if (logout) {
             await logout() // Llama a la función logout del contexto
@@ -23,55 +66,24 @@ export const Sidebar = () => {
         <section className={`${style.sidebar}`}>
             <img src={logo} alt="Logo" className={`${style.sidebarImage}`} />
             <ul>
-                <Link
-                    to="/home"
-                    className={`${location.pathname === '/home' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <House />
-                        <span>Inicio</span>
-                    </li>
-                </Link>
+                {routes.map((route) => {
+                    const IconComponent = iconMap[route.icon as keyof typeof iconMap] // Obtener el componente del icono
 
-                <Link
-                    to="/user"
-                    className={`${location.pathname === '/user' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <Users />
-                        <span>Usuarios</span>
-                    </li>
-                </Link>
-
-                <Link
-                    to="/build"
-                    className={`${location.pathname === '/build' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <Building2 />
-                        Edificios
-                    </li>
-                </Link>
-
-                <Link
-                    to="/device"
-                    className={`${location.pathname === '/device' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <Laptop />
-                        Equipos
-                    </li>
-                </Link>
-
-                <Link
-                    to="/incident"
-                    className={`${location.pathname === '/incident' ? style.sidebarSelected : style.nonSelected}`}
-                >
-                    <li>
-                        <CircleX />
-                        Incidencias
-                    </li>
-                </Link>
+                    return (
+                        <Link
+                            key={route.route}
+                            to={route.route}
+                            className={`${
+                                location.pathname === route.route ? style.sidebarSelected : style.nonSelected
+                            }`}
+                        >
+                            <li>
+                                {IconComponent && <IconComponent />} {/* Renderizar el icono */}
+                                <span>{route.name}</span>
+                            </li>
+                        </Link>
+                    )
+                })}
 
                 <li onClick={handleLogOut} className={style.nonSelected}>
                     <LogOut />
