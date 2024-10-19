@@ -1,122 +1,266 @@
-import { useEffect, useState } from 'react'
-import { IOptions, IUser } from '../../../utils'
-import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
+import { useCallback, useEffect, useState } from 'react'
+import { Device, IOptions } from '../../../utils'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { getUserPositionOptions } from '../../../utils/selectOptions/userOptions'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
-import { Users2 } from 'lucide-react'
+import { CircleX } from 'lucide-react'
 import style from '../../style/modal.module.css'
+import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
 
 interface Props {
     onClose: () => void
-    userData?: IUser
 }
 
-export const AddIncidentModal = ({ userData, onClose }: Props) => {
+export const AddIncidentModal = ({ onClose }: Props) => {
+    const [buildingId, setBuildingId] = useState<string | undefined>(undefined)
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const [positionOptionsState] = useState<IOptions[]>(getUserPositionOptions)
-    const [position, setPosition] = useState<string | undefined>(undefined)
+
+    const [buildingsOptions, setBuildingsOptions] = useState<IOptions[]>([])
+    const [officesOptions, setOfficesOptions] = useState<IOptions[]>([])
+    const [deviceOptions, setDeviceOptions] = useState<IOptions[]>([])
+    const [incidentTypeOptions] = useState<IOptions[]>(getIncidentTypeOptions)
+    const [workTypeOptions, setWorkTypeOptions] = useState<IOptions[]>()
+
+    const [building, setBuilding] = useState<string | undefined>(undefined)
+    const [location, setLocation] = useState<string | undefined>(undefined)
+    const [device, setDevice] = useState<string | undefined>(undefined)
+    const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
+    const [workType, setWorkType] = useState<string | undefined>(undefined)
 
     const { onInputChange, formState, updateFields } = useForm({
-        name: '',
-        email: '',
-        username: '',
-        password: '',
-        position: '',
+        folio: '',
+        build: '',
+        sublocation: '',
+        device: '',
+        incident_type: '',
+        work: '',
+        description: '',
     })
+
+    const fetchFolio = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/incidents-folio`, {
+                credentials: 'include',
+            })
+
+            if (!response.ok) {
+                throw new Error(`Error en la solicitud: ${response.status}`)
+            }
+
+            const { folio } = await response.json()
+            updateFields({ folio: folio.toString() })
+        } catch (error) {
+            console.error('Error al obtener el folio:', error)
+        }
+    }
+
+    const fetchDepartment = async () => {
+        try {
+            const id = await getUserDepartment()
+            setDepartmentId(id ?? undefined)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const fetchBuildings = useCallback(async () => {
+        if (departmentId) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
+                    credentials: 'include',
+                })
+                const data = await response.json()
+                setBuildingsOptions(
+                    data.map((building: { _id: string; name: string }) => ({
+                        label: building.name,
+                        value: building._id,
+                    })),
+                )
+            } catch (error) {
+                toast.error('Error al obtener los edificios')
+            }
+        }
+    }, [departmentId])
+
+    const fetchOffices = useCallback(async () => {
+        if (building) {
+            try {
+                const response = await fetch(
+                    `${API_BASE_URL}/locations-search?building_id=${buildingId}&department_id=${departmentId}`,
+                    {
+                        credentials: 'include',
+                    },
+                )
+                const data = await response.json()
+                setOfficesOptions(
+                    data.map((office: { _id: string; name: string }) => ({
+                        label: office.name,
+                        value: office._id,
+                    })),
+                )
+            } catch (error) {
+                console.error('Error al obtener las oficinas/salones')
+            }
+        }
+    }, [building])
+
+    const fetchDevices = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/devices-search?locationId=${location}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            setDeviceOptions(
+                data.map((building: { _id: string; name: string }) => ({
+                    label: building.name,
+                    value: building._id,
+                })),
+            )
+        } catch (err) {
+            toast.error('Error al obtener los dispositivos')
+        }
+    }
+
+    useEffect(() => {
+        fetchDepartment()
+        fetchFolio()
+    }, [])
+
+    useEffect(() => {
+        fetchDevices()
+    }, [location])
+
+    useEffect(() => {
+        fetchOffices()
+    }, [buildingId, fetchOffices])
+
+    useEffect(() => {
+        fetchBuildings()
+    }, [departmentId, fetchBuildings])
+
+    useEffect(() => {
+        const work = getWorkTypeOptions(incidentType)
+        setWorkTypeOptions(work)
+    }, [incidentType])
 
     return (
         <>
             <div className={style.titleModal}>
-                <Users2 size={34} />
-                <h2>{!userData ? 'Agregar Usuario' : 'Editar Usuario'}</h2>
+                <CircleX />
+                <h2>Agregar Incidencia</h2>
             </div>
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
                     <div className={style.rowModal}>
-                        <section>
-                            Nombre
+                        <section className={style.disabled}>
+                            Folio
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="name"
-                                    value={formState.name}
-                                    placeholder="Ingresa el nombre"
+                                    name="folio"
+                                    value={formState.folio}
+                                    placeholder="Ingresa el folio"
                                     type="text"
                                     onChange={onInputChange}
-                                    autoComplete="nameUser"
+                                    autoComplete="folio"
                                 />
                             </div>
                         </section>
                         <section>
-                            Correo Electrónico
-                            <div className={style.formInput}>
-                                <CustomInput
-                                    isFormInput
-                                    name="email"
-                                    value={formState.email}
-                                    placeholder="Ingresa el correo"
-                                    type="text"
-                                    onChange={onInputChange}
-                                    autoComplete="emailUser"
-                                />
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className={style.rowModal}>
-                        <section>
-                            Usuario
-                            <div className={style.formInput}>
-                                <CustomInput
-                                    isFormInput
-                                    name="username"
-                                    value={formState.username}
-                                    placeholder="Ingresa el nombre de usuario"
-                                    type="text"
-                                    onChange={onInputChange}
-                                    autoComplete="username"
-                                />
-                            </div>
-                        </section>
-                        <section>
-                            Contraseña
-                            <div className={style.formInput}>
-                                <CustomInput
-                                    isFormInput
-                                    name="password"
-                                    value={formState.password}
-                                    placeholder="Ingresa la contraseña"
-                                    type="password"
-                                    onChange={onInputChange}
-                                    autoComplete="password"
-                                />
-                            </div>
-                        </section>
-                    </div>
-
-                    <div className={style.rowModal}>
-                        <section>
-                            Puesto
+                            Edificio
                             <div className={style.formInput}>
                                 <CustomSelect
-                                    value={position}
-                                    placeholder="Selecciona el puesto"
-                                    options={positionOptionsState}
+                                    value={building}
+                                    placeholder="Selecciona el edificio"
+                                    options={buildingsOptions}
                                     onSelect={(selected: { label: string; value: string }) => {
-                                        setPosition(selected.value)
+                                        setBuildingId(selected.value)
+                                        setBuilding(selected.value)
                                     }}
                                 />
                             </div>
                         </section>
                     </div>
+
+                    <div className={style.rowModal}>
+                        <section>
+                            Sublocalización
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    value={location}
+                                    placeholder="Selecciona la oficina/salon"
+                                    options={officesOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setLocation(selected.value)
+                                    }}
+                                />
+                            </div>
+                        </section>
+                        <section>
+                            Equipo
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    value={device}
+                                    placeholder="Selecciona el equipo"
+                                    options={deviceOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setDevice(selected.value)
+                                    }}
+                                />
+                            </div>
+                        </section>
+                    </div>
+
+                    <div className={style.rowModal}>
+                        <section>
+                            Tipo de Incidencia
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    value={incidentType}
+                                    placeholder="Selecciona el tipo de incidencia"
+                                    options={incidentTypeOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setIncidentType(selected.value)
+                                    }}
+                                />
+                            </div>
+                        </section>
+                        <section>
+                            Trabajo
+                            <div className={style.formInput}>
+                                <CustomSelect
+                                    value={workType}
+                                    placeholder="Selecciona el tipo de trabajo"
+                                    options={workTypeOptions ?? []}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setWorkType(selected.value)
+                                    }}
+                                />
+                            </div>
+                        </section>
+                    </div>
+
+                    <section>
+                        Descripción
+                        <div className={style.formDescription}>
+                            <CustomInput
+                                isFormInput
+                                name="description"
+                                value={formState.description}
+                                placeholder="Ingresa la descripción"
+                                type="text"
+                                onChange={onInputChange}
+                                autoComplete="description"
+                            />
+                        </div>
+                    </section>
                 </div>
                 <div className={` ${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>
-                    {/* <button className={style.saveButton} onClick={saveDevice}> */}
                     <button className={style.saveButton}>Guardar</button>
                 </div>
             </div>

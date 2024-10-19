@@ -5,6 +5,7 @@ import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
+import { IIncident } from '../../../utils/interface/incident'
 
 interface IncidentTableProps {
     refresh: boolean
@@ -14,8 +15,8 @@ interface IncidentTableProps {
 }
 
 export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
-    const [rowData, setRowData] = useState<IDevice[]>([])
-    const [departmentId, setDepartmentId] = useState<string | null>(null)
+    const [rowData2, setRowData2] = useState<IDevice[]>([])
+    const [rowData, setRowData] = useState<IIncident[]>([])
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
@@ -41,57 +42,53 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
         }
     }
 
-    const fetchDevices = useCallback(async () => {
-        if (!departmentId) return
+    const fetchIncident = useCallback(async () => {
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`,
-                {
-                    credentials: 'include',
-                },
-            )
+            const response = await fetch(`${API_BASE_URL}/incidents`, {
+                credentials: 'include',
+            })
             const data = await response.json()
 
             const formattedData = await Promise.all(
-                data.map(async ({ _id, name, type, brand, specs, location_id, status }: DeviceProps) => {
-                    const userName = await getUserName(specs?.user_id ? specs.user_id : '')
+                data.map(async ({ folio, date, device, incident_type, description, status }: IIncident) => {
                     return {
-                        _id,
-                        name,
-                        type,
-                        brand,
-                        specs,
-                        user: userName,
-                        location: location_id.name,
+                        folio,
+                        date,
+                        device,
+                        incident_type,
+                        description,
                         status,
                     }
                 }),
             )
+            console.log('data', formattedData)
 
             setRowData(formattedData)
         } catch (err) {
             console.error(err)
         }
-    }, [departmentId, building])
+    }, [building])
 
-    useEffect(() => {
-        const fetchDepartment = async () => {
-            try {
-                const id = await getUserDepartment()
-                setDepartmentId(id)
-            } catch (err) {
-                console.error(err)
-            }
-        }
-        fetchDepartment()
-    }, [])
+    // useEffect(() => {
+    //     const fetchDepartment = async () => {
+    //         try {
+    //             const id = await getUserDepartment()
+    //             setDepartmentId(id)
+    //         } catch (err) {
+    //             console.error(err)
+    //         }
+    //     }
+    //     fetchDepartment()
+    // }, [])
 
-    useEffect(() => {
-        fetchDevices()
-    }, [departmentId, refresh, fetchDevices, building])
+    // useEffect(() => {
+    //     fetchDevices()
+    // }, [departmentId, refresh, fetchDevices, building])
 
     const colDefs: ColDef[] = [
-        { field: 'name', headerName: 'Nombre de equipo', sortable: true, width: 270 }, // Usa flex
+        { field: 'folio', headerName: 'Folio', sortable: true, width: 270 },
+        { field: 'date', headerName: 'Fecha de solicitud', sortable: true },
+        { field: 'nameDevice', headerName: 'Equipo', sortable: true }, // Usa flex
         {
             field: 'type',
             headerName: 'Tipo',
@@ -99,87 +96,48 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
             flex: 1,
             cellRenderer: (params: ICellRendererParams) => {
                 switch (params.value) {
-                    case 'LAPTOP':
-                        return 'Laptop'
-                    case 'PC':
-                        return 'Escritorio'
-                    case 'PRINTER':
-                        return 'Impresora'
-                    case 'SWITCH':
-                        return 'Switch'
-                    case 'ROUTER':
-                        return 'Router'
-                    case 'PROJECTOR':
-                        return 'Proyector'
-                    case 'VOLTAGE-REGULATOR':
-                        return 'Regulador de voltaje'
-                    case 'NO-BREAK':
-                        return 'No-break'
+                    case 'COMPUTER':
+                        return 'Computo'
+                    case 'REPAIR':
+                        return 'Reparación'
+                    case 'MAINTANCE':
+                        return 'Mantenimiento'
                     default:
                         return 'Desconocido'
                 }
             },
         },
-        {
-            field: 'brand',
-            headerName: 'Marca',
-            sortable: true,
-            flex: 1,
-            cellRenderer: (params: ICellRendererParams) => {
-                switch (params.value) {
-                    case 'HP':
-                        return 'HP'
-                    case 'DELL':
-                        return 'Dell'
-                    case 'LENOVO':
-                        return 'Lenovo'
-                    case 'ACER':
-                        return 'Acer'
-                    case 'ASUS':
-                        return 'Asus'
-                    case 'APPLE':
-                        return 'Apple'
-                    case 'SAMSUNG':
-                        return 'Samsung'
-                    case 'EPSON':
-                        return 'Epson'
-                    case 'CISCO':
-                        return 'Cisco'
-                    case 'LINKSYS':
-                        return 'Linksys'
-                    case 'KOBLENZ':
-                        return 'Koblenz'
-                    case 'OTHER':
-                        return 'Otra'
-                    default:
-                        return 'Desconocida'
-                }
-            },
-        },
-        { field: 'user', headerName: 'Usuario', sortable: true, flex: 1 },
-        { field: 'location', headerName: 'Locación', sortable: true, flex: 1 },
+        { field: 'description', headerName: 'Descripción', sortable: true, flex: 1 },
         {
             field: 'status',
             headerName: 'Status',
             sortable: true,
             cellRenderer: (params: ICellRendererParams) => {
                 switch (params.value) {
-                    case 'ACTIVE':
-                        return 'Activo'
-                    case 'INACTIVE':
-                        return 'Inactivo'
+                    case 'IN_PROCESS':
+                        return 'En proceso'
+                    case 'SENT':
+                        return 'Enviada'
+                    case 'RELEASED':
+                        return 'Liberada'
+                    case 'FINISHED':
+                        return 'Terminada'
                     default:
                         return 'En reparación'
                 }
             },
             cellStyle: (params: CellClassParams) => {
                 switch (params.value) {
-                    case 'ACTIVE':
+                    case 'IN_PROCESS':
+                        return { color: '#20AEF3' }
+                    case 'SENT':
+                        return { color: '#FFFFFF' }
+                    case 'RELEASED':
                         return { color: '#A9DFD8' }
-                    case 'INACTIVE':
-                        return { color: '#C84242' }
-                    default:
+                    case 'FINISHED':
                         return { color: '#FEAF5A' }
+                    default:
+                        return { color: '#ff0505' }
                 }
             },
             flex: 1,

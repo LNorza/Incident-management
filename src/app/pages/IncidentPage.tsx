@@ -65,10 +65,10 @@ export const IncidentPage = () => {
         <>
             <div className={style.container}>
                 <section className={style.header}>
-                    <h2>Equipos</h2>
+                    <h2>Incidencias</h2>
                     <article className={style.actionArticle}>
                         <div className={style.actioncontainer}>
-                            <span>Edificio</span>
+                            <span>Tipo</span>
                             <div>
                                 <CustomSelect
                                     menu
