@@ -19,7 +19,7 @@
 }
 
 .hideText {
-  color: var(--BackgroundGray);
+  visibility: hidden;
 }
 
 .actionSection {

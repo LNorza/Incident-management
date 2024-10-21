@@ -9,13 +9,14 @@ export interface IIncident {
   status: IncidentState,
 }
 
-export interface CreateIncidentDto {
-  device_id: number;
+export interface ICreateIncident {
+  folio: string;
+  device_id: string;
   date: Date;
-  status: string;
+  status?: string;
   incident_type: string;
   work: string;
   period: number;
   description: string;
-  department_id: number;
+  department_id: string;
 }

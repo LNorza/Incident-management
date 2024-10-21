@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Device, IOptions } from '../../../utils'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
-import { getUserPositionOptions } from '../../../utils/selectOptions/userOptions'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
 import { CircleX } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
+import { ICreateIncident } from '../../../utils/interface/incident'
 
 interface Props {
     onClose: () => void
@@ -29,14 +29,16 @@ export const AddIncidentModal = ({ onClose }: Props) => {
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
 
-    const { onInputChange, formState, updateFields } = useForm({
+    const { onInputChange, formState, updateFields } = useForm<ICreateIncident>({
         folio: '',
-        build: '',
-        sublocation: '',
-        device: '',
+        device_id: '',
+        date: new Date(),
+        status: 'SENT',
         incident_type: '',
         work: '',
+        period: 1,
         description: '',
+        department_id: '',
     })
 
     const fetchFolio = async () => {
@@ -122,6 +124,46 @@ export const AddIncidentModal = ({ onClose }: Props) => {
             toast.error('Error al obtener los dispositivos')
         }
     }
+
+    const handleTestSubmit = () => {
+        // updateFields({
+        //     department_id: building,
+        //     device_id: device,
+        //     incident_type: incidentType,
+        //     work: workType,
+        // })
+        console.log('Soy el submit', formState)
+        try {
+            // const method = deviceId ? 'PUT' : 'POST'
+            const url = `${API_BASE_URL}/incidents`
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formState),
+            }).then((response) => {
+                if (response.ok) {
+                    toast.success('Se creo la incidencia correctamente')
+                    onClose()
+                }
+            })
+        } catch (error) {
+            console.error('Error:', error)
+            toast.error('Error al crear la incidencia')
+        }
+    }
+
+    useEffect(() => {
+        updateFields({
+            department_id: building,
+            device_id: device,
+            incident_type: incidentType,
+            work: workType,
+        })
+    }, [workType])
 
     useEffect(() => {
         fetchDepartment()
@@ -250,7 +292,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                                 name="description"
                                 value={formState.description}
                                 placeholder="Ingresa la descripción"
-                                type="text"
+                                type="description"
                                 onChange={onInputChange}
                                 autoComplete="description"
                             />
@@ -261,7 +303,9 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>
-                    <button className={style.saveButton}>Guardar</button>
+                    <button onClick={handleTestSubmit} className={style.saveButton}>
+                        Guardar
+                    </button>
                 </div>
             </div>
         </>
