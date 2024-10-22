@@ -1,15 +1,26 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useContext } from 'react'
 import { IUserData } from '../../utils'
 import { Link } from 'react-router-dom'
 import { Bell, ChevronDown, CircleUser, User, LogOut } from 'lucide-react'
 import { getUserData } from '../../utils/api'
 import profileStyles from '../style/navbar.module.css'
+import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../auth/context/AuthContext'
 import style from '../style/profileModal.module.css'
 
 export const ProfileOptions = () => {
     const [isOpen, setIsOpen] = useState(false)
     const [userData, setUserData] = useState<IUserData | null>(null)
     const modalRef = useRef<HTMLDivElement | null>(null)
+    const navigate = useNavigate()
+    const { logout } = useContext(AuthContext)
+
+    const handleLogOut = async () => {
+        if (logout) {
+            await logout()
+            navigate('/login')
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -76,7 +87,7 @@ export const ProfileOptions = () => {
                         <User />
                         Perfil
                     </Link>
-                    <div className={style.option}>
+                    <div className={style.option} onClick={handleLogOut}>
                         <LogOut />
                         Cerrar sesión
                     </div>

@@ -1,11 +1,9 @@
-import { LogOut } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { House, Users, Building2, Laptop, CircleX } from 'lucide-react'
 import style from '../style/sidebar.module.css'
 import { getUserRole } from '../../utils/api/userData'
 import { ISidebar } from '../../utils/interface/sidebar'
-import { useContext, useEffect, useState } from 'react'
-import { AuthContext } from '../../auth/context/AuthContext'
+import { useEffect, useState } from 'react'
 import { API_BASE_URL } from '../../utils/api'
 
 const logo = '/assets/logoLogin.svg'
@@ -19,8 +17,6 @@ const iconMap = {
 
 export const Sidebar = () => {
     const location = useLocation()
-    const navigate = useNavigate()
-    const { logout } = useContext(AuthContext)
     const [routes, setRoutes] = useState<[ISidebar] | []>([]) // Estado para guardar las rutas
     const [userRole, setUserRole] = useState<string | null>(null)
 
@@ -55,14 +51,6 @@ export const Sidebar = () => {
         fetchNavbarRoutes()
     }, [userRole]) // Ejecutar cada vez que `userRole` cambie
 
-    // Función para el logout
-    const handleLogOut = async () => {
-        if (logout) {
-            await logout() // Llama a la función logout del contexto
-            navigate('/login') // Redirige al login después del logout
-        }
-    }
-
     return (
         <section className={`${style.sidebar}`}>
             <img src={logo} alt="Logo" className={`${style.sidebarImage}`} />
@@ -85,11 +73,6 @@ export const Sidebar = () => {
                         </Link>
                     )
                 })}
-
-                <li onClick={handleLogOut} className={style.nonSelected}>
-                    <LogOut />
-                    Cerrar Sesión
-                </li>
             </ul>
         </section>
     )

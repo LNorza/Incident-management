@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
+import { AuthContext } from '../../auth/context/AuthContext'
+import { useNavigate } from 'react-router-dom'
 import { Uploader, Loader } from 'rsuite'
 import { toast } from 'sonner'
 import { CustomInput } from '../../ui'
@@ -7,6 +9,7 @@ import { getUserData } from '../../utils/api'
 import { API_BASE_URL } from '../../utils/api'
 import { FileType } from 'rsuite/esm/Uploader'
 import { IUserData } from '../../utils'
+import { useForm } from '../../hooks/useForm'
 import style from '../style/profileContainer.module.css'
 
 function previewFile(file: Blob, callback: (value: string | ArrayBuffer | null) => void) {
@@ -21,7 +24,20 @@ export const ProfilePage = () => {
     const [uploading, setUploading] = useState(false)
     const [fileInfo, setFileInfo] = useState<string | null>(null)
     const [userData, setUserData] = useState<IUserData | null>(null)
-    const [oldPassword, setOldPassword] = useState('')
+    const { onInputChange, formState } = useForm({
+        oldPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    })
+    const navigate = useNavigate()
+    const { logout } = useContext(AuthContext)
+
+    const handleLogOut = async () => {
+        if (logout) {
+            await logout()
+            navigate('/login')
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -69,6 +85,45 @@ export const ProfilePage = () => {
             console.error('Error de red o en el servidor:', error)
         } finally {
             setUploading(false)
+        }
+    }
+
+    const handlePasswordUpdate = async () => {
+        const { oldPassword, newPassword, confirmPassword } = formState
+
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return toast.error('Por favor llena todos los campos')
+        }
+        if (newPassword !== confirmPassword) {
+            return toast.error('Las contraseñas no coinciden')
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/update-password/${userData?._id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ oldPassword, newPassword }),
+                credentials: 'include',
+            })
+
+            if (response.ok) {
+                toast.success('Contraseña actualizada exitosamente')
+                setTimeout(() => {
+                    handleLogOut()
+                }, 1000)
+            } else {
+                const result = await response.json()
+                if (result.message === 'Invalid password') {
+                    return toast.error('Contraseña incorrecta')
+                } else {
+                    toast.error(result.message || 'Error al actualizar la contraseña')
+                }
+            }
+        } catch (error) {
+            console.error('Error al actualizar la contraseña:', error)
+            toast.error('Error en la solicitud')
         }
     }
 
@@ -152,35 +207,58 @@ export const ProfilePage = () => {
             <h1>Actualizar contraseña</h1>
             <div className={style.profileCard}>
                 <div className={style.profileInfoContainer}>
-                    <div className={style.profileInfoList}>
+                    <div className={style.profileInfoPassword}>
                         <div className={style.profileInfo}>
                             <span className={style.passwordInputText}>Contraseña actual</span>
                             <div className={style.passwordInput}>
                                 <CustomInput
                                     placeholder="Ingresa la contraseña actual"
                                     password
-                                    onChange={(text) => {
-                                        setOldPassword(text)
-                                    }}
+                                    name="oldPassword"
+                                    value={formState.oldPassword}
+                                    onChange={onInputChange}
+                                    isFormInput
                                 />
                             </div>
                         </div>
 
                         <div className={style.newPasswordContainer}>
-                            <div className={style.profileInfo}>
+                            <div className={style.profileInfoPassword}>
                                 <span className={style.passwordInputText}>Nueva contraseña</span>
                                 <div className={style.passwordInput}>
-                                    <CustomInput />
+                                    <CustomInput
+                                        placeholder="Ingresa la contraseña actual"
+                                        password
+                                        name="newPassword"
+                                        value={formState.newPassword}
+                                        onChange={onInputChange}
+                                        isFormInput
+                                    />
                                 </div>
                             </div>
 
-                            <div className={style.profileInfo}>
+                            <div className={style.profileInfoPassword}>
                                 <span className={style.passwordInputText}>Confirmar contraseña</span>
                                 <div className={style.passwordInput}>
-                                    <CustomInput />
+                                    <CustomInput
+                                        placeholder="Ingresa la contraseña actual"
+                                        password
+                                        name="confirmPassword"
+                                        value={formState.confirmPassword}
+                                        onChange={onInputChange}
+                                        isFormInput
+                                    />
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div className={style.passwordButtonContainer}>
+                        <span className={style.passwordButtonText}>
+                            Una vez actualizada la contraseña la sesión se cerrará
+                        </span>
+                        <button className={style.updatePasswordButton} onClick={handlePasswordUpdate}>
+                            Actualizar
+                        </button>
                     </div>
                 </div>
             </div>
