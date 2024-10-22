@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { AreaChart, IncidentsOfMonth, SemiCircleChart } from '../components'
 import { API_BASE_URL, getUserData } from '../../utils/api'
-import { IUser } from '../../utils'
+import { IUserData } from '../../utils'
 import style from '../style/cardContainer.module.css'
 
 export const Dashboard = () => {
-    const [userData, setUserData] = useState<IUser | null>(null)
+    const [userData, setUserData] = useState<IUserData | null>(null)
     const [devicesNumber, setDevicesNumber] = useState<number | null>(0)
 
     useEffect(() => {
@@ -14,7 +14,7 @@ export const Dashboard = () => {
                 const userData = await getUserData()
                 setUserData(userData)
                 if (userData) {
-                    await fetchDevicesNumber(userData.department_id)
+                    await fetchDevicesNumber(userData.department._id)
                 }
             } catch (error) {
                 console.error('Error fetching data:', error)

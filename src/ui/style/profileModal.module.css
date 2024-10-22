@@ -1,24 +1,4 @@
-.editActions {
-    display: flex;
-    position: relative;
-    align-items: center;
-    justify-content: center;
-}
-
-.dots:hover {
-    filter: brightness(0.7);
-}
-
-.editActionsBtn {
-    background-color: transparent !important;
-    border: none;
-    width: fit-content;
-    height: fit-content;
-    padding: 0.5rem 0rem 0rem 0rem !important;
-    cursor: pointer;
-}
-
-.editActionsMenu {
+.options {
     display: flex;
     position: absolute;
     top: 100%;
@@ -37,12 +17,7 @@
     animation: fadeInDown 0.15s ease-in-out;
 }
 
-.editActionsMenu.openUp {
-    top: auto;
-    bottom: 100%;
-}
-
-.editActionsItem {
+.option {
     padding: 12px 12px;
     border-radius: 10px;
     white-space: nowrap;
@@ -52,15 +27,24 @@
     align-items: center;
     gap: 12px;
     height: 44px;
+    color: white;
+    text-decoration: none;
 }
 
-.editActionsItem:hover {
+.option:hover {
     background-color: #21222d;
     cursor: pointer;
     border-radius: 10px;
+    color: white;
+    text-decoration: none;
 }
 
-.editActionsText {
-    font-weight: 400 !important;
-    font-size: 1rem;
+.option:focus-within {
+    color: white;
+    text-decoration: none;
+}
+
+.option:active {
+    color: white;
+    text-decoration: none;
 }

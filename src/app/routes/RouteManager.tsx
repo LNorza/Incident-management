@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
-import { BuildingPage, Dashboard, DevicePage, IncidentPage, UserPage } from '../pages'
+import { BuildingPage, Dashboard, DevicePage, IncidentPage, UserPage, ProfilePage } from '../pages'
 import { Navbar, Sidebar } from '../../ui'
 import { Toaster } from 'sonner'
 import style from '../style/appContainer.module.css'
@@ -26,7 +26,7 @@ export const RouteManager = () => {
                     <Route path="build" element={<BuildingPage />} />
                     <Route path="device" element={<DevicePage />} />
                     <Route path="incident" element={<IncidentPage />} />
-
+                    <Route path="profile" element={<ProfilePage />} />
                     {/* DefaultRoute */}
                     <Route path="/*" element={<Navigate to={'/home'} />} />
                 </Routes>

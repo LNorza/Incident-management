@@ -1,7 +1,41 @@
-import { IUser } from '../interface'
+import { IUserData } from '../interface'
 import { API_BASE_URL } from './apiConfig'
 
-export const getUserData = async (): Promise<IUser | null> => {
+const getPosition = (position: string): string => {
+    switch (position) {
+        case 'HEAD_SYSTEMS_DEPARTMENT':
+            return 'Jefe del departamento de sistemas'
+        case 'HEAD_BIOCHEMISTRY_DEPARTMENT':
+            return 'Jefe del departamento de bioquímica'
+        case 'LAB_CHIEF':
+            return 'Jefe de laboratorio'
+        case 'TEACHER':
+            return 'Docente'
+        default:
+            return 'Desconocido'
+    }
+}
+
+const getRole = (role: string): string => {
+    switch (role) {
+        case 'ADMIN':
+            return 'Administrador'
+        case 'ADMIN_DEPARTMENT':
+            return 'Administrador de departamento'
+        case 'ADMIN_TECHNICIANS':
+            return 'Administrador de técnicos'
+        case 'TECHNICIAN':
+            return 'Técnico'
+        case 'ADMIN_LAB':
+            return 'Administrador de laboratorio'
+        case 'ONLY_READ':
+            return 'Solo lectura'
+        default:
+            return 'Usuario'
+    }
+}
+
+export const getUserData = async (): Promise<IUserData | null> => {
     try {
         const response = await fetch(`${API_BASE_URL}/info`, {
             method: 'GET',
@@ -17,19 +51,12 @@ export const getUserData = async (): Promise<IUser | null> => {
 
         const user = await response.json()
 
-        const userData: IUser = {
+        const userData: IUserData = {
             _id: user._id,
             name: user.name,
-            position:
-                user.position === 'HEAD_SYSTEMS_DEPARTMENT'
-                    ? 'Jefe del departamento de sistemas'
-                    : user.position === 'HEAD_BIOCHEMISTRY_DEPARTMENT'
-                    ? 'Jefe del departamento de bioquímica'
-                    : user.position === 'TEACHER'
-                    ? 'Docente'
-                    : 'Desconocido',
-            department_id: user.department_id.toString(),
-            role: user.role,
+            position: getPosition(user.position),
+            department: user.department_id,
+            role: getRole(user.role),
             email: user.email,
             username: user.username,
             imageUrl: user.imageUrl,
@@ -57,8 +84,8 @@ export const getUserDepartment = async (): Promise<string | null> => {
         }
         const user = await response.json()
 
-        if (user && user.department_id) {
-            return user.department_id.toString()
+        if (user && user.department_id._id) {
+            return user.department_id._id
         }
 
         return null

@@ -1,8 +1,10 @@
-import React, { InputHTMLAttributes } from 'react'
+import React, { useState, InputHTMLAttributes } from 'react'
+import { Eye, EyeOff } from 'lucide-react' // Importamos ambos iconos
 import styles from '../style/customInput.module.css'
 
 interface Props extends InputHTMLAttributes<HTMLInputElement> {
     icon?: React.ReactNode
+    password?: boolean
     name?: string
     placeholder?: string
     type?: string
@@ -12,11 +14,26 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
     isFormInput?: boolean
 }
 
-export const CustomInput = ({ icon, isFormInput, ...props }: Props) => {
+export const CustomInput = ({ icon, isFormInput, password, ...props }: Props) => {
+    const [showPassword, setShowPassword] = useState(false)
+
+    const togglePasswordVisibility = () => {
+        setShowPassword((prev) => !prev)
+    }
+
     return (
         <div className={` ${styles.inputContainer}  ${icon ? styles.icon : ''}`}>
             {icon && <span className={`${styles.inputIcon} ${icon ? styles.icon : ''}`}>{icon}</span>}
-            <input {...props} className={`${styles.inputField} ${isFormInput ? styles.form : ''}`} />
+            <input
+                {...props}
+                type={password && !showPassword ? 'password' : 'text'}
+                className={`${styles.inputField} ${isFormInput ? styles.form : ''}`}
+            />
+            {password && (
+                <span className={`${styles.inputIcon} ${styles.password} `} onClick={togglePasswordVisibility}>
+                    {showPassword ? <EyeOff /> : <Eye />}
+                </span>
+            )}
         </div>
     )
 }

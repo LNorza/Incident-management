@@ -1,0 +1,62 @@
+.profileContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.profileCard {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 64px;
+    width: 100%;
+    height: 100%;
+    padding: 64px;
+    background-color: var(--CardGray);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.profileInfoContainer {
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    width: 100%;
+}
+
+.profileInfoList {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 50%;
+}
+
+.profileInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.profileInfoTitle {
+    color: var(--MainGreenColor);
+}
+
+.profileInfoText {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.passwordInputText {
+    font-size: 1.25rem;
+    font-weight: 500;
+}
+
+.passwordInput {
+    width: 300px;
+    height: 40px;
+}
+
+.newPasswordContainer {
+    display: flex;
+    gap: 32px;
+}

@@ -58,6 +58,7 @@ export const Login = () => {
                             value={password}
                             onChange={onInputChange}
                             autoComplete="password"
+                            password
                         />
                     </div>
 

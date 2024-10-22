@@ -37,7 +37,7 @@ a {
 }
 
 h1 {
-    font-size: 2em !important;
+    font-size: 1.75em !important;
     line-height: 1.1 !important;
 }
 
@@ -97,4 +97,19 @@ li {
     align-items: center !important;
     padding-left: 16px !important;
     background-color: var(--BackgroundGray) !important;
+}
+
+.rs-uploader-picture .rs-uploader-trigger-btn {
+    margin: 0 !important;
+}
+
+@keyframes fadeInDown {
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
