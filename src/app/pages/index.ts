@@ -1,6 +1,6 @@
 export * from './BuildingPage'
 export * from './Dashboard'
 export * from './DevicePage'
-export * from './UserPage'
 export * from './IncidentPage'
 export * from './ProfilePage'
+export * from './UserPage'

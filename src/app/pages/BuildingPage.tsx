@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { BuildContent, BuildModal } from '../components'
-import { BuildingProps, BuildModalType, OfficeProps } from '../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../utils/api'
+import { API_BASE_URL, BuildingProps, BuildModalType, getUserDepartment, OfficeProps } from '../../utils'
 import { Plus } from 'lucide-react'
 import style from '../style/BuildContainer.module.css'
 

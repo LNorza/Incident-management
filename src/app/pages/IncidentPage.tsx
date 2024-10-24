@@ -1,11 +1,10 @@
 import { useState } from 'react'
 import { CustomSelect } from '../../ui'
-import { IncidentTable } from '../components/IncidentPageContent/IncidentTable'
-import style from '../style/deviceContainer.module.css'
 import { IncidentModalType, IOptions } from '../../utils'
+import { IncidentModal, IncidentTable } from '../components'
+
 import { Plus } from 'lucide-react'
-import { IncidentModal } from '../components/IncidentPageContent/IncidentModal'
-import { getUserRole } from '../../utils/api'
+import style from '../style/deviceContainer.module.css'
 
 export const IncidentPage = () => {
     const [incident, setIncident] = useState<string>('ALL')

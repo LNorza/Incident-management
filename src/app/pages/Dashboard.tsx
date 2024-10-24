@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AreaChart, IncidentsOfMonth, SemiCircleChart } from '../components'
-import { API_BASE_URL, getUserData } from '../../utils/api'
-import { IUserData } from '../../utils'
+import { API_BASE_URL, getUserData, IUserData } from '../../utils'
 import style from '../style/cardContainer.module.css'
 
 export const Dashboard = () => {

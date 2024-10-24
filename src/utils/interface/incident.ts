@@ -3,7 +3,7 @@ import { IncidentState } from "../enum";
 export interface IIncident {
   folio: string,
   date: string,
-  device: string,
+  device_id: string,
   incident_type: string,
   description: string,
   status: IncidentState,

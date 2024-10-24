@@ -11,6 +11,15 @@ export const useForm = <T extends object>(initialForm: T) => {
     }))
   }
 
+  const onTextAreaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = event.target
+    setFormState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }))
+  }
+
+
   const onResetForm = () => {
     setFormState(initialForm)
   }
@@ -27,6 +36,7 @@ export const useForm = <T extends object>(initialForm: T) => {
     ...formState,
     formState,
     onInputChange,
+    onTextAreaChange,
     onResetForm,
     setFormState,
     updateFields,
