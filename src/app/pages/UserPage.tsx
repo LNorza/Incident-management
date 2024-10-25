@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { IOptions, IUser, UserModalType } from '../../utils'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL, getUserRole } from '../../utils/api'
+import { API_BASE_URL, getUserRole, getUserPositionOptions, IOptions, IUser, UserModalType } from '../../utils'
+import { UserModal, UserTable } from '../components'
 import { Plus } from 'lucide-react'
-import { UserTable } from '../components'
-import { UserModal } from '../components/UserPageContent/UserModal'
 import style from '../style/deviceContainer.module.css'
-import { getUserPositionOptions, getUserPositionTechniciansOptions } from '../../utils/selectOptions/userOptions'
+import { getUserPositionOptions } from '../../utils/selectOptions/userOptions'
 
 export const UserPage = () => {
     const [showModal, setShowModal] = useState(false)

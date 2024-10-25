@@ -1,4 +1,6 @@
 export * from './build'
 export * from './device'
-export * from './user'
+export * from './incident'
 export * from './options'
+export * from './sidebar'
+export * from './user'

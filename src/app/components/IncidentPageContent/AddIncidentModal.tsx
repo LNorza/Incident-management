@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Device, IOptions } from '../../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
-import { CustomInput, CustomSelect } from '../../../ui'
+import style from '../../style/modal.module.css'
 import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
 import { CircleX } from 'lucide-react'
-import style from '../../style/modal.module.css'
+import { CustomInput, CustomSelect } from '../../../ui'
+import { IOptions } from '../../../utils'
 import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
 import { ICreateIncident } from '../../../utils/interface/incident'
+import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { CustomTextArea } from '../../../ui/components/CustomTextArea'
 
 interface Props {
     onClose: () => void
@@ -29,7 +30,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
 
-    const { onInputChange, formState, updateFields } = useForm<ICreateIncident>({
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<ICreateIncident>({
         folio: '',
         device_id: '',
         date: new Date(),
@@ -126,13 +127,6 @@ export const AddIncidentModal = ({ onClose }: Props) => {
     }
 
     const handleTestSubmit = () => {
-        // updateFields({
-        //     department_id: building,
-        //     device_id: device,
-        //     incident_type: incidentType,
-        //     work: workType,
-        // })
-        console.log('Soy el submit', formState)
         try {
             // const method = deviceId ? 'PUT' : 'POST'
             const url = `${API_BASE_URL}/incidents`
@@ -287,14 +281,13 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                     <section>
                         Descripción
                         <div className={style.formDescription}>
-                            <CustomInput
+                            <CustomTextArea
                                 isFormInput
                                 name="description"
                                 value={formState.description}
                                 placeholder="Ingresa la descripción"
                                 type="description"
-                                onChange={onInputChange}
-                                autoComplete="description"
+                                onChange={onTextAreaChange}
                             />
                         </div>
                     </section>

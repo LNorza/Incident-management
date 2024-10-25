@@ -1,4 +1,4 @@
-export * from './DeviceTable'
+export * from './AddDeviceModal'
 export * from './DeviceModal'
 export * from './DevicesList'
-export * from './AddDeviceModal'
+export * from './DeviceTable'

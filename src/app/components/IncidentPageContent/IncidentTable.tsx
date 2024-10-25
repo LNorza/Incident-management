@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { DeviceProps, IDevice, myTheme } from '../../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { IDevice, myTheme } from '../../../utils'
+import { API_BASE_URL } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { IIncident } from '../../../utils/interface/incident'
+import { dateFormatter } from '../../../utils/formatter/date.formatter'
 
 interface IncidentTableProps {
     refresh: boolean
@@ -15,33 +16,40 @@ interface IncidentTableProps {
 }
 
 export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
-    const [rowData2, setRowData2] = useState<IDevice[]>([])
     const [rowData, setRowData] = useState<IIncident[]>([])
+
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
-    const handleEditClick = useCallback((row: IDevice) => {
-        editDevice(row._id)
-    }, [])
+    const handleEditClick = useCallback(
+        (row: IDevice) => {
+            editDevice(row._id)
+        },
+        [editDevice],
+    )
 
-    const handleDeleteClick = useCallback((row: IDevice) => {
-        deleteDevice(row._id, row.name)
-    }, [])
+    const handleDeleteClick = useCallback(
+        (row: IDevice) => {
+            deleteDevice(row._id, row.name)
+        },
+        [deleteDevice],
+    )
 
-    const getUserName = async (userId: string) => {
-        if (userId === '') return 'Compartido'
+    // Función para obtener el dispositivo
+    const fetchDeviceById = async (deviceId: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+            const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
                 credentials: 'include',
             })
             const data = await response.json()
-            return `${data.name}`
+            return data.name // Devuelve el nombre del dispositivo
         } catch (err) {
-            console.error(err)
-            return 'Desconocido'
+            console.error(`Error fetching device ${deviceId}:`, err)
+            return 'Desconocido' // En caso de error, devuelve un valor por defecto
         }
     }
 
+    // Función principal para obtener los incidentes
     const fetchIncident = useCallback(async () => {
         try {
             const response = await fetch(`${API_BASE_URL}/incidents`, {
@@ -49,48 +57,44 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
             })
             const data = await response.json()
 
+            // Cache local para evitar múltiples solicitudes al mismo dispositivo
+            const deviceCache: { [key: string]: string } = {}
+
             const formattedData = await Promise.all(
-                data.map(async ({ folio, date, device, incident_type, description, status }: IIncident) => {
+                data.map(async ({ folio, date, device_id, incident_type, description, status }: IIncident) => {
+                    const formattedDate = dateFormatter(new Date(date))
+
+                    // Revisa si el dispositivo ya está en la caché
+                    if (!deviceCache[device_id]) {
+                        deviceCache[device_id] = await fetchDeviceById(device_id)
+                    }
+
                     return {
                         folio,
-                        date,
-                        device,
+                        date: formattedDate,
+                        device_id: deviceCache[device_id], // Usa el nombre del dispositivo desde la caché
                         incident_type,
                         description,
                         status,
                     }
                 }),
             )
-            console.log('data', formattedData)
-
             setRowData(formattedData)
         } catch (err) {
             console.error(err)
         }
     }, [building])
 
-    // useEffect(() => {
-    //     const fetchDepartment = async () => {
-    //         try {
-    //             const id = await getUserDepartment()
-    //             setDepartmentId(id)
-    //         } catch (err) {
-    //             console.error(err)
-    //         }
-    //     }
-    //     fetchDepartment()
-    // }, [])
-
-    // useEffect(() => {
-    //     fetchDevices()
-    // }, [departmentId, refresh, fetchDevices, building])
+    useEffect(() => {
+        fetchIncident()
+    }, [fetchIncident, refresh, building])
 
     const colDefs: ColDef[] = [
-        { field: 'folio', headerName: 'Folio', sortable: true, width: 270 },
+        { field: 'folio', headerName: 'Folio', sortable: true, width: 100 },
         { field: 'date', headerName: 'Fecha de solicitud', sortable: true },
-        { field: 'nameDevice', headerName: 'Equipo', sortable: true }, // Usa flex
+        { field: 'device_id', headerName: 'Equipo', sortable: true }, // Actualizado para devolver el nombre del dispositivo
         {
-            field: 'type',
+            field: 'incident_type',
             headerName: 'Tipo',
             sortable: true,
             flex: 1,
@@ -137,7 +141,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
                     case 'FINISHED':
                         return { color: '#FEAF5A' }
                     default:
-                        return { color: '#ff0505' }
+                        return { color: '#FFFF' }
                 }
             },
             flex: 1,
@@ -170,7 +174,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
                 ],
             }),
             autoHeight: true,
-            flex: 0.7, // Usa flex para las acciones
+            flex: 0.7,
         },
     ]
 
