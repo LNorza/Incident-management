@@ -1,14 +1,26 @@
 import { IUserData } from '../interface'
 import { API_BASE_URL } from './apiConfig'
 
-const getPosition = (position: string): string => {
+export const getPosition = (position: string): string => {
     switch (position) {
         case 'HEAD_SYSTEMS_DEPARTMENT':
             return 'Jefe del departamento de sistemas'
         case 'HEAD_BIOCHEMISTRY_DEPARTMENT':
             return 'Jefe del departamento de bioquímica'
+        case 'TECHNICIANS_CHIEF':
+            return 'Jefe de técnicos'
         case 'LAB_CHIEF':
             return 'Jefe de laboratorio'
+        case 'TECHNICIAN':
+            return 'Técnico'
+        case 'TECHNICIAN_SYSTEMS':
+            return 'Técnico de sistemas'
+        case 'TECHNICIAN_NETWORKS':
+            return 'Técnico de redes'
+        case 'TECHNICIAN_SOFTWARE':
+            return 'Técnico de software'
+        case 'TECHNICIAN_HARDWARE':
+            return 'Técnico de hardware'
         case 'TEACHER':
             return 'Docente'
         default:
@@ -16,7 +28,7 @@ const getPosition = (position: string): string => {
     }
 }
 
-const getRole = (role: string): string => {
+export const getRole = (role: string): string => {
     switch (role) {
         case 'ADMIN':
             return 'Administrador'

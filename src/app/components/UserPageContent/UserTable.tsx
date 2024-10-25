@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { IUser, myTheme } from '../../../utils'
-import { formatUserPositions, formatUserRoles } from '../../../utils/selectOptions/userOptions'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { API_BASE_URL, getUserDepartment, getPosition, getRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
@@ -44,8 +43,8 @@ export const UserTable: React.FC<UserTableProps> = ({ refresh, positionFilter, e
                     email,
                     username,
                     password,
-                    position: formatUserPositions(position),
-                    role: formatUserRoles(role),
+                    position: getPosition(position),
+                    role: getRole(role),
                     department_id,
                     imageUrl,
                 }),

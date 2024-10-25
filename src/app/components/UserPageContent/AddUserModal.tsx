@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { IOptions, IUser } from '../../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
-import { getUserPositionOptions } from '../../../utils/selectOptions/userOptions'
+import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
+import { getUserPositionOptions, getUserPositionTechniciansOptions } from '../../../utils/selectOptions/userOptions'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
@@ -15,9 +15,8 @@ interface Props {
 
 export const AddUserModal = ({ userData, onClose }: Props) => {
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const [positionOptionsState] = useState<IOptions[]>(getUserPositionOptions)
     const [position, setPosition] = useState<string | undefined>(undefined)
-
+    const [positionOptionsState, setPositionOptionsState] = useState<IOptions[]>([])
     const { onInputChange, formState, updateFields } = useForm({
         name: '',
         email: '',
@@ -35,8 +34,29 @@ export const AddUserModal = ({ userData, onClose }: Props) => {
         }
     }
 
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            if (role === 'ADMIN_TECHNICIANS') {
+                setPositionOptionsState(getUserPositionTechniciansOptions)
+            } else {
+                setPositionOptionsState(getUserPositionOptions)
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     useEffect(() => {
-        fetchDepartment()
+        const getData = async () => {
+            try {
+                await fetchUserRole()
+                await fetchDepartment()
+            } catch (err) {
+                console.error(err)
+            }
+        }
+        getData()
     }, [])
 
     useEffect(() => {
@@ -75,9 +95,15 @@ export const AddUserModal = ({ userData, onClose }: Props) => {
         return true
     }
 
-    const getUserRole = () => {
+    const getRole = () => {
         if (position === 'LAB_CHIEF') return 'ADMIN_LAB'
         if (position === 'TEACHER') return 'ONLY_READ'
+        if (position === 'TECHNICIAN') return 'TECHNICIAN'
+        if (position === 'TECHNICIAN_SYSTEMS') return 'TECHNICIAN'
+        if (position === 'TECHNICIAN_NETWORKS') return 'TECHNICIAN'
+        if (position === 'TECHNICIAN_SOFTWARE') return 'TECHNICIAN'
+        if (position === 'TECHNICIAN_HARDWARE') return 'TECHNICIAN'
+        return 'ONLY_READ'
     }
 
     const saveDevice = () => {
@@ -90,7 +116,7 @@ export const AddUserModal = ({ userData, onClose }: Props) => {
             username: formState.username,
             password: formState.password,
             position: position,
-            role: getUserRole(),
+            role: getRole(),
             department_id: departmentId,
             imageUrl: '',
         }

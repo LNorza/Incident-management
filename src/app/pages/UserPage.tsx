@@ -1,6 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL, getUserPositionOptions, IOptions, IUser, UserModalType } from '../../utils'
+import {
+    API_BASE_URL,
+    getUserRole,
+    getUserPositionOptions,
+    getUserPositionTechniciansOptions,
+    IOptions,
+    IUser,
+    UserModalType,
+} from '../../utils'
 import { UserModal, UserTable } from '../components'
 import { Plus } from 'lucide-react'
 import style from '../style/deviceContainer.module.css'
@@ -13,7 +21,24 @@ export const UserPage = () => {
     const [userData, setUserData] = useState<IUser | undefined>(undefined)
     const [refreshTable, setRefreshTable] = useState(false)
     const [position, setPosition] = useState<string>('ALL')
-    const [usersOptions] = useState<IOptions[]>([{ label: 'Todos', value: 'ALL' }, ...getUserPositionOptions])
+    const [usersOptions, setUserOptions] = useState<IOptions[]>([])
+
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            if (role === 'ADMIN_TECHNICIANS') {
+                setUserOptions([{ label: 'Todos', value: 'ALL' }, ...getUserPositionTechniciansOptions])
+            } else {
+                setUserOptions([{ label: 'Todos', value: 'ALL' }, ...getUserPositionOptions])
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchUserRole()
+    }, [])
 
     const handleSelect = (selected: { label: string; value: string }) => {
         setPosition(selected.value)
@@ -22,6 +47,7 @@ export const UserPage = () => {
 
     const onOpenModal = () => {
         setTypeModal('AddUser')
+        setRefreshTable(false)
         setShowModal(true)
     }
 

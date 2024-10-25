@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { BuildContent, BuildModal } from '../components'
-import { API_BASE_URL, BuildingProps, BuildModalType, getUserDepartment, OfficeProps } from '../../utils'
+import { BuildingProps, BuildModalType, OfficeProps } from '../../utils'
+import { API_BASE_URL, getUserDepartment, getUserRole } from '../../utils/api'
 import { Plus } from 'lucide-react'
 import style from '../style/BuildContainer.module.css'
 
@@ -16,15 +17,30 @@ export const BuildingPage = () => {
     const [deleteName, setDeleteName] = useState<string>('')
     const [deleteFunction, setDeleteFunction] = useState<() => void>(() => () => {})
     const [locationId, setLocationId] = useState<string | undefined>('')
+    const [userRole, setUserRole] = useState<string | null>(null)
+    const isTechnician = userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
 
     useEffect(() => {
         fetchDepartment()
+        fetchUserRole()
     }, [])
+
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            setUserRole(role)
+        } catch (err) {
+            console.error(err)
+        }
+    }
 
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
+                const url = isTechnician
+                    ? `${API_BASE_URL}/buildings`
+                    : `${API_BASE_URL}/buildings-search?department_id=${departmentId}`
+                const response = await fetch(url, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -33,7 +49,7 @@ export const BuildingPage = () => {
                 console.error('Error fetching buildings:', error)
             }
         }
-    }, [departmentId])
+    }, [departmentId, userRole])
 
     useEffect(() => {
         fetchBuildings()
@@ -124,10 +140,12 @@ export const BuildingPage = () => {
             <div className={`${style.container}`}>
                 <section className={`${style.headerBuild}`}>
                     <h2>Edificios</h2>
-                    <button onClick={() => handleTypeModal('AddBuild')} className={`${style.buildAddButton}`}>
-                        <Plus strokeWidth={1.75} />
-                        Agregar
-                    </button>
+                    {!isTechnician && (
+                        <button onClick={() => handleTypeModal('AddBuild')} className={`${style.buildAddButton}`}>
+                            <Plus strokeWidth={1.75} />
+                            Agregar
+                        </button>
+                    )}
                 </section>
                 <section className={`${style.buildingsContainer}`}>
                     {buildings.length > 0 ? (

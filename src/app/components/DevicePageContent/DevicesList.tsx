@@ -65,7 +65,7 @@ export const DevicesListModal = ({ locationId, onClose }: Props) => {
 
     const fetchDevices = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/devices-search?locationId=${locationId}`, {
+            const response = await fetch(`${API_BASE_URL}/devices-search?location_id=${locationId}`, {
                 credentials: 'include',
             })
             const data = await response.json()
