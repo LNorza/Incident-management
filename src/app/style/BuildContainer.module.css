@@ -134,7 +134,11 @@
 }
 
 .buildTableHeaderName {
-    width: 80%;
+    width: 40%;
+}
+
+.buildTableHeaderManager {
+    width: 40%;
 }
 
 .buildTableHeaderActions {
@@ -144,8 +148,23 @@
     width: 20%;
 }
 
+.buildTableHeaderAdmin {
+    justify-content: flex-start;
+}
+
+.buildTableName {
+    width: 40%;
+}
+
+.buildTableManager {
+    width: 40%;
+}
+
 .buildTableActions {
-    width: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 20%;
 }
 
 .buildTableHeaderText {
@@ -221,4 +240,6 @@
 .totalDevicesText {
     font-size: 1.25rem;
     font-weight: 400;
+    display: flex;
+    gap: 4px;
 }

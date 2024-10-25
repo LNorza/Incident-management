@@ -6,10 +6,11 @@ export interface BuildingProps {
     departments: [
         {
             department_id?: string
-            build_manager?: {
+            build_manager: {
                 _id: string
                 name: string
             }
+            _id: string
         },
     ]
     totalDevices: number

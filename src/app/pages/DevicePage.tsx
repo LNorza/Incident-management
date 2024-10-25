@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { DeviceModal, DeviceTable } from '../components'
-import { API_BASE_URL, getUserDepartment } from '../../utils/api'
+import { API_BASE_URL, getUserDepartment, getUserRole } from '../../utils/api'
 import { CustomSelect } from '../../ui'
 import { DeviceModalType, IOptions } from '../../utils'
 import { Plus } from 'lucide-react'
@@ -15,6 +15,17 @@ export const DevicePage = () => {
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [buildingsOptions, setBuildingsOptions] = useState<IOptions[]>([])
     const [building, setBuilding] = useState<string>('ALL')
+    const [userRole, setUserRole] = useState<string | null>(null)
+    const isTechnician = userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
+
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            setUserRole(role)
+        } catch (err) {
+            console.error(err)
+        }
+    }
 
     const fetchDepartment = async () => {
         try {
@@ -26,13 +37,20 @@ export const DevicePage = () => {
     }
 
     useEffect(() => {
-        fetchDepartment()
+        const getData = async () => {
+            await fetchUserRole()
+            await fetchDepartment()
+        }
+        getData()
     }, [])
 
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
+                const url = isTechnician
+                    ? `${API_BASE_URL}/buildings`
+                    : `${API_BASE_URL}/buildings-search?department_id=${departmentId}`
+                const response = await fetch(url, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -115,9 +133,13 @@ export const DevicePage = () => {
                         <span>Edificio</span>
                         <div className={style.actionSection}>
                             <CustomSelect menu value={building} options={buildingsOptions} onSelect={handleSelect} />
-                            <button onClick={onOpenModal} className={style.button}>
-                                <Plus /> Agregar
-                            </button>
+                            {userRole === 'TECHNICIAN' ? (
+                                <></>
+                            ) : (
+                                <button onClick={onOpenModal} className={style.button}>
+                                    <Plus /> Agregar
+                                </button>
+                            )}
                         </div>
                     </article>
                 </section>

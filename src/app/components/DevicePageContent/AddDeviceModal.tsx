@@ -12,7 +12,7 @@ import {
     INoBreak,
     IOptions,
 } from '../../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
 import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
 import { useForm } from '../../../hooks'
 import { toast } from 'sonner'
@@ -54,6 +54,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const projectorConnectivityOptions: IOptions[] = getConnectivityRouterOptions
     const printerTypeOptions: IOptions[] = getPrinterTypeOptions
     const inkOptions: IOptions[] = getInkOptions
+    const [userRole, setUserRole] = useState<string | null>(null)
     const { onInputChange, formState, updateFields } = useForm({
         name: '',
         model: '',
@@ -155,9 +156,15 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     }
 
     const fetchBuildings = useCallback(async () => {
-        if (departmentId) {
+        if (departmentId && userRole) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
+                console.log('departmentId', departmentId)
+                console.log('userRole', userRole)
+                const url =
+                    userRole === 'ADMIN_TECHNICIANS'
+                        ? `${API_BASE_URL}/buildings`
+                        : `${API_BASE_URL}/buildings-search?department_id=${departmentId}`
+                const response = await fetch(url, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -171,17 +178,14 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                 console.error('Error fetching buildings:', error)
             }
         }
-    }, [departmentId])
+    }, [departmentId, userRole])
 
     const fetchOffices = useCallback(async () => {
         if (building) {
             try {
-                const response = await fetch(
-                    `${API_BASE_URL}/locations-search?building_id=${buildingId}&department_id=${departmentId}`,
-                    {
-                        credentials: 'include',
-                    },
-                )
+                const response = await fetch(`${API_BASE_URL}/locations-search?building_id=${buildingId}`, {
+                    credentials: 'include',
+                })
                 const data = await response.json()
                 setOfficesOptions(
                     data.map((office: { _id: string; name: string }) => ({
@@ -195,18 +199,6 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         }
     }, [building])
 
-    const fetchDevice = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
-                credentials: 'include',
-            })
-            const data = await response.json()
-            setDeviceData(data)
-        } catch (error) {
-            console.error('Error fetching device:', error)
-        }
-    }
-
     useEffect(() => {
         fetchDepartment()
     }, [])
@@ -216,7 +208,29 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     }, [buildingId, fetchOffices])
 
     useEffect(() => {
+        const fetchUserRole = async () => {
+            try {
+                const role = await getUserRole()
+                setUserRole(role)
+            } catch (err) {
+                console.error(err)
+            }
+        }
+
+        const fetchDevice = async () => {
+            try {
+                const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
+                    credentials: 'include',
+                })
+                const data = await response.json()
+                setDeviceData(data)
+            } catch (error) {
+                console.error('Error fetching device:', error)
+            }
+        }
+
         const fetchData = async () => {
+            await fetchUserRole()
             await fetchBuildings()
             if (deviceId) {
                 await fetchDevice()

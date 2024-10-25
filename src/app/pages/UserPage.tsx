@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { IOptions, IUser, UserModalType } from '../../utils'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL } from '../../utils/api'
+import { API_BASE_URL, getUserRole } from '../../utils/api'
 import { Plus } from 'lucide-react'
 import { UserTable } from '../components'
 import { UserModal } from '../components/UserPageContent/UserModal'
 import style from '../style/deviceContainer.module.css'
-import { getUserPositionOptions } from '../../utils/selectOptions/userOptions'
+import { getUserPositionOptions, getUserPositionTechniciansOptions } from '../../utils/selectOptions/userOptions'
 
 export const UserPage = () => {
     const [showModal, setShowModal] = useState(false)
@@ -16,7 +16,24 @@ export const UserPage = () => {
     const [userData, setUserData] = useState<IUser | undefined>(undefined)
     const [refreshTable, setRefreshTable] = useState(false)
     const [position, setPosition] = useState<string>('ALL')
-    const [usersOptions] = useState<IOptions[]>([{ label: 'Todos', value: 'ALL' }, ...getUserPositionOptions])
+    const [usersOptions, setUserOptions] = useState<IOptions[]>([])
+
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            if (role === 'ADMIN_TECHNICIANS') {
+                setUserOptions([{ label: 'Todos', value: 'ALL' }, ...getUserPositionTechniciansOptions])
+            } else {
+                setUserOptions([{ label: 'Todos', value: 'ALL' }, ...getUserPositionOptions])
+            }
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    useEffect(() => {
+        fetchUserRole()
+    }, [])
 
     const handleSelect = (selected: { label: string; value: string }) => {
         setPosition(selected.value)
@@ -25,6 +42,7 @@ export const UserPage = () => {
 
     const onOpenModal = () => {
         setTypeModal('AddUser')
+        setRefreshTable(false)
         setShowModal(true)
     }
 

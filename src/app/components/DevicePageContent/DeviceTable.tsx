@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
 import { DeviceProps, IDevice, myTheme } from '../../../utils'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
+import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
@@ -18,6 +18,8 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
+    const [userRole, setUserRole] = useState<string | null>(null)
+    const isTechnician = userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
 
     const handleEditClick = useCallback((row: IDevice) => {
         editDevice(row._id)
@@ -44,12 +46,13 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
     const fetchDevices = useCallback(async () => {
         if (!departmentId) return
         try {
-            const response = await fetch(
-                `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`,
-                {
-                    credentials: 'include',
-                },
-            )
+            console.log(building)
+            const url = isTechnician
+                ? `${API_BASE_URL}/devices-by-department-search?building_id=${building}`
+                : `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`
+            const response = await fetch(url, {
+                credentials: 'include',
+            })
             const data = await response.json()
 
             const formattedData = await Promise.all(
@@ -86,8 +89,21 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
         fetchDepartment()
     }, [])
 
+    const fetchUserRole = async () => {
+        try {
+            const role = await getUserRole()
+            setUserRole(role)
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
     useEffect(() => {
-        fetchDevices()
+        const infoDevices = async () => {
+            await fetchUserRole()
+            await fetchDevices()
+        }
+        infoDevices()
     }, [departmentId, refresh, fetchDevices, building])
 
     const colDefs: ColDef[] = [
@@ -201,14 +217,18 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                             handleEditClick(row)
                         },
                     },
-                    {
-                        text: 'Borrar',
-                        icon: Trash2,
-                        onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation()
-                            handleDeleteClick(row)
-                        },
-                    },
+                    ...(userRole === 'ADMIN_DEPARTMENT' || userRole === 'ADMIN_TECHNICIANS'
+                        ? [
+                              {
+                                  text: 'Borrar',
+                                  icon: Trash2,
+                                  onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
+                                      e.stopPropagation()
+                                      handleDeleteClick(row)
+                                  },
+                              },
+                          ]
+                        : []),
                 ],
             }),
             autoHeight: true,

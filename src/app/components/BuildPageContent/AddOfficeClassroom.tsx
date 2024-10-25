@@ -27,6 +27,7 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
     const typesOptions = [
         { value: 'office', label: 'Oficina' },
         { value: 'classroom', label: 'Salón' },
+        { value: 'lab', label: 'Laboratorio' },
     ]
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const [needManager, setNeedManager] = useState(false)
@@ -36,7 +37,7 @@ export const AddOfficeClassroom = ({ buildingId, officeData, onClose }: Props) =
 
     useEffect(() => {
         fetchDepartment()
-    }, [])
+    })
 
     const fetchDepartment = async () => {
         try {
