@@ -1,8 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { DeviceModal, DeviceTable } from '../components'
-import { API_BASE_URL, getUserDepartment, getUserRole } from '../../utils/api'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL, DeviceModalType, getUserDepartment, IOptions } from '../../utils'
+import { API_BASE_URL, DeviceModalType, getUserDepartment, IOptions, getUserRole } from '../../utils'
 import { Plus } from 'lucide-react'
 import style from '../style/deviceContainer.module.css'
 
