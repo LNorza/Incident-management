@@ -3,7 +3,7 @@ import { LucideIcon, Ellipsis } from 'lucide-react'
 import ReactDOM from 'react-dom'
 import style from '../style/Actions.module.css'
 
-interface Action {
+export interface Action {
     text: string
     icon: LucideIcon
     color?: string

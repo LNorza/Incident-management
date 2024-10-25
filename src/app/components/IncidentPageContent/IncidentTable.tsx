@@ -1,39 +1,50 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IDevice, myTheme } from '../../../utils'
-import { API_BASE_URL } from '../../../utils/api'
+import { myTheme } from '../../../utils'
+import { API_BASE_URL, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
-import { Trash2, Pencil } from 'lucide-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { IIncident } from '../../../utils/interface/incident'
 import { dateFormatter } from '../../../utils/formatter/date.formatter'
+import { getActionIncident } from '../../utils/getActionsIncidents'
 
 interface IncidentTableProps {
     refresh: boolean
     building: string
-    editDevice: (deviceId: string) => void
-    deleteDevice: (deviceId: string, deleteName: string) => void
+    editIncident?: (deviceId: string) => void
+    deleteIncident?: (deviceId: string, deleteName: string) => void
 }
 
-export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building, editDevice, deleteDevice }) => {
+export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building, editIncident, deleteIncident }) => {
     const [rowData, setRowData] = useState<IIncident[]>([])
 
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
+    const [userRole, setUserRole] = useState<string | null>(null)
 
-    const handleEditClick = useCallback(
-        (row: IDevice) => {
-            editDevice(row._id)
+    const handleReleasedClick = useCallback(
+        (row: IIncident) => {
+            if (editIncident) {
+                editIncident(row._id)
+            }
         },
-        [editDevice],
+        [editIncident],
     )
 
     const handleDeleteClick = useCallback(
-        (row: IDevice) => {
-            deleteDevice(row._id, row.name)
+        (row: IIncident) => {
+            if (deleteIncident) {
+                deleteIncident(row._id, `Folio ${row.folio}`)
+            }
         },
-        [deleteDevice],
+        [deleteIncident],
     )
+
+    // Función para obtener el rol del usuario
+    const fetchRole = async () => {
+        const role = await getUserRole() // Obtener el rol del usuario
+        setUserRole(role) // Guardar el rol en el estado
+    }
 
     // Función para obtener el dispositivo
     const fetchDeviceById = async (deviceId: string) => {
@@ -61,7 +72,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
             const deviceCache: { [key: string]: string } = {}
 
             const formattedData = await Promise.all(
-                data.map(async ({ folio, date, device_id, incident_type, description, status }: IIncident) => {
+                data.map(async ({ _id, folio, date, device_id, incident_type, description, status }: IIncident) => {
                     const formattedDate = dateFormatter(new Date(date))
 
                     // Revisa si el dispositivo ya está en la caché
@@ -70,6 +81,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
                     }
 
                     return {
+                        _id,
                         folio,
                         date: formattedDate,
                         device_id: deviceCache[device_id], // Usa el nombre del dispositivo desde la caché
@@ -84,6 +96,10 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
             console.error(err)
         }
     }, [building])
+
+    useEffect(() => {
+        fetchRole()
+    }, [])
 
     useEffect(() => {
         fetchIncident()
@@ -114,7 +130,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
         { field: 'description', headerName: 'Descripción', sortable: true, flex: 1 },
         {
             field: 'status',
-            headerName: 'Status',
+            headerName: 'Estatus',
             sortable: true,
             cellRenderer: (params: ICellRendererParams) => {
                 switch (params.value) {
@@ -150,29 +166,22 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
             field: 'actions',
             headerName: 'Acciones',
             cellRenderer: Actions,
-            cellRendererParams: (params: ICellRendererParams) => ({
-                row: params.data,
-                table: true,
-                parentRef: contentRef,
-                actions: [
-                    {
-                        text: 'Editar',
-                        icon: Pencil,
-                        onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation()
-                            handleEditClick(row)
-                        },
-                    },
-                    {
-                        text: 'Borrar',
-                        icon: Trash2,
-                        onClick: (row: IDevice, e: React.MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation()
-                            handleDeleteClick(row)
-                        },
-                    },
-                ],
-            }),
+            cellRendererParams: (params: ICellRendererParams) => {
+                const actions = getActionIncident({
+                    status: params.data.status,
+                    role: userRole ?? undefined,
+                    rowData: params.data,
+                    function1: handleReleasedClick,
+                    function2: handleDeleteClick,
+                })
+
+                return {
+                    row: params.data,
+                    table: true,
+                    parentRef: contentRef,
+                    actions: actions,
+                }
+            },
             autoHeight: true,
             flex: 0.7,
         },

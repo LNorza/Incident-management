@@ -6,15 +6,17 @@ import { CircleX } from 'lucide-react'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { IOptions } from '../../../utils'
 import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
-import { ICreateIncident } from '../../../utils/interface/incident'
+import { ICreateIncident, Incident } from '../../../utils/interface/incident'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { CustomTextArea } from '../../../ui/components/CustomTextArea'
+import { set } from 'date-fns'
 
 interface Props {
     onClose: () => void
+    incidentId?: string | undefined
 }
 
-export const AddIncidentModal = ({ onClose }: Props) => {
+export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     const [buildingId, setBuildingId] = useState<string | undefined>(undefined)
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
 
@@ -24,11 +26,25 @@ export const AddIncidentModal = ({ onClose }: Props) => {
     const [incidentTypeOptions] = useState<IOptions[]>(getIncidentTypeOptions)
     const [workTypeOptions, setWorkTypeOptions] = useState<IOptions[]>()
 
+    const [folio, setFolio] = useState<string | undefined>(undefined)
     const [building, setBuilding] = useState<string | undefined>(undefined)
     const [location, setLocation] = useState<string | undefined>(undefined)
     const [device, setDevice] = useState<string | undefined>(undefined)
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
+    const [description, setDescription] = useState<string | undefined>(undefined)
+
+    const [incidentData, setIncidentData] = useState<ICreateIncident>({
+        folio: '',
+        device_id: '',
+        date: new Date(),
+        status: 'SENT',
+        incident_type: '',
+        work: '',
+        period: 1,
+        description: '',
+        department_id: '',
+    })
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<ICreateIncident>({
         folio: '',
@@ -65,6 +81,37 @@ export const AddIncidentModal = ({ onClose }: Props) => {
             setDepartmentId(id ?? undefined)
         } catch (err) {
             console.error(err)
+        }
+    }
+
+    const fetchDevices = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/devices-search?locationId=${location}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            setDeviceOptions(
+                data.map((building: { _id: string; name: string }) => ({
+                    label: building.name,
+                    value: building._id,
+                })),
+            )
+        } catch (err) {
+            toast.error('Error al obtener los dispositivos')
+        }
+    }
+
+    const fetchIncident = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/incidents/${incidentId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            console.log('Incident data:', data)
+
+            setIncidentData(data)
+        } catch (error) {
+            console.error('Error fetching device:', error)
         }
     }
 
@@ -109,24 +156,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
         }
     }, [building])
 
-    const fetchDevices = async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/devices-search?locationId=${location}`, {
-                credentials: 'include',
-            })
-            const data = await response.json()
-            setDeviceOptions(
-                data.map((building: { _id: string; name: string }) => ({
-                    label: building.name,
-                    value: building._id,
-                })),
-            )
-        } catch (err) {
-            toast.error('Error al obtener los dispositivos')
-        }
-    }
-
-    const handleTestSubmit = () => {
+    const saveIncident = () => {
         try {
             // const method = deviceId ? 'PUT' : 'POST'
             const url = `${API_BASE_URL}/incidents`
@@ -151,6 +181,17 @@ export const AddIncidentModal = ({ onClose }: Props) => {
     }
 
     useEffect(() => {
+        fetchDepartment()
+        fetchFolio()
+    }, [])
+
+    useEffect(() => {
+        if (incidentId) {
+            fetchIncident()
+        }
+    }, [incidentId])
+
+    useEffect(() => {
         updateFields({
             department_id: building,
             device_id: device,
@@ -158,11 +199,6 @@ export const AddIncidentModal = ({ onClose }: Props) => {
             work: workType,
         })
     }, [workType])
-
-    useEffect(() => {
-        fetchDepartment()
-        fetchFolio()
-    }, [])
 
     useEffect(() => {
         fetchDevices()
@@ -181,11 +217,38 @@ export const AddIncidentModal = ({ onClose }: Props) => {
         setWorkTypeOptions(work)
     }, [incidentType])
 
+    useEffect(() => {
+        if (incidentData.folio) {
+            // Asegúrate de que incidentData tenga datos
+            setFolio(incidentData.folio)
+            setBuilding(buildingsOptions.find((building) => building.value === incidentData.department_id)?.value)
+            // setLocation(officesOptions.find((office) => office.value === incidentData.department_id)?.label)
+            setDevice(deviceOptions.find((device) => device.value === incidentData.device_id)?.value)
+            setIncidentType(
+                incidentTypeOptions.find((incident) => incident.value === incidentData.incident_type)?.value,
+            )
+            setWorkType(workTypeOptions?.find((work) => work.value === incidentData.work)?.value)
+            setDescription(incidentData.description)
+
+            updateFields({
+                folio: folio,
+                device_id: device,
+                date: incidentData.date,
+                status: incidentData.status,
+                incident_type: incidentType,
+                work: workType,
+                period: incidentData.period,
+                description: description,
+                department_id: building,
+            })
+        }
+    }, [incidentData, incidentId])
+
     return (
         <>
             <div className={style.titleModal}>
                 <CircleX />
-                <h2>Agregar Incidencia</h2>
+                <h2>{!incidentId ? 'Agregar Incidencia' : 'Editar Incidencia'}</h2>
             </div>
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
@@ -204,7 +267,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section>
+                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
                             Edificio
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -221,7 +284,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                     </div>
 
                     <div className={style.rowModal}>
-                        <section>
+                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
                             Sublocalización
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -296,7 +359,7 @@ export const AddIncidentModal = ({ onClose }: Props) => {
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>
-                    <button onClick={handleTestSubmit} className={style.saveButton}>
+                    <button onClick={saveIncident} className={style.saveButton}>
                         Guardar
                     </button>
                 </div>

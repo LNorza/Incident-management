@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { CustomSelect } from '../../ui'
-import { IncidentModalType, IOptions } from '../../utils'
+import { API_BASE_URL, IncidentModalType, IOptions } from '../../utils'
 import { IncidentModal, IncidentTable } from '../components'
 
 import { Plus } from 'lucide-react'
@@ -12,6 +12,8 @@ export const IncidentPage = () => {
     const [showModal, setShowModal] = useState(false)
     const [typeModal, setTypeModal] = useState<IncidentModalType>()
     const [refreshTable, setRefreshTable] = useState(false)
+    const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
+    const [deleteName, setDeleteName] = useState<string>('')
 
     const handleSelect = (selected: { label: string; value: string }) => {
         console.log(selected)
@@ -20,44 +22,44 @@ export const IncidentPage = () => {
     }
 
     const onOpenModal = () => {
-        // setTypeModal('AddDevice')
-        // setDeviceId(undefined)
+        setTypeModal('AddIncident')
+        setIncidentId(undefined)
         setShowModal(true)
     }
 
-    const handleEditModal = (deviceId: string) => {
-        // setTypeModal('EditDevice')
-        // setDeviceId(deviceId)
+    const handleEditModal = (id: string) => {
+        setTypeModal('EditIncident')
+        setIncidentId(id)
         setRefreshTable(false)
         setShowModal(true)
     }
 
-    const handleDeleteModal = (deviceId: string, deviceName: string) => {
-        // setTypeModal('DeleteDevice')
-        // setDeviceId(deviceId)
-        // setDeleteName(deviceName)
+    const handleDeleteModal = (id: string, incidentName: string) => {
+        setTypeModal('DeleteIncident')
+        setIncidentId(id)
+        setDeleteName(incidentName)
         setRefreshTable(false)
         setShowModal(true)
     }
 
     const onCloseModal = () => {
-        // setDeviceId(undefined)
-        // setDeleteName('')
+        setIncidentId(undefined)
+        setDeleteName('')
         setRefreshTable(true)
         setShowModal(false)
     }
 
     const deleteIncident = async () => {
-        // try {
-        //     const response = await fetch(`${API_BASE_URL}/devices/${deviceId}`, {
-        //         method: 'DELETE',
-        //         credentials: 'include',
-        //     })
-        //     if (!response.ok) throw new Error('Error al borrar edificio')
-        //     onCloseModal()
-        // } catch (error) {
-        //     console.error(error)
-        // }
+        try {
+            const response = await fetch(`${API_BASE_URL}/incidents/${incidentId}`, {
+                method: 'DELETE',
+                credentials: 'include',
+            })
+            if (!response.ok) throw new Error('Error al borrar la incidencia')
+            onCloseModal()
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (
@@ -105,13 +107,20 @@ export const IncidentPage = () => {
                     <IncidentTable
                         refresh={refreshTable}
                         building={incident}
-                        editDevice={handleEditModal}
-                        deleteDevice={handleDeleteModal}
+                        editIncident={handleEditModal}
+                        deleteIncident={handleDeleteModal}
                     />
                 </section>
             </div>
 
-            <IncidentModal isOpen={showModal} onClose={onCloseModal} type={typeModal} deleteFunction={deleteIncident} />
+            <IncidentModal
+                isOpen={showModal}
+                onClose={onCloseModal}
+                type={typeModal}
+                incidentId={incidentId}
+                deleteFunction={deleteIncident}
+                deleteName={deleteName}
+            />
         </>
     )
 }

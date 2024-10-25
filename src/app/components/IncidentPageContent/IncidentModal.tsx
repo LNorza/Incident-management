@@ -8,7 +8,7 @@ interface Props {
     isOpen: boolean
     onClose: () => void
     type?: IncidentModalType
-    deviceId?: string
+    incidentId?: string
     deleteName?: string
     deleteFunction: () => void
 }
@@ -16,7 +16,7 @@ interface Props {
 export const IncidentModal = ({
     isOpen,
     type = 'AddIncident',
-    deviceId,
+    incidentId,
     deleteName,
     deleteFunction,
     onClose,
@@ -33,7 +33,8 @@ export const IncidentModal = ({
                     )}
                     {type === 'EditIncident' && (
                         <section className={style.largeModalInfoContainer}>
-                            <AddDeviceModal onClose={onClose} deviceId={deviceId} />
+                            {/* <AddDeviceModal onClose={onClose} incidentId={incidentId} /> */}
+                            <AddIncidentModal onClose={onClose} incidentId={incidentId} />
                         </section>
                     )}
                     {type === 'DeleteIncident' && (

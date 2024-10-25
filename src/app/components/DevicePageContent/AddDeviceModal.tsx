@@ -74,6 +74,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         brightness: '',
         scope: '',
     })
+
     const [buyDate, setBuyDate] = useState<Date | null>(null)
     const [selectedDeviceType, setSelectedDeviceType] = useState<IOptions | null>(null)
     const [brand, setBrand] = useState<string | undefined>(undefined)
@@ -201,9 +202,11 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
+            console.log('data', data)
+
             setDeviceData(data)
         } catch (error) {
-            console.error('Error fetching device:', error)
+            console.error('Error fetching incident:', error)
         }
     }
 
