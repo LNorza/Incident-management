@@ -1,4 +1,15 @@
 import { IncidentState } from "../enum";
+import { Device } from "./device";
+
+export interface IFormIncident {
+  folio: string;
+  building: string;
+  location: string;
+  device: string;
+  incident_type: string;
+  worktype: string;
+  description: string;
+}
 
 export interface IIncident {
   _id: string,
@@ -11,26 +22,17 @@ export interface IIncident {
 }
 
 export interface Incident {
-  folio: string,
-  date: Date,
-  device_id: string,
-  incident_type: string,
-  description: string,
-  status: IncidentState,
-  department_id: string,
-  location_id: string,
-  period: number,
-  work: string,
-  technician_id: string,
-  start_date: Date,
-  end_date: Date,
-  time_duration: string,
-  priority: string,
-  rejected_reason: string,
-  qualification: number,
-  comments: string,
-  created_at: Date,
-  updated_at: Date,
+  date: string
+  location_id: string
+  description: string
+  device_id: Device
+  folio: string
+  incident_type: string
+  period: number
+  status: string
+  updated_at: string
+  work: string
+  _id: string
 }
 
 export interface ICreateIncident {

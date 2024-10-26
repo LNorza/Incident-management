@@ -6,10 +6,9 @@ import { CircleX } from 'lucide-react'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { IOptions } from '../../../utils'
 import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
-import { ICreateIncident, Incident } from '../../../utils/interface/incident'
+import { ICreateIncident, IFormIncident, Incident, UpdateIncidentDto } from '../../../utils/interface/incident'
 import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
 import { CustomTextArea } from '../../../ui/components/CustomTextArea'
-import { set } from 'date-fns'
 
 interface Props {
     onClose: () => void
@@ -26,15 +25,13 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     const [incidentTypeOptions] = useState<IOptions[]>(getIncidentTypeOptions)
     const [workTypeOptions, setWorkTypeOptions] = useState<IOptions[]>()
 
-    const [folio, setFolio] = useState<string | undefined>(undefined)
     const [building, setBuilding] = useState<string | undefined>(undefined)
     const [location, setLocation] = useState<string | undefined>(undefined)
     const [device, setDevice] = useState<string | undefined>(undefined)
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
-    const [description, setDescription] = useState<string | undefined>(undefined)
-
-    const [incidentData, setIncidentData] = useState<ICreateIncident>({
+    //State para nueva incidencia
+    const [newIncident, setNewIncident] = useState<ICreateIncident>({
         folio: '',
         device_id: '',
         date: new Date(),
@@ -46,16 +43,65 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         department_id: '',
     })
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<ICreateIncident>({
-        folio: '',
-        device_id: '',
-        date: new Date(),
-        status: 'SENT',
+    const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
         incident_type: '',
         work: '',
-        period: 1,
         description: '',
-        department_id: '',
+    })
+
+    const [incidentData, setIncidentData] = useState<Incident>({
+        date: '',
+        location_id: '',
+        description: '',
+        device_id: {
+            _id: '',
+            name: '',
+            type: '',
+            brand: '',
+            specs: {},
+            location_id: {
+                _id: '',
+                name: '',
+                building_id: {
+                    _id: '',
+                    name: '',
+                    description: '',
+                    isShared: false,
+                    departments: [
+                        {
+                            department_id: '',
+                            build_manager: {
+                                _id: '',
+                                name: '',
+                            },
+                            _id: '',
+                        },
+                    ],
+                    totalDevices: 0,
+                },
+            },
+            status: '',
+            purchaseDate: '',
+            warrantyYears: 0,
+            deviceModel: '',
+        },
+        folio: '',
+        incident_type: '',
+        period: 0,
+        status: '',
+        updated_at: '',
+        work: '',
+        _id: '',
+    })
+
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IFormIncident>({
+        folio: '',
+        building: '',
+        location: '',
+        device: '',
+        incident_type: '',
+        worktype: '',
+        description: '',
     })
 
     const fetchFolio = async () => {
@@ -107,7 +153,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            console.log('Incident data:', data)
+            // console.log('Incident data:', data)
 
             setIncidentData(data)
         } catch (error) {
@@ -118,7 +164,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?location_id=${departmentId}`, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -138,7 +184,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         if (building) {
             try {
                 const response = await fetch(
-                    `${API_BASE_URL}/locations-search?building_id=${buildingId}&department_id=${departmentId}`,
+                    `${API_BASE_URL}/locations-search?building_id=${buildingId}&location_id=${departmentId}`,
                     {
                         credentials: 'include',
                     },
@@ -157,8 +203,28 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     }, [building])
 
     const saveIncident = () => {
+        // if (incidentId) {
+        //     try {
+        //         const url = `${API_BASE_URL}/incidents/${incidentId}`
+        //         fetch(url, {
+        //             method: 'PUT',
+        //             headers: {
+        //                 'Content-Type': 'application/json',
+        //             },
+        //             credentials: 'include',
+        //             body: JSON.stringify(updateIncident),
+        //         }).then((response) => {
+        //             if (response.ok) {
+        //                 toast.success('Se actualizo la incidencia correctamente')
+        //                 onClose()
+        //             }
+        //         })
+        //     } catch (error) {
+        //         console.error('Error:', error)
+        //         toast.error('Error al actualizar la incidencia')
+        //     }
+        // } else {
         try {
-            // const method = deviceId ? 'PUT' : 'POST'
             const url = `${API_BASE_URL}/incidents`
 
             fetch(url, {
@@ -167,7 +233,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(formState),
+                body: JSON.stringify(newIncident),
             }).then((response) => {
                 if (response.ok) {
                     toast.success('Se creo la incidencia correctamente')
@@ -178,39 +244,29 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             console.error('Error:', error)
             toast.error('Error al crear la incidencia')
         }
+        // }
     }
 
     useEffect(() => {
-        fetchDepartment()
         fetchFolio()
+        fetchDepartment()
     }, [])
 
     useEffect(() => {
-        if (incidentId) {
-            fetchIncident()
-        }
-    }, [incidentId])
-
-    useEffect(() => {
-        updateFields({
-            department_id: building,
-            device_id: device,
-            incident_type: incidentType,
-            work: workType,
-        })
-    }, [workType])
-
-    useEffect(() => {
-        fetchDevices()
-    }, [location])
-
-    useEffect(() => {
         fetchOffices()
+        fetchDevices()
     }, [buildingId, fetchOffices])
 
     useEffect(() => {
-        fetchBuildings()
-    }, [departmentId, fetchBuildings])
+        const fetchData = async () => {
+            await fetchBuildings()
+            if (incidentId) {
+                await fetchFolio()
+                await fetchIncident()
+            }
+        }
+        fetchData()
+    }, [incidentId, departmentId, fetchBuildings])
 
     useEffect(() => {
         const work = getWorkTypeOptions(incidentType)
@@ -218,31 +274,60 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     }, [incidentType])
 
     useEffect(() => {
-        if (incidentData.folio) {
-            // Asegúrate de que incidentData tenga datos
-            setFolio(incidentData.folio)
-            setBuilding(buildingsOptions.find((building) => building.value === incidentData.department_id)?.value)
-            // setLocation(officesOptions.find((office) => office.value === incidentData.department_id)?.label)
-            setDevice(deviceOptions.find((device) => device.value === incidentData.device_id)?.value)
-            setIncidentType(
-                incidentTypeOptions.find((incident) => incident.value === incidentData.incident_type)?.value,
-            )
-            setWorkType(workTypeOptions?.find((work) => work.value === incidentData.work)?.value)
-            setDescription(incidentData.description)
+        updateFields({
+            building: building,
+            device: device,
+            location: location,
+            incident_type: incidentType,
+            worktype: workType,
+        })
+    }, [workType])
 
-            updateFields({
-                folio: folio,
-                device_id: device,
-                date: incidentData.date,
-                status: incidentData.status,
-                incident_type: incidentType,
-                work: workType,
-                period: incidentData.period,
-                description: description,
-                department_id: building,
-            })
-        }
+    useEffect(() => {
+        setNewIncident({
+            folio: formState.folio,
+            device_id: formState.device,
+            date: new Date(),
+            status: 'SENT',
+            incident_type: formState.incident_type,
+            work: formState.worktype,
+            period: 1,
+            description: formState.description,
+            department_id: formState.location,
+        })
+    }, [formState.description])
+
+    useEffect(() => {
+        setUpdateIncident({
+            incident_type: formState.incident_type,
+            work: formState.worktype,
+            description: formState.description,
+        })
+    }, [formState.incident_type, formState.worktype, formState.description])
+
+    useEffect(() => {
+        updateFields({
+            folio: incidentData.folio,
+            description: incidentData.description,
+        })
+        setBuilding(
+            buildingsOptions.find((building) => building.value === incidentData.device_id.location_id.building_id._id)
+                ?.value,
+        )
+        setBuildingId(incidentData.device_id.location_id.building_id._id)
+        setLocation(officesOptions.find((office) => office.value === incidentData.device_id.location_id._id)?.value)
+        setDevice(deviceOptions.find((device) => device.value === incidentData.device_id._id)?.value)
+        setIncidentType(incidentTypeOptions.find((incident) => incident.value === incidentData.incident_type)?.value)
+        setWorkType(workTypeOptions?.find((work) => work.value === incidentData.work)?.value)
+
+        updateFields({
+            device: device,
+            incident_type: incidentType,
+            worktype: workType,
+        })
     }, [incidentData, incidentId])
+
+    console.log('newIncident:', newIncident)
 
     return (
         <>
@@ -297,7 +382,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section>
+                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
                             Equipo
                             <div className={style.formInput}>
                                 <CustomSelect
