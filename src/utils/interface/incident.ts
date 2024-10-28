@@ -3,18 +3,23 @@ import { Device } from "./device";
 
 export interface IFormIncident {
   folio: string;
+  technician?: string;
   building: string;
   location: string;
   device: string;
   incident_type: string;
   worktype: string;
+  date?: Date;
+  priority?: string;
+  arrived_date?: string
+  time_duration?: string
   description: string;
 }
 
 export interface IIncident {
   _id: string,
   folio: string,
-  date: string,
+  date: Date,
   device_id: string,
   incident_type: string,
   description: string,
@@ -31,6 +36,11 @@ export interface Incident {
   period: number
   status: string
   updated_at: string
+  created_at?: string
+  technician_id: string
+  priority: string
+  arrived_date: string
+  time_duration: string
   work: string
   _id: string
 }

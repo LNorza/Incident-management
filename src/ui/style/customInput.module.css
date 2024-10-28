@@ -99,3 +99,12 @@
     outline: none;
     caret-color: white;
 }
+
+.greencolor {
+    color: #abe7df;
+}
+
+.redcolor {
+    color: var(--Red);
+}
+

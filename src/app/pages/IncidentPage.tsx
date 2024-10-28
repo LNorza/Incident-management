@@ -1,22 +1,24 @@
 import { useState } from 'react'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL, IncidentModalType, IOptions } from '../../utils'
+import { API_BASE_URL, IncidentModalType, IncidentState, IOptions } from '../../utils'
 import { IncidentModal, IncidentTable } from '../components'
 
 import { Plus } from 'lucide-react'
 import style from '../style/deviceContainer.module.css'
 
 export const IncidentPage = () => {
-    const [incident, setIncident] = useState<string>('ALL')
-    const [incidentOptions, setIncidentOptions] = useState<IOptions[]>([])
     const [showModal, setShowModal] = useState(false)
     const [typeModal, setTypeModal] = useState<IncidentModalType>()
     const [refreshTable, setRefreshTable] = useState(false)
-    const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
     const [deleteName, setDeleteName] = useState<string>('')
+    const [incidentStatus, setIncidentStatus] = useState<IncidentState>()
+    const [nameAction, setNameAction] = useState('')
+
+    const [incident, setIncident] = useState<string>('ALL')
+    const [incidentOptions, setIncidentOptions] = useState<IOptions[]>([])
+    const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
 
     const handleSelect = (selected: { label: string; value: string }) => {
-        console.log(selected)
         setIncident(selected.value)
         setRefreshTable(true)
     }
@@ -27,8 +29,23 @@ export const IncidentPage = () => {
         setShowModal(true)
     }
 
-    const handleEditModal = (id: string) => {
-        setTypeModal('EditIncident')
+    const handletypeModal = (
+        id: string,
+        type: IncidentModalType = 'EditIncident',
+        incidentStatus?: IncidentState,
+        nameAction?: string,
+    ) => {
+        setTypeModal(type)
+        console.log('nameAction', nameAction)
+
+        if (type == 'FinishedIncident') {
+            setTypeModal('FinishedIncident')
+            setNameAction(nameAction || '')
+        }
+        if (type == 'InfoIncident') {
+            setTypeModal('InfoIncident')
+            setIncidentStatus(incidentStatus)
+        }
         setIncidentId(id)
         setRefreshTable(false)
         setShowModal(true)
@@ -44,6 +61,7 @@ export const IncidentPage = () => {
 
     const onCloseModal = () => {
         setIncidentId(undefined)
+        setIncidentStatus(undefined)
         setDeleteName('')
         setRefreshTable(true)
         setShowModal(false)
@@ -61,7 +79,6 @@ export const IncidentPage = () => {
             console.error(error)
         }
     }
-
     return (
         <>
             <div className={style.container}>
@@ -107,7 +124,7 @@ export const IncidentPage = () => {
                     <IncidentTable
                         refresh={refreshTable}
                         building={incident}
-                        editIncident={handleEditModal}
+                        typeincidentModal={handletypeModal}
                         deleteIncident={handleDeleteModal}
                     />
                 </section>
@@ -118,8 +135,10 @@ export const IncidentPage = () => {
                 onClose={onCloseModal}
                 type={typeModal}
                 incidentId={incidentId}
-                deleteFunction={deleteIncident}
                 deleteName={deleteName}
+                status={incidentStatus}
+                nameAction={nameAction}
+                deleteFunction={deleteIncident}
             />
         </>
     )

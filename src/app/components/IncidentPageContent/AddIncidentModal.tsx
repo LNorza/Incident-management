@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useState } from 'react'
-import style from '../../style/modal.module.css'
+import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
+import {
+    API_BASE_URL,
+    getIncidentTypeOptions,
+    getUserDepartment,
+    getWorkTypeOptions,
+    ICreateIncident,
+    IFormIncident,
+    Incident,
+    IOptions,
+    UpdateIncidentDto,
+} from '../../../utils'
 import { useForm } from '../../../hooks'
-import { toast } from 'sonner'
 import { CircleX } from 'lucide-react'
-import { CustomInput, CustomSelect } from '../../../ui'
-import { IOptions } from '../../../utils'
-import { getIncidentTypeOptions, getWorkTypeOptions } from '../../../utils/selectOptions/incidentOptions'
-import { ICreateIncident, IFormIncident, Incident, UpdateIncidentDto } from '../../../utils/interface/incident'
-import { API_BASE_URL, getUserDepartment } from '../../../utils/api'
-import { CustomTextArea } from '../../../ui/components/CustomTextArea'
+import { toast } from 'sonner'
+import style from '../../style/modal.module.css'
 
 interface Props {
     onClose: () => void
@@ -92,6 +98,10 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         updated_at: '',
         work: '',
         _id: '',
+        technician_id: '',
+        priority: '',
+        arrived_date: '',
+        time_duration: '',
     })
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IFormIncident>({
@@ -153,7 +163,6 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            // console.log('Incident data:', data)
 
             setIncidentData(data)
         } catch (error) {
@@ -202,49 +211,33 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         }
     }, [building])
 
-    const saveIncident = () => {
-        // if (incidentId) {
-        //     try {
-        //         const url = `${API_BASE_URL}/incidents/${incidentId}`
-        //         fetch(url, {
-        //             method: 'PUT',
-        //             headers: {
-        //                 'Content-Type': 'application/json',
-        //             },
-        //             credentials: 'include',
-        //             body: JSON.stringify(updateIncident),
-        //         }).then((response) => {
-        //             if (response.ok) {
-        //                 toast.success('Se actualizo la incidencia correctamente')
-        //                 onClose()
-        //             }
-        //         })
-        //     } catch (error) {
-        //         console.error('Error:', error)
-        //         toast.error('Error al actualizar la incidencia')
-        //     }
-        // } else {
-        try {
-            const url = `${API_BASE_URL}/incidents`
+    const saveIncident = async () => {
+        const url = `${API_BASE_URL}/incidents${incidentId ? `/${incidentId}` : ''}`
+        const method = incidentId ? 'PUT' : 'POST'
+        const incidentData = incidentId ? updateIncident : newIncident
 
-            fetch(url, {
-                method: 'POST',
+        try {
+            const response = await fetch(url, {
+                method,
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(newIncident),
-            }).then((response) => {
-                if (response.ok) {
-                    toast.success('Se creo la incidencia correctamente')
-                    onClose()
-                }
+                body: JSON.stringify(incidentData),
             })
+
+            if (response.ok) {
+                toast.success(`Se ${incidentId ? 'actualizó' : 'creó'} la incidencia correctamente`)
+                onClose()
+            } else {
+                const errorData = await response.json()
+                console.error('Error en la respuesta:', errorData)
+                toast.error('Error en la solicitud')
+            }
         } catch (error) {
             console.error('Error:', error)
-            toast.error('Error al crear la incidencia')
+            toast.error('Error al procesar la solicitud')
         }
-        // }
     }
 
     useEffect(() => {
@@ -288,7 +281,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             folio: formState.folio,
             device_id: formState.device,
             date: new Date(),
-            status: 'SENT',
+            status: 'RELEASED',
             incident_type: formState.incident_type,
             work: formState.worktype,
             period: 1,
@@ -326,8 +319,6 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             worktype: workType,
         })
     }, [incidentData, incidentId])
-
-    console.log('newIncident:', newIncident)
 
     return (
         <>

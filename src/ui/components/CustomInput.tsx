@@ -9,12 +9,13 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
     placeholder?: string
     type?: string
     value?: string
+    color?: string
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
     autocomplete?: string
     isFormInput?: boolean
 }
 
-export const CustomInput = ({ icon, isFormInput, password, ...props }: Props) => {
+export const CustomInput = ({ icon, isFormInput, color, password, ...props }: Props) => {
     const [showPassword, setShowPassword] = useState(false)
 
     const togglePasswordVisibility = () => {
@@ -27,7 +28,9 @@ export const CustomInput = ({ icon, isFormInput, password, ...props }: Props) =>
             <input
                 {...props}
                 type={password && !showPassword ? 'password' : 'text'}
-                className={`${styles.inputField} ${isFormInput ? styles.form : ''}`}
+                className={`${styles.inputField} ${isFormInput ? styles.form : ''} ${
+                    color != undefined ? `${color == 'g' ? styles.greencolor : styles.redcolor}` : ''
+                }`}
             />
             {password && (
                 <span className={`${styles.inputIcon} ${styles.password} `} onClick={togglePasswordVisibility}>

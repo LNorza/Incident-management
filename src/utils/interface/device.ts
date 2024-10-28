@@ -11,6 +11,23 @@ export interface IDevice {
   status: DeviceState
 }
 
+export interface Device2 {
+  _id?: string
+  name: string
+  type: string
+  status: string
+  specs: IComputerSpecs | ILaptop | IPrinter | ISwitch | IRouter | INoBreak | IVoltageRegulator | IProjector
+  purchaseDate: string
+  warrantyYears: number
+  deviceModel: string
+  brand: string
+  location_id: {
+    _id: string
+    name: string
+    building_id: string
+  }
+}
+
 export interface Device {
   _id?: string
   name: string

@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { myTheme } from '../../../utils'
+import { IncidentModalType, IncidentState, myTheme } from '../../../utils'
 import { API_BASE_URL, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
@@ -11,11 +11,21 @@ import { getActionIncident } from '../../utils/getActionsIncidents'
 interface IncidentTableProps {
     refresh: boolean
     building: string
-    editIncident?: (deviceId: string) => void
+    typeincidentModal?: (
+        deviceId: string,
+        type?: IncidentModalType,
+        incidentStatus?: IncidentState,
+        nameAction?: string,
+    ) => void
     deleteIncident?: (deviceId: string, deleteName: string) => void
 }
 
-export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building, editIncident, deleteIncident }) => {
+export const IncidentTable: React.FC<IncidentTableProps> = ({
+    refresh,
+    building,
+    typeincidentModal,
+    deleteIncident,
+}) => {
     const [rowData, setRowData] = useState<IIncident[]>([])
 
     const contentRef = useRef<HTMLDivElement>(null)
@@ -23,12 +33,24 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
     const [userRole, setUserRole] = useState<string | null>(null)
 
     const handleReleasedClick = useCallback(
-        (row: IIncident) => {
-            if (editIncident) {
-                editIncident(row._id)
+        (row: IIncident, type?: IncidentModalType, action?: string) => {
+            if (typeincidentModal) {
+                if (type == 'EditIncident') {
+                    typeincidentModal(row._id)
+                }
+                if (type == 'InfoIncident') {
+                    if (row.status != 'SENT') {
+                        typeincidentModal(row._id, 'InfoIncident', row.status)
+                    } else {
+                        typeincidentModal(row._id, 'InfoIncident')
+                    }
+                }
+                if (type == 'FinishedIncident') {
+                    typeincidentModal(row._id, 'FinishedIncident', row.status, action)
+                }
             }
         },
-        [editIncident],
+        [typeincidentModal],
     )
 
     const handleDeleteClick = useCallback(
@@ -142,6 +164,10 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
                         return 'Liberada'
                     case 'FINISHED':
                         return 'Terminada'
+                    case 'ASSIGNED':
+                        return 'Asignada'
+                    case 'REJECTED':
+                        return 'Rechazada'
                     default:
                         return 'En reparación'
                 }
@@ -156,6 +182,8 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({ refresh, building,
                         return { color: '#A9DFD8' }
                     case 'FINISHED':
                         return { color: '#FEAF5A' }
+                    case 'REJECTED':
+                        return { color: '#FF0000' }
                     default:
                         return { color: '#FFFF' }
                 }

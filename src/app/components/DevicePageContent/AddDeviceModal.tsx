@@ -11,6 +11,7 @@ import {
     IVoltageRegulator,
     INoBreak,
     IOptions,
+    Device2,
 } from '../../../utils'
 import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
 import { CustomCheckBox, CustomInput, CustomSelect } from '../../../ui'
@@ -99,7 +100,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
     const [projectorResolution, setProjectorResolution] = useState<string | undefined>(undefined)
     const [projectorConnectivity, setProjectorConnectivity] = useState<string | undefined>(undefined)
     const [control, setControl] = useState<boolean | undefined>(false)
-    const [deviceData, setDeviceData] = useState<Device>({
+    const [deviceData, setDeviceData] = useState<Device2>({
         name: '',
         type: '',
         status: '',

@@ -1,11 +1,11 @@
 import { CheckCheck, Trash2, Pencil, LucideIcon, SendHorizonal, CircleAlert, Printer } from "lucide-react"; // Importa los íconos necesarios
-import { IIncident } from "../../utils";
+import { IIncident, IncidentModalType } from "../../utils";
 
 interface Props {
   rowData: any;
   status: string;
   role?: string;
-  function1: (row: any, e: React.MouseEvent<HTMLDivElement>) => void
+  function1: (row: any, type: IncidentModalType, nameAction: string, e: React.MouseEvent<HTMLDivElement>) => void
   function2: (row: any, e: React.MouseEvent<HTMLDivElement>) => void
 }
 
@@ -27,7 +27,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: CheckCheck as LucideIcon, // Forzamos el tipo del ícono
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
-              // handleEditClick(rowData); // Asegúrate de definir esta función
+              function1(rowData, 'FinishedIncident', 'RELEASED', e)
             },
           },
           {
@@ -35,7 +35,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: SendHorizonal as LucideIcon, // Forzamos el tipo del ícono
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
-              // handleDeleteClick(rowData); // Asegúrate de definir esta función
+              function1(rowData, 'FinishedIncident', 'RESENT', e)
             },
           },
         ];
@@ -48,7 +48,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: Pencil,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function1(rowData, e)
+              function1(rowData, 'EditIncident', '', e)
             },
           },
           {
@@ -69,7 +69,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: CircleAlert,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              // handleEditClick(rowData)
+              function1(rowData, 'InfoIncident', '', e)
             },
           },
           {
