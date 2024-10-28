@@ -68,6 +68,8 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         setUserRole(role) // Guardar el rol en el estado
     }
 
+    console.log('role', userRole)
+
     // Función para obtener el dispositivo
     const fetchDeviceById = async (deviceId: string) => {
         try {

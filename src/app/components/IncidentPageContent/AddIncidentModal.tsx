@@ -281,7 +281,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             folio: formState.folio,
             device_id: formState.device,
             date: new Date(),
-            status: 'RELEASED',
+            status: 'SENT',
             incident_type: formState.incident_type,
             work: formState.worktype,
             period: 1,

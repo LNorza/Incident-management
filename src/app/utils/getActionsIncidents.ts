@@ -1,4 +1,4 @@
-import { CheckCheck, Trash2, Pencil, LucideIcon, SendHorizonal, CircleAlert, Printer } from "lucide-react"; // Importa los íconos necesarios
+import { CheckCheck, Trash2, Pencil, LucideIcon, SendHorizonal, CircleAlert, Printer, UserRoundPlus, Ban, Clock, CircleCheckBig } from "lucide-react"; // Importa los íconos necesarios
 import { IIncident, IncidentModalType } from "../../utils";
 
 interface Props {
@@ -78,6 +78,139 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
               // handleDeleteClick(rowData)
+            },
+          },
+        ];
+        break;
+    }
+  }
+
+  if (role == 'ADMIN_TECHNICIANS') {
+    switch (status) {
+      case 'SENT':
+        return [
+          {
+            text: 'Asignar incidencia',
+            icon: UserRoundPlus,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'EditIncident', '', e)
+            },
+          },
+          {
+            text: 'Rechazar incidencia',
+            icon: Ban,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function2(rowData, e)
+            },
+          },
+          {
+            text: 'Imprimir',
+            icon: Printer,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              // handleDeleteClick(rowData)
+            },
+          },
+        ];
+        break;
+
+      default:
+        return [
+          {
+            text: 'Información',
+            icon: CircleAlert,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'InfoIncident', '', e)
+            },
+          },
+          {
+            text: 'Imprimir',
+            icon: Printer,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              // handleDeleteClick(rowData)
+            },
+          },
+        ];
+        break;
+    }
+  }
+  if (role == 'TECHNICIAN') {
+    switch (status) {
+      case 'ASSIGNED':
+        return [
+          {
+            text: 'Información',
+            icon: CircleAlert,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'EditIncident', '', e)
+            },
+          },
+          {
+            text: 'Asignar tiempo',
+            icon: Clock,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation();
+              function1(rowData, 'FinishedIncident', 'RESENT', e)
+            },
+          },
+        ];
+        break;
+
+      // case 'FINISHED':
+      //   return [
+      //     {
+      //       text: 'Liberar',
+      //       icon: CheckCheck as LucideIcon, // Forzamos el tipo del ícono
+      //       onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+      //         e.stopPropagation();
+      //         function1(rowData, 'FinishedIncident', 'RELEASED', e)
+      //       },
+      //     },
+      //     {
+      //       text: 'Reenviar',
+      //       icon: SendHorizonal as LucideIcon, // Forzamos el tipo del ícono
+      //       onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+      //         e.stopPropagation();
+      //         function1(rowData, 'FinishedIncident', 'RESENT', e)
+      //       },
+      //     },
+      //   ];
+      //   break;
+
+      case 'IN_PROCESS':
+        return [
+          {
+            text: 'Información',
+            icon: CircleAlert,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'EditIncident', '', e)
+            },
+          },
+          {
+            text: 'Finalizar',
+            icon: CircleCheckBig,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function2(rowData, e)
+            },
+          },
+        ];
+        break;
+
+      default:
+        return [
+          {
+            text: 'Información',
+            icon: CircleAlert,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'InfoIncident', '', e)
             },
           },
         ];
