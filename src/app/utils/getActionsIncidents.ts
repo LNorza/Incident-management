@@ -134,6 +134,8 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
               // handleDeleteClick(rowData)
             },
           },
+
+
         ];
         break;
     }
