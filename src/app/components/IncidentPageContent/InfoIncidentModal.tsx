@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { CustomInput, CustomTextArea } from '../../../ui'
-import { API_BASE_URL, Incident, IncidentState } from '../../../utils'
+import { API_BASE_URL, getUserRole, Incident, IncidentState } from '../../../utils'
 import { InfoIcon } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { useForm } from '../../../hooks'
 import { translateIncident } from '../../../utils/formatter/incident.formatter'
+import { getHoursIncident } from '../../utils/getHour'
 
 interface Props {
     onClose: () => void
@@ -14,6 +15,8 @@ interface Props {
 
 export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
     const [colorState, setColorState] = useState<string | undefined>(undefined)
+    const [userRole, setUserRole] = useState<string | null>(null)
+
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
         location_id: '',
@@ -63,6 +66,59 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         work: '',
         _id: '',
     })
+    const [incidentData, setIncidentData] = useState<Incident>({
+        date: '',
+        location_id: '',
+        description: '',
+        device_id: {
+            _id: '',
+            name: '',
+            type: '',
+            brand: '',
+            specs: {},
+            location_id: {
+                _id: '',
+                name: '',
+                building_id: {
+                    _id: '',
+                    name: '',
+                    description: '',
+                    isShared: false,
+                    departments: [
+                        {
+                            department_id: '',
+                            build_manager: {
+                                _id: '',
+                                name: '',
+                            },
+                            _id: '',
+                        },
+                    ],
+                    totalDevices: 0,
+                },
+            },
+            status: '',
+            purchaseDate: '',
+            warrantyYears: 0,
+            deviceModel: '',
+        },
+        folio: '',
+        incident_type: '',
+        period: 0,
+        status: '',
+        updated_at: '',
+        work: '',
+        _id: '',
+        technician_id: '',
+        priority: '',
+        arrived_date: '',
+        time_duration: '',
+    })
+
+    const fetchRole = async () => {
+        const role = await getUserRole() // Obtener el rol del usuario
+        setUserRole(role) // Guardar el rol en el estado
+    }
 
     const fetchIncident = async () => {
         try {
@@ -71,7 +127,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
             })
             const data = await response.json()
             updateFields(data)
-            // setIncidentData(data)
+            setIncidentData(data)
         } catch (error) {
             console.error('Error fetching device:', error)
         }
@@ -79,6 +135,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
 
     useEffect(() => {
         fetchIncident()
+        fetchRole()
     }, [])
 
     useEffect(() => {
@@ -91,17 +148,15 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
             incident_type: translateIncident(formState.incident_type, 'incident'),
             status: translateIncident(formState.status, 'status'),
             date: new Date(formState.date).toLocaleDateString(),
+            arrived_date: getHoursIncident(new Date(incidentData.date)),
             created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
         })
     }, [formState.date])
-
-    console.log('state', status)
-
     return (
         <>
             <div className={style.titleModal}>
                 <InfoIcon size={40} />
-                {status == 'REJECTED' ? <h2>Información de rechazado</h2> : <h2>Información</h2>}
+                {status == 'REJECTED' ? <h2>Información de rechaza</h2> : <h2>Información</h2>}
             </div>
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
@@ -220,6 +275,36 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 </section>
                             </div>
 
+                            {status == 'FINISHED' ||
+                                (userRole == 'ADMIN_TECHNICIANS' && (
+                                    <div className={style.rowModal}>
+                                        <section className={style.disabled}>
+                                            Departamento
+                                            <div className={style.formInput}>
+                                                <CustomInput
+                                                    isFormInput
+                                                    name="location"
+                                                    value={formState.device_id.location_id.name}
+                                                    type="text"
+                                                    onChange={onInputChange}
+                                                />
+                                            </div>
+                                        </section>
+                                        <section className={style.disabled}>
+                                            Fecha de solicitud
+                                            <div className={style.formInput}>
+                                                <CustomInput
+                                                    isFormInput
+                                                    name="device"
+                                                    value={formState.device_id.name}
+                                                    type="text"
+                                                    onChange={onInputChange}
+                                                />
+                                            </div>
+                                        </section>
+                                    </div>
+                                ))}
+
                             <div className={style.rowModal}>
                                 <section className={style.disabled}>
                                     Tipo de incidencia
@@ -261,7 +346,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     </div>
                                 </section>
                                 <section className={style.disabled}>
-                                    Prioridad asignada
+                                    {userRole == 'ADMIN_TECHNICIANS' ? 'Prioridad' : 'Prioridad asignada'}
                                     <div className={`${style.formInput}`}>
                                         <CustomInput
                                             isFormInput
@@ -274,6 +359,112 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     </div>
                                 </section>
                             </div>
+
+                            {userRole == 'ADMIN_TECHNICIANS' && status != 'ASSIGNED' ? (
+                                <>
+                                    <div className={style.rowModal}>
+                                        <section className={style.disabled}>
+                                            Hora de llegada
+                                            <div className={style.formInput}>
+                                                <CustomInput
+                                                    isFormInput
+                                                    name="arrivaltime"
+                                                    value={formState.arrived_date}
+                                                    type="text"
+                                                    onChange={onInputChange}
+                                                />
+                                            </div>
+                                        </section>
+                                        <section className={style.disabled}>
+                                            Tiempo de duración
+                                            <div className={style.formInput}>
+                                                <CustomInput
+                                                    isFormInput
+                                                    name="durationtime"
+                                                    value={formState.time_duration}
+                                                    type="text"
+                                                    onChange={onInputChange}
+                                                />
+                                            </div>
+                                        </section>
+                                    </div>
+
+                                    <div className={style.rowModal}>
+                                        <section className={style.disabled}></section>
+                                        <section className={style.disabled}>
+                                            Fecha de inicio
+                                            <div className={style.formInput}>
+                                                <CustomInput
+                                                    isFormInput
+                                                    name="durationtime"
+                                                    value={formState.date}
+                                                    type="text"
+                                                    onChange={onInputChange}
+                                                />
+                                            </div>
+                                        </section>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    {status != 'ASSIGNED' && userRole == 'ADMIN_TECHNICIANS' && (
+                                        <>
+                                            <div className={style.rowModal}>
+                                                <section className={style.disabled}>
+                                                    Fecha de solicitud
+                                                    <div className={style.formInput}>
+                                                        <CustomInput
+                                                            isFormInput
+                                                            name="arrivaltime"
+                                                            value={formState.created_at}
+                                                            type="text"
+                                                            onChange={onInputChange}
+                                                        />
+                                                    </div>
+                                                </section>
+                                                <section className={style.disabled}>
+                                                    Fecha de inicio
+                                                    <div className={style.formInput}>
+                                                        <CustomInput
+                                                            isFormInput
+                                                            name="durationtime"
+                                                            value={formState.date}
+                                                            type="text"
+                                                            onChange={onInputChange}
+                                                        />
+                                                    </div>
+                                                </section>
+                                            </div>
+                                            <div className={style.rowModal}>
+                                                <section className={style.disabled}>
+                                                    Hora de llegada
+                                                    <div className={style.formInput}>
+                                                        <CustomInput
+                                                            isFormInput
+                                                            name="arrivaltime"
+                                                            value={formState.arrived_date}
+                                                            type="text"
+                                                            onChange={onInputChange}
+                                                        />
+                                                    </div>
+                                                </section>
+                                                <section className={style.disabled}>
+                                                    Tiempo de duración
+                                                    <div className={style.formInput}>
+                                                        <CustomInput
+                                                            isFormInput
+                                                            name="durationtime"
+                                                            value={formState.time_duration}
+                                                            type="text"
+                                                            onChange={onInputChange}
+                                                        />
+                                                    </div>
+                                                </section>
+                                            </div>
+                                        </>
+                                    )}
+                                </>
+                            )}
                         </>
                     )}
 

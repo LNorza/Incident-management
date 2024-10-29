@@ -19,4 +19,10 @@ export type WorkType =
   | 'Diagnosis & Repair'
   | 'Hardware Issues'
 
-export type IncidentModalType = 'AddIncident' | 'EditIncident' | 'DeleteIncident' | 'InfoIncident' | 'FinishedIncident'
+export type IncidentModalType =
+  | 'AddIncident'
+  | 'EditIncident'
+  | 'AssignedIncident'
+  | 'DeleteIncident'
+  | 'InfoIncident'
+  | 'FinishedIncident'

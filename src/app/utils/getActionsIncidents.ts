@@ -94,7 +94,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: UserRoundPlus,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function1(rowData, 'EditIncident', '', e)
+              function1(rowData, 'AssignedIncident', 'ASSIGNED', e)
             },
           },
           {
@@ -102,7 +102,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: Ban,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function2(rowData, e)
+              function1(rowData, 'AssignedIncident', 'REJECTED', e)
             },
           },
           {

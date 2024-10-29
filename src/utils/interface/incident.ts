@@ -41,6 +41,7 @@ export interface Incident {
   priority: string
   arrived_date: string
   time_duration: string
+  comments?: string
   work: string
   _id: string
 }

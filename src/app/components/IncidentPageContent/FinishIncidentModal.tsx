@@ -15,6 +15,7 @@ import {
 import { toast } from 'sonner'
 import { DateInput } from 'rsuite'
 import { Calification } from '../../../ui/components/calification'
+import { getHoursIncident } from '../../utils/getHour'
 
 interface Props {
     onClose: () => void
@@ -113,12 +114,6 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         }
     }
 
-    const getHours = (date: Date): string => {
-        const hours = date.getHours().toString().padStart(2, '0')
-        const minutes = date.getMinutes().toString().padStart(2, '0')
-        return `${hours}:${minutes}`
-    }
-
     const saveIncident = async () => {
         try {
             const url = `${API_BASE_URL}/incidents/${incidentId}`
@@ -156,10 +151,10 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
             folio: incidentData.folio,
             device: incidentData.device_id.name,
             date: new Date(incidentData.date),
-            arrived_date: getHours(new Date(incidentData.date)),
+            arrived_date: getHoursIncident(new Date(incidentData.date)),
             time_duration: incidentData.time_duration,
-            description: incidentData.description,
         })
+
         setIncidentType(incidentTypeOptions.find((incident) => incident.value === incidentData.incident_type)?.value)
         setWorkType(workTypeOptions.find((work) => work.value === incidentData.work)?.value)
         setDateStart(new Date(incidentData.date))
@@ -168,6 +163,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     useEffect(() => {
         if (action == 'RESENT') {
             setUpdateIncident({
+                status: 'SENT',
                 incident_type: incidentType,
                 work: workType,
                 description: formState.description,
@@ -333,7 +329,11 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                 isFormInput
                                 name="description"
                                 value={formState.description}
-                                placeholder="Ingresa la nueva descripción"
+                                placeholder={
+                                    action === 'RESENT'
+                                        ? 'Ingresa la nueva descripción'
+                                        : 'Ingresa algún comentario sobre el servicio'
+                                }
                                 type="description"
                                 onChange={onTextAreaChange}
                             />

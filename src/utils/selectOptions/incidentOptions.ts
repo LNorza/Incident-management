@@ -6,6 +6,12 @@ export const getIncidentTypeOptions: IOptions[] = [
   { label: 'Mantenimiento', value: 'MAINTANCE' },
 ]
 
+export const getIncidentPriorityOptions: IOptions[] = [
+  { label: 'Alta', value: 'HIGH' },
+  { label: 'Media', value: 'MEDIUM' },
+  { label: 'Baja', value: 'LOW' },
+]
+
 export const getWorkTypeOptions = (type?: string): IOptions[] => {
   switch (type) {
     case 'COMPUTER':

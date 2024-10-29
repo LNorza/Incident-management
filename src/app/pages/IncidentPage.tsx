@@ -36,15 +36,21 @@ export const IncidentPage = () => {
         nameAction?: string,
     ) => {
         setTypeModal(type)
-        console.log('nameAction', nameAction)
-
         if (type == 'FinishedIncident') {
             setTypeModal('FinishedIncident')
             setNameAction(nameAction || '')
+            setRefreshTable(false)
         }
         if (type == 'InfoIncident') {
             setTypeModal('InfoIncident')
             setIncidentStatus(incidentStatus)
+            setRefreshTable(false)
+        }
+        if (type == 'AssignedIncident') {
+            setTypeModal('AssignedIncident')
+            setIncidentStatus(incidentStatus)
+            setNameAction(nameAction || '')
+            setRefreshTable(false)
         }
         setIncidentId(id)
         setRefreshTable(false)

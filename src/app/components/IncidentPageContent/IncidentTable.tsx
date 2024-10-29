@@ -6,7 +6,7 @@ import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { IIncident } from '../../../utils/interface/incident'
 import { dateFormatter } from '../../../utils/formatter/date.formatter'
-import { getActionIncident } from '../../utils/getActionsIncidents'
+import { getActionIncident } from '../../utils'
 
 interface IncidentTableProps {
     refresh: boolean
@@ -48,6 +48,9 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                 if (type == 'FinishedIncident') {
                     typeincidentModal(row._id, 'FinishedIncident', row.status, action)
                 }
+                if (type == 'AssignedIncident') {
+                    typeincidentModal(row._id, 'AssignedIncident', row.status, action)
+                }
             }
         },
         [typeincidentModal],
@@ -67,9 +70,6 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         const role = await getUserRole() // Obtener el rol del usuario
         setUserRole(role) // Guardar el rol en el estado
     }
-
-    console.log('role', userRole)
-
     // Función para obtener el dispositivo
     const fetchDeviceById = async (deviceId: string) => {
         try {
