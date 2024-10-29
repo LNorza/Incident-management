@@ -8,7 +8,6 @@ interface Props {
   function1: (row: any, type: IncidentModalType, nameAction: string, e: React.MouseEvent<HTMLDivElement>) => void
   function2: (row: any, e: React.MouseEvent<HTMLDivElement>) => void
 }
-
 export interface Action {
   text: string
   icon: LucideIcon
@@ -147,7 +146,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: CircleAlert,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function1(rowData, 'EditIncident', '', e)
+              function1(rowData, 'InfoIncident', '', e)
             },
           },
           {
@@ -155,32 +154,11 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: Clock,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation();
-              function1(rowData, 'FinishedIncident', 'RESENT', e)
+              function1(rowData, 'AssignedIncident', 'ASSIGNED', e)
             },
           },
         ];
         break;
-
-      // case 'FINISHED':
-      //   return [
-      //     {
-      //       text: 'Liberar',
-      //       icon: CheckCheck as LucideIcon, // Forzamos el tipo del ícono
-      //       onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
-      //         e.stopPropagation();
-      //         function1(rowData, 'FinishedIncident', 'RELEASED', e)
-      //       },
-      //     },
-      //     {
-      //       text: 'Reenviar',
-      //       icon: SendHorizonal as LucideIcon, // Forzamos el tipo del ícono
-      //       onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
-      //         e.stopPropagation();
-      //         function1(rowData, 'FinishedIncident', 'RESENT', e)
-      //       },
-      //     },
-      //   ];
-      //   break;
 
       case 'IN_PROCESS':
         return [
@@ -189,7 +167,7 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: CircleAlert,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function1(rowData, 'EditIncident', '', e)
+              function1(rowData, 'InfoIncident', '', e)
             },
           },
           {

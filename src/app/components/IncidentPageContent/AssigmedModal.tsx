@@ -2,12 +2,11 @@ import { useCallback, useEffect, useState } from 'react'
 import { useForm } from '../../../hooks'
 import {
     API_BASE_URL,
+    getArriveHourOptions,
     getIncidentPriorityOptions,
-    getIncidentTypeOptions,
+    getTimeDurationOptions,
     getUserDepartment,
     getUserRole,
-    getWorkTypeOptions,
-    IFormIncident,
     Incident,
     IOptions,
     translateIncident,
@@ -28,11 +27,16 @@ interface Props {
 export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
     const rol = 'TECHNICIAN'
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const [technicians, setTechnicians] = useState<string | undefined>(undefined)
     const [priority, setPriority] = useState<string | undefined>(undefined)
+    const [technicians, setTechnicians] = useState<string | undefined>(undefined)
+    const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
+    const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
+    const [userRole, setUserRole] = useState<string | null>(null)
 
     const [priorityOptions] = useState<IOptions[]>(getIncidentPriorityOptions)
     const [technicianOptions, setTechnicianOptions] = useState<IOptions[]>([])
+    const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
+    const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
@@ -84,6 +88,11 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         work: '',
         _id: '',
     })
+
+    const fetchRole = async () => {
+        const role = await getUserRole() // Obtener el rol del usuario
+        setUserRole(role) // Guardar el rol en el estado
+    }
 
     const [incidentData, setIncidentData] = useState<Incident>({
         date: '',
@@ -137,6 +146,8 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         status: '',
         technician_id: '',
         priority: '',
+        time_duration: '',
+        arraived_date: '',
     })
 
     const fetchUsers = useCallback(async () => {
@@ -208,18 +219,28 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
 
     useEffect(() => {
         fetchIncident()
+        fetchRole()
     }, [])
 
     useEffect(() => {
-        fetchDepartment()
-        fetchUsers()
+        if (incidentData && incidentData) {
+            fetchDepartment()
+            fetchUsers()
+        }
     }, [incidentData])
 
     useEffect(() => {
-        if (action == 'REJECTED') {
+        if (action === 'REJECTED') {
             setUpdateIncident({
                 status: 'REJECTED',
                 comments: formState.comments,
+            })
+        }
+        if (action == 'ASSIGNED' && userRole === 'TECHNICIAN') {
+            setUpdateIncident({
+                status: 'IN_PROCESS',
+                arraived_date: arriveHour,
+                time_duration: timeDuration,
             })
         } else {
             setUpdateIncident({
@@ -228,10 +249,18 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                 priority: priority,
             })
         }
-    }, [priority, technicians])
+    }, [priority, technicians, formState.comments])
+
+    console.log('updateIncident', updateIncident)
 
     useEffect(() => {
         const createdAt = formState.created_at
+        if (userRole === 'TECHNICIAN') {
+            setTechnicians(
+                technicianOptions.find((technician) => technician.value === incidentData.technician_id)?.value,
+            )
+            setPriority(priorityOptions.find((priority) => priority.value === incidentData.priority)?.value)
+        }
         updateFields({
             work: translateIncident(formState.work, 'work'),
             incident_type: translateIncident(formState.incident_type, 'incident'),
@@ -240,9 +269,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
             arrived_date: getHoursIncident(new Date(incidentData.date)),
             created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
         })
-    }, [formState.date])
-
-    console.log('action', action)
+    }, [formState.date, formState.work, formState.status, incidentData, technicianOptions, priorityOptions])
 
     return (
         <>
@@ -363,9 +390,11 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                         </section>
                     </div>
 
+                    <></>
+
                     {action != 'REJECTED' && (
                         <div className={style.rowModal}>
-                            <section>
+                            <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
                                 Técnico
                                 <div className={style.formInput}>
                                     <CustomSelect
@@ -378,7 +407,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                     />
                                 </div>
                             </section>
-                            <section>
+                            <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
                                 Prioridad
                                 <div className={style.formInput}>
                                     <CustomSelect
@@ -387,6 +416,37 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                         options={priorityOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setPriority(selected.value)
+                                        }}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {userRole == 'TECHNICIAN' && (
+                        <div className={style.rowModal}>
+                            <section>
+                                Hora de llegada
+                                <div className={style.formInput}>
+                                    <CustomSelect
+                                        value={arriveHour}
+                                        placeholder="Selecciona al técnico"
+                                        options={arriveHourOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setArriveHour(selected.value)
+                                        }}
+                                    />
+                                </div>
+                            </section>
+                            <section>
+                                Tiempo de duración
+                                <div className={style.formInput}>
+                                    <CustomSelect
+                                        value={timeDuration}
+                                        placeholder="Selecciona el equipo"
+                                        options={timeDurationOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setTimeDuration(selected.value)
                                         }}
                                     />
                                 </div>

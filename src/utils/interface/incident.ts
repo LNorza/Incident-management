@@ -62,6 +62,7 @@ export interface UpdateIncidentDto {
   start_date?: Date;
   end_date?: Date;
   time_duration?: string;
+  arraived_date?: string;
   status?: string;
   incident_type?: string;
   work?: string;
