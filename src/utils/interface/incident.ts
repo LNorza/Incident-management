@@ -14,6 +14,7 @@ export interface IFormIncident {
   arrived_date?: string
   time_duration?: string
   description: string;
+  comments?: string;
 }
 
 export interface IIncident {
@@ -29,6 +30,7 @@ export interface IIncident {
 export interface Incident {
   date: string
   location_id: string
+  department_name?: string
   description: string
   device_id: Device
   folio: string
@@ -39,8 +41,8 @@ export interface Incident {
   created_at?: string
   technician_id: string
   priority: string
-  arrived_date: string
-  time_duration: string
+  arrival_time?: string
+  time_duration?: string
   comments?: string
   work: string
   _id: string
@@ -62,7 +64,7 @@ export interface UpdateIncidentDto {
   start_date?: Date;
   end_date?: Date;
   time_duration?: string;
-  arraived_date?: string;
+  arrival_time?: string;
   status?: string;
   incident_type?: string;
   work?: string;

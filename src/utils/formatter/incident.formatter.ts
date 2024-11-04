@@ -16,6 +16,12 @@ const workTypetranslations: { [key: string]: string } = {
   'hardware_software_problems': 'Problemas de hardware',
 };
 
+const priorityTranslations: { [key: string]: string } = {
+  'LOW': 'Baja',
+  'MEDIUM': 'Media',
+  'HIGH': 'Alta',
+};
+
 const StatusTranslations: { [key: string]: string } = {
   'IN_PROGRESS': 'En proceso',
   'SENT': 'Enviada',
@@ -35,6 +41,8 @@ export const translateIncident = (text: string, type?: string): string => {
       return StatusTranslations[text] || text;
     case 'incident':
       return incidentTypeTranslations[text] || text;
+    case 'priority':
+      return priorityTranslations[text] || text;
     default:
       return 'No hay traducción';
   }

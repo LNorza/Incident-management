@@ -27,6 +27,7 @@ interface Props {
 export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
     const rol = 'TECHNICIAN'
     const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
+    const [departmentName, setDepartmentName] = useState<string | undefined>(undefined)
     const [priority, setPriority] = useState<string | undefined>(undefined)
     const [technicians, setTechnicians] = useState<string | undefined>(undefined)
     const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
@@ -40,6 +41,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
+        department_name: '',
         location_id: '',
         description: '',
         device_id: {
@@ -48,6 +50,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
             type: '',
             brand: '',
             specs: {},
+
             location_id: {
                 _id: '',
                 name: '',
@@ -81,18 +84,13 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         updated_at: '',
         created_at: '',
         technician_id: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
         comments: '',
         priority: '',
         work: '',
         _id: '',
     })
-
-    const fetchRole = async () => {
-        const role = await getUserRole() // Obtener el rol del usuario
-        setUserRole(role) // Guardar el rol en el estado
-    }
 
     const [incidentData, setIncidentData] = useState<Incident>({
         date: '',
@@ -139,7 +137,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         _id: '',
         technician_id: '',
         priority: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
     })
     const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
@@ -147,8 +145,13 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         technician_id: '',
         priority: '',
         time_duration: '',
-        arraived_date: '',
+        arrival_time: '',
     })
+
+    const fetchRole = async () => {
+        const role = await getUserRole() // Obtener el rol del usuario
+        setUserRole(role) // Guardar el rol en el estado
+    }
 
     const fetchUsers = useCallback(async () => {
         if (!departmentId) return
@@ -172,6 +175,16 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         try {
             const id = await getUserDepartment()
             setDepartmentId(id ?? undefined)
+        } catch (err) {
+            console.error(err)
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/departments/${departmentId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            setDepartmentName(data.name)
         } catch (err) {
             console.error(err)
         }
@@ -235,23 +248,22 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                 status: 'REJECTED',
                 comments: formState.comments,
             })
-        }
-        if (action == 'ASSIGNED' && userRole === 'TECHNICIAN') {
-            setUpdateIncident({
-                status: 'IN_PROCESS',
-                arraived_date: arriveHour,
-                time_duration: timeDuration,
-            })
         } else {
-            setUpdateIncident({
-                status: 'ASSIGNED',
-                technician_id: technicians,
-                priority: priority,
-            })
+            if (action == 'ASSIGNED' && userRole === 'TECHNICIAN') {
+                setUpdateIncident({
+                    status: 'IN_PROCESS',
+                    arrival_time: arriveHour,
+                    time_duration: timeDuration,
+                })
+            } else {
+                setUpdateIncident({
+                    status: 'ASSIGNED',
+                    technician_id: technicians,
+                    priority: priority,
+                })
+            }
         }
-    }, [priority, technicians, formState.comments])
-
-    console.log('updateIncident', updateIncident)
+    }, [priority, technicians, formState.comments, arriveHour, timeDuration])
 
     useEffect(() => {
         const createdAt = formState.created_at
@@ -263,20 +275,20 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         }
         updateFields({
             work: translateIncident(formState.work, 'work'),
+            department_name: departmentName,
             incident_type: translateIncident(formState.incident_type, 'incident'),
             status: translateIncident(formState.status, 'status'),
             date: new Date(formState.date).toLocaleDateString(),
-            arrived_date: getHoursIncident(new Date(incidentData.date)),
+            arrival_time: getHoursIncident(new Date(incidentData.date)),
             created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
         })
-    }, [formState.date, formState.work, formState.status, incidentData, technicianOptions, priorityOptions])
+    }, [formState.folio, departmentName, technicianOptions, priorityOptions])
 
     return (
         <>
             <div className={style.titleModal}>
                 {action != 'REJECTED' ? <UserRoundPlus size={40} /> : <Ban size={40} />}
                 <h2>{action != 'REJECTED' ? 'Asignar incidencia' : 'Rechazar incidencia'}</h2>
-                {/* <h2>Asignar incidencia</h2> */}
             </div>
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
@@ -343,7 +355,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="location"
-                                    value={formState.device_id.location_id.name}
+                                    value={formState.department_name}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -355,7 +367,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="device"
-                                    value={formState.device_id.name}
+                                    value={formState.created_at}
                                     type="text"
                                     onChange={onInputChange}
                                 />

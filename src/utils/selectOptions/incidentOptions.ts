@@ -1,5 +1,15 @@
 import { IOptions } from "../interface";
 
+
+export const getIncidentStateOptions: IOptions[] = [
+  { label: 'Enviado', value: 'SENT' },
+  { label: 'Asignado', value: 'ASSIGNED' },
+  { label: 'En proceso', value: 'IN_PROCESS' },
+  { label: 'Liberado', value: 'RELEASED' },
+  { label: 'Rechazado', value: 'REJECTED' },
+  { label: 'Finalizado', value: 'FINISHED' },
+]
+
 export const getIncidentTypeOptions: IOptions[] = [
   { label: 'Computo', value: 'COMPUTER' },
   { label: 'Reparación', value: 'REPAIR' },

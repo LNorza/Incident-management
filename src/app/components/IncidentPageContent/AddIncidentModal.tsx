@@ -100,7 +100,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         _id: '',
         technician_id: '',
         priority: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
     })
 

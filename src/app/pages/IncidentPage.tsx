@@ -1,6 +1,13 @@
 import { useState } from 'react'
 import { CustomSelect } from '../../ui'
-import { API_BASE_URL, IncidentModalType, IncidentState, IOptions } from '../../utils'
+import {
+    API_BASE_URL,
+    getIncidentStateOptions,
+    getIncidentTypeOptions,
+    IncidentModalType,
+    IncidentState,
+    IOptions,
+} from '../../utils'
 import { IncidentModal, IncidentTable } from '../components'
 
 import { Plus } from 'lucide-react'
@@ -17,6 +24,9 @@ export const IncidentPage = () => {
     const [incident, setIncident] = useState<string>('ALL')
     const [incidentOptions, setIncidentOptions] = useState<IOptions[]>([])
     const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
+
+    const [typeIncident] = useState<IOptions[]>(getIncidentTypeOptions)
+    const [statusIncident] = useState<IOptions[]>(getIncidentStateOptions)
 
     const handleSelect = (selected: { label: string; value: string }) => {
         setIncident(selected.value)
@@ -97,7 +107,7 @@ export const IncidentPage = () => {
                                 <CustomSelect
                                     menu
                                     value={incident}
-                                    options={incidentOptions}
+                                    options={typeIncident}
                                     onSelect={handleSelect}
                                     placeholder="Todos"
                                 />
@@ -110,7 +120,7 @@ export const IncidentPage = () => {
                                     <CustomSelect
                                         menu
                                         value={incident}
-                                        options={incidentOptions}
+                                        options={statusIncident}
                                         onSelect={handleSelect}
                                         placeholder="Todos"
                                     />

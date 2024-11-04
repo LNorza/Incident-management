@@ -42,7 +42,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                     if (row.status != 'SENT') {
                         typeincidentModal(row._id, 'InfoIncident', row.status)
                     } else {
-                        typeincidentModal(row._id, 'InfoIncident')
+                        typeincidentModal(row._id, 'InfoIncident', 'SENT')
                     }
                 }
                 if (type == 'FinishedIncident') {

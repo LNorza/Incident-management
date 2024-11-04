@@ -1,5 +1,5 @@
 import { CheckCheck, Trash2, Pencil, LucideIcon, SendHorizonal, CircleAlert, Printer, UserRoundPlus, Ban, Clock, CircleCheckBig } from "lucide-react"; // Importa los íconos necesarios
-import { IIncident, IncidentModalType } from "../../utils";
+import { getArriveHourOptions, IIncident, IncidentModalType } from "../../utils";
 
 interface Props {
   rowData: any;
@@ -175,7 +175,20 @@ export const getActionIncident = ({ status, role, rowData, function1, function2 
             icon: CircleCheckBig,
             onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
               e.stopPropagation()
-              function2(rowData, e)
+              function1(rowData, 'FinishedIncident', 'FINISHED', e)
+            },
+          },
+        ];
+        break;
+
+      case 'SENT':
+        return [
+          {
+            text: 'Información',
+            icon: CircleAlert,
+            onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
+              e.stopPropagation()
+              function1(rowData, 'InfoIncident', 'SENT', e)
             },
           },
         ];

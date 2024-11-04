@@ -1,11 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CustomInput, CustomTextArea } from '../../../ui'
-import { API_BASE_URL, getUserRole, Incident, IncidentState } from '../../../utils'
+import {
+    API_BASE_URL,
+    getArriveHourOptions,
+    getTimeDurationOptions,
+    getUserDepartment,
+    getUserRole,
+    Incident,
+    IncidentState,
+    IOptions,
+} from '../../../utils'
 import { InfoIcon } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { useForm } from '../../../hooks'
 import { translateIncident } from '../../../utils/formatter/incident.formatter'
-import { getHoursIncident } from '../../utils/getHour'
 
 interface Props {
     onClose: () => void
@@ -14,12 +22,24 @@ interface Props {
 }
 
 export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
+    const [rol] = useState('TECHNICIAN')
+    const [technicianDepartmentId] = useState('67206b309acf1976ca32173b')
+    const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
+    const [departmentName, setDepartmentName] = useState<string | undefined>(undefined)
     const [colorState, setColorState] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
+    const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
+    const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
+    const [technicianName, setTechnicianName] = useState<string | undefined>(undefined)
+
+    const [priority, setpriority] = useState()
+    const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
+    const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
         location_id: '',
+        department_name: '',
         description: '',
         device_id: {
             _id: '',
@@ -59,9 +79,9 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         status: '',
         updated_at: '',
         created_at: '',
-        technician_id: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
+        technician_id: '',
         priority: '',
         work: '',
         _id: '',
@@ -69,6 +89,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
     const [incidentData, setIncidentData] = useState<Incident>({
         date: '',
         location_id: '',
+        department_name: '',
         description: '',
         device_id: {
             _id: '',
@@ -111,9 +132,51 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         _id: '',
         technician_id: '',
         priority: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
     })
+
+    const fetchDepartment = async () => {
+        if (!departmentId) {
+            try {
+                const id = await getUserDepartment()
+                setDepartmentId(id ?? undefined)
+            } catch (err) {
+                console.error(err)
+            }
+        } else {
+            try {
+                const response = await fetch(`${API_BASE_URL}/departments/${departmentId}`, {
+                    credentials: 'include',
+                })
+                const data = await response.json()
+                setDepartmentName(data.name)
+            } catch (err) {
+                console.error(err)
+            }
+        }
+    }
+
+    const fetchUsers = useCallback(async () => {
+        if (!departmentId) return
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/users-search?department_id=${technicianDepartmentId}&position=${rol}`,
+                {
+                    credentials: 'include',
+                },
+            )
+            const data = await response.json()
+            const userAux = data
+            userAux.map((user: any) => {
+                if (user._id === formState.technician_id) {
+                    setTechnicianName(user.name)
+                }
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }, [departmentId])
 
     const fetchRole = async () => {
         const role = await getUserRole() // Obtener el rol del usuario
@@ -134,29 +197,50 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
     }
 
     useEffect(() => {
-        fetchIncident()
-        fetchRole()
+        const fetchData = async () => {
+            await fetchIncident()
+            await fetchRole()
+            await fetchDepartment()
+        }
+        fetchData()
     }, [])
 
     useEffect(() => {
+        const fetchData = async () => {
+            await fetchDepartment()
+            await fetchUsers()
+        }
+        fetchData()
+    }, [incidentData, departmentId, incidentId])
+
+    useEffect(() => {
         const createdAt = formState.created_at
+        if (formState.arrival_time) {
+            setArriveHour(arriveHourOptions.find((option) => option.value === formState.arrival_time)?.label)
+        }
+        if (formState.time_duration) {
+            setTimeDuration(timeDurationOptions.find((option) => option.value === formState.time_duration)?.label)
+        }
 
-        setColorState(status == 'REJECTED' ? 'r' : undefined)
-
+        setColorState(status === 'REJECTED' ? 'r' : undefined)
         updateFields({
+            priority: translateIncident(formState.priority, 'priority') || 'No asignado',
             work: translateIncident(formState.work, 'work'),
             incident_type: translateIncident(formState.incident_type, 'incident'),
+            department_name: departmentName,
             status: translateIncident(formState.status, 'status'),
             date: new Date(formState.date).toLocaleDateString(),
-            arrived_date: getHoursIncident(new Date(incidentData.date)),
             created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
+            arrival_time: arriveHour,
+            time_duration: timeDuration,
         })
-    }, [formState.date])
+    }, [formState.folio, priority, departmentName, formState.status, formState.created_at])
+
     return (
         <>
             <div className={style.titleModal}>
                 <InfoIcon size={40} />
-                {status == 'REJECTED' ? <h2>Información de rechaza</h2> : <h2>Información</h2>}
+                {status == 'REJECTED' ? <h2>Información de rechazo</h2> : <h2>Información</h2>}
             </div>
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
@@ -275,35 +359,34 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 </section>
                             </div>
 
-                            {status == 'FINISHED' ||
-                                (userRole == 'ADMIN_TECHNICIANS' && (
-                                    <div className={style.rowModal}>
-                                        <section className={style.disabled}>
-                                            Departamento
-                                            <div className={style.formInput}>
-                                                <CustomInput
-                                                    isFormInput
-                                                    name="location"
-                                                    value={formState.device_id.location_id.name}
-                                                    type="text"
-                                                    onChange={onInputChange}
-                                                />
-                                            </div>
-                                        </section>
-                                        <section className={style.disabled}>
-                                            Fecha de solicitud
-                                            <div className={style.formInput}>
-                                                <CustomInput
-                                                    isFormInput
-                                                    name="device"
-                                                    value={formState.device_id.name}
-                                                    type="text"
-                                                    onChange={onInputChange}
-                                                />
-                                            </div>
-                                        </section>
-                                    </div>
-                                ))}
+                            {(userRole == 'ADMIN_TECHNICIANS' || userRole == 'TECHNICIAN') && (
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Departamento
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="department_name"
+                                                value={formState.department_name}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Fecha de solicitud
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="created_at"
+                                                value={formState.created_at}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
+                            )}
 
                             <div className={style.rowModal}>
                                 <section className={style.disabled}>
@@ -339,7 +422,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="technician"
-                                            value={formState.technician_id}
+                                            value={technicianName || 'No asignado'}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -351,7 +434,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="priority"
-                                            value={formState.work}
+                                            value={formState.priority || ''}
                                             type="text"
                                             color="g"
                                             onChange={onInputChange}
@@ -360,7 +443,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 </section>
                             </div>
 
-                            {userRole == 'ADMIN_TECHNICIANS' && status != 'ASSIGNED' ? (
+                            {(userRole == 'ADMIN_TECHNICIANS' || userRole == 'TECHNICIAN') && status != 'ASSIGNED' ? (
                                 <>
                                     <div className={style.rowModal}>
                                         <section className={style.disabled}>
@@ -369,7 +452,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                                 <CustomInput
                                                     isFormInput
                                                     name="arrivaltime"
-                                                    value={formState.arrived_date}
+                                                    value={formState.arrival_time}
                                                     type="text"
                                                     onChange={onInputChange}
                                                 />
@@ -442,7 +525,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                                         <CustomInput
                                                             isFormInput
                                                             name="arrivaltime"
-                                                            value={formState.arrived_date}
+                                                            value={formState.arrival_time}
                                                             type="text"
                                                             onChange={onInputChange}
                                                         />
@@ -468,7 +551,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                         </>
                     )}
 
-                    {status == undefined && (
+                    {status == undefined && status != 'SENT' && (
                         <>
                             <div className={style.rowModal}>
                                 <section className={style.disabled}>
@@ -504,7 +587,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="arrivaltime"
-                                            value={formState.arrived_date}
+                                            value={formState.arrival_time}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -525,25 +608,40 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                             </div>
                         </>
                     )}
-                    <section className={style.disabled}>
-                        Descripción
-                        <div className={style.formDescription}>
-                            <CustomTextArea
-                                isFormInput
-                                name="description"
-                                value={formState.description}
-                                type="description"
-                                onChange={onTextAreaChange}
-                            />
-                        </div>
-                    </section>
+                    {status == 'REJECTED' ? (
+                        <section className={style.disabled}>
+                            Motivos
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="description"
+                                    value={formState.comments}
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    ) : (
+                        <section className={style.disabled}>
+                            Descripción
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="description"
+                                    value={formState.description}
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    )}
                 </div>
 
                 <div className={` ${style.modalButtonContainer} ${style.add}`}>
-                    <button onClick={onClose} className={style.cancelButton}>
-                        Cancelar
+                    <button onClick={onClose} className={style.saveButton}>
+                        Cerrar
                     </button>
-                    <button className={style.saveButton}>Guardar</button>
+                    {/* <button className={style.saveButton}>Guardar</button> */}
                 </div>
             </div>
         </>

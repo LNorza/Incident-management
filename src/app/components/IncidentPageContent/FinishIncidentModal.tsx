@@ -1,21 +1,21 @@
 import { CheckCheck } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import style from '../../style/modal.module.css'
 import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
 import { useForm } from '../../../hooks'
 import {
     API_BASE_URL,
+    getArriveHourOptions,
     getIncidentTypeOptions,
+    getTimeDurationOptions,
     getWorkTypeOptions,
-    IFormIncident,
     Incident,
     IOptions,
+    translateIncident,
     UpdateIncidentDto,
 } from '../../../utils'
 import { toast } from 'sonner'
-import { DateInput } from 'rsuite'
 import { Calification } from '../../../ui/components/calification'
-import { getHoursIncident } from '../../utils/getHour'
 
 interface Props {
     onClose: () => void
@@ -31,6 +31,14 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     const [calification, setCalification] = useState(0)
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
+
+    const [rol] = useState('TECHNICIAN')
+    const [departmentId] = useState('67206b309acf1976ca32173b')
+    const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
+    const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
+    const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
+    const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
+    const [technicianName, setTechnicianName] = useState<string | undefined>(undefined)
 
     const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
         incident_type: '',
@@ -83,23 +91,59 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         _id: '',
         technician_id: '',
         priority: '',
-        arrived_date: '',
+        arrival_time: '',
         time_duration: '',
     })
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IFormIncident>({
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
-        technician: '',
-        building: '',
-        location: '',
-        device: '',
-        incident_type: '',
-        worktype: '',
-        date: new Date(),
-        priority: '',
-        arrived_date: '',
-        time_duration: '',
+        location_id: '',
+        department_name: '',
         description: '',
+        device_id: {
+            _id: '',
+            name: '',
+            type: '',
+            brand: '',
+            specs: {},
+            location_id: {
+                _id: '',
+                name: '',
+                building_id: {
+                    _id: '',
+                    name: '',
+                    description: '',
+                    isShared: false,
+                    departments: [
+                        {
+                            department_id: '',
+                            build_manager: {
+                                _id: '',
+                                name: '',
+                            },
+                            _id: '',
+                        },
+                    ],
+                    totalDevices: 0,
+                },
+            },
+            status: '',
+            purchaseDate: '',
+            warrantyYears: 0,
+            deviceModel: '',
+        },
+        date: '',
+        incident_type: '',
+        period: 0,
+        status: '',
+        updated_at: '',
+        created_at: '',
+        arrival_time: '',
+        time_duration: '',
+        technician_id: '',
+        priority: '',
+        work: '',
+        _id: '',
     })
 
     const fetchIncident = async () => {
@@ -108,11 +152,28 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
+            updateFields(data)
             setIncidentData(data)
         } catch (error) {
             console.error('Error fetching device:', error)
         }
     }
+
+    const fetchUsers = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users-search?department_id=${departmentId}&position=${rol}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            data.forEach((user: any) => {
+                if (user._id === formState.technician_id) {
+                    setTechnicianName(user.name)
+                }
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }, [departmentId, formState.technician_id])
 
     const saveIncident = async () => {
         try {
@@ -142,23 +203,44 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     }, [incidentId])
 
     useEffect(() => {
-        const work = getWorkTypeOptions(incidentType)
-        setWorkTypeOptions(work || []) // Asegura que sea siempre un array
+        fetchUsers()
+    }, [departmentId, rol, formState.technician_id])
+
+    useEffect(() => {
+        if (incidentType) {
+            setWorkTypeOptions(getWorkTypeOptions(incidentType))
+        }
     }, [incidentType])
 
     useEffect(() => {
-        updateFields({
-            folio: incidentData.folio,
-            device: incidentData.device_id.name,
-            date: new Date(incidentData.date),
-            arrived_date: getHoursIncident(new Date(incidentData.date)),
-            time_duration: incidentData.time_duration,
-        })
+        if (incidentData) {
+            setIncidentType(incidentData.incident_type)
+            setWorkType(incidentData.work)
+            setDateStart(new Date(incidentData.date))
+        }
+    }, [incidentData])
 
-        setIncidentType(incidentTypeOptions.find((incident) => incident.value === incidentData.incident_type)?.value)
-        setWorkType(workTypeOptions.find((work) => work.value === incidentData.work)?.value)
-        setDateStart(new Date(incidentData.date))
-    }, [incidentData, incidentTypeOptions, workTypeOptions])
+    useEffect(() => {
+        const createdAt = formState.created_at
+        if (formState.arrival_time) {
+            setArriveHour(arriveHourOptions.find((option) => option.value === formState.arrival_time)?.label)
+        }
+        if (formState.time_duration) {
+            setTimeDuration(timeDurationOptions.find((option) => option.value === formState.time_duration)?.label)
+        }
+
+        updateFields({
+            description: '',
+            priority: translateIncident(formState.priority, 'priority') || 'No asignado',
+            work: translateIncident(formState.work, 'work'),
+            incident_type: translateIncident(formState.incident_type, 'incident'),
+            status: translateIncident(formState.status, 'status'),
+            date: new Date(formState.date).toLocaleDateString(),
+            created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
+            arrival_time: arriveHour,
+            time_duration: timeDuration,
+        })
+    }, [formState.folio, arriveHourOptions, timeDurationOptions])
 
     useEffect(() => {
         if (action == 'RESENT') {
@@ -169,14 +251,16 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 description: formState.description,
             })
         } else {
+            console.log('calification', calification)
+            console.log('formState.comments', formState.comments)
+
             setUpdateIncident({
-                work: workType,
-                start_date: formState.date,
+                status: 'RELEASED',
                 qualification: calification,
-                comments: formState.description,
+                comments: formState.comments,
             })
         }
-    }, [incidentType, workType, formState])
+    }, [incidentType, workType])
 
     return (
         <>
@@ -207,7 +291,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="device"
-                                    value={formState.device}
+                                    value={formState.device_id.name}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -247,7 +331,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="technician"
-                                            value={formState.technician}
+                                            value={technicianName || 'No asignado'}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -267,7 +351,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                 </section>
                             </div>
                             <div className={style.rowModal}>
-                                <section>
+                                <section className={style.disabled}>
                                     Trabajo
                                     <div className={style.formInput}>
                                         <CustomSelect
@@ -278,33 +362,34 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                     </div>
                                 </section>
 
-                                <section>
+                                <section className={style.disabled}>
                                     Fecha de inicio
                                     <div className={style.formInput}>
-                                        <DateInput
-                                            value={dateStart}
-                                            onChange={(value: Date | null) => {
-                                                setDateStart(value)
-                                            }}
+                                        <CustomInput
+                                            isFormInput
+                                            name="durationtime"
+                                            value={formState.date}
+                                            type="text"
+                                            onChange={onInputChange}
                                         />
                                     </div>
                                 </section>
                             </div>
 
                             <div className={style.rowModal}>
-                                <section>
+                                <section className={style.disabled}>
                                     Hora de llegada
                                     <div className={style.formInput}>
                                         <CustomInput
                                             isFormInput
                                             name="arrivaltime"
-                                            value={formState.arrived_date}
+                                            value={formState.arrival_time}
                                             type="text"
                                             onChange={onInputChange}
                                         />
                                     </div>
                                 </section>
-                                <section>
+                                <section className={style.disabled}>
                                     Tiempo de duración
                                     <div className={style.formInput}>
                                         <CustomInput
@@ -322,23 +407,35 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
 
                     {action != 'RESENT' && <Calification onRatingChange={(rating) => setCalification(rating)} />}
 
-                    <section>
-                        {action === 'RESENT' ? 'Nueva descripción' : 'Comentarios'}
-                        <div className={style.formDescription}>
-                            <CustomTextArea
-                                isFormInput
-                                name="description"
-                                value={formState.description}
-                                placeholder={
-                                    action === 'RESENT'
-                                        ? 'Ingresa la nueva descripción'
-                                        : 'Ingresa algún comentario sobre el servicio'
-                                }
-                                type="description"
-                                onChange={onTextAreaChange}
-                            />
-                        </div>
-                    </section>
+                    {action === 'RESENT' ? (
+                        <section>
+                            Nueva descripción
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="description"
+                                    value={formState.description}
+                                    placeholder="Ingresa la nueva descripción "
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    ) : (
+                        <section>
+                            Comentarios
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="comments"
+                                    value={formState.comments}
+                                    placeholder="Ingresa algún comentario sobre el servicio"
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    )}
                 </div>
                 <div className={`${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.cancelButton}>
