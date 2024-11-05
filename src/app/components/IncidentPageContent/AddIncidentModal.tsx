@@ -320,6 +320,8 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         })
     }, [incidentData, incidentId])
 
+    console.log('location', officesOptions)
+
     return (
         <>
             <div className={style.titleModal}>

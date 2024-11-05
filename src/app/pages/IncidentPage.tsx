@@ -21,17 +21,13 @@ export const IncidentPage = () => {
     const [incidentStatus, setIncidentStatus] = useState<IncidentState>()
     const [nameAction, setNameAction] = useState('')
 
-    const [incident, setIncident] = useState<string>('ALL')
-    const [incidentOptions, setIncidentOptions] = useState<IOptions[]>([])
+    const [incident] = useState<string>('ALL')
     const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
 
-    const [typeIncident] = useState<IOptions[]>(getIncidentTypeOptions)
-    const [statusIncident] = useState<IOptions[]>(getIncidentStateOptions)
-
-    const handleSelect = (selected: { label: string; value: string }) => {
-        setIncident(selected.value)
-        setRefreshTable(true)
-    }
+    const [typeIncidentOptions] = useState<IOptions[]>(getIncidentTypeOptions('ALL'))
+    const [statusIncidentOptions] = useState<IOptions[]>(getIncidentStateOptions('ALL'))
+    const [typeIncident, setTypeIncident] = useState<string>('ALL')
+    const [statusIncident, setstatusIncident] = useState<string>('ALL')
 
     const onOpenModal = () => {
         setTypeModal('AddIncident')
@@ -106,9 +102,11 @@ export const IncidentPage = () => {
                             <div>
                                 <CustomSelect
                                     menu
-                                    value={incident}
-                                    options={typeIncident}
-                                    onSelect={handleSelect}
+                                    value={typeIncident}
+                                    options={typeIncidentOptions}
+                                    onSelect={(selected: { label: string; value: string }) => {
+                                        setTypeIncident(selected.value)
+                                    }}
                                     placeholder="Todos"
                                 />
                             </div>
@@ -119,9 +117,11 @@ export const IncidentPage = () => {
                                 <div>
                                     <CustomSelect
                                         menu
-                                        value={incident}
-                                        options={statusIncident}
-                                        onSelect={handleSelect}
+                                        value={statusIncident}
+                                        options={statusIncidentOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setstatusIncident(selected.value)
+                                        }}
                                         placeholder="Todos"
                                     />
                                 </div>
@@ -139,7 +139,8 @@ export const IncidentPage = () => {
                 <section>
                     <IncidentTable
                         refresh={refreshTable}
-                        building={incident}
+                        typeIncident={typeIncident}
+                        statusIncident={statusIncident}
                         typeincidentModal={handletypeModal}
                         deleteIncident={handleDeleteModal}
                     />

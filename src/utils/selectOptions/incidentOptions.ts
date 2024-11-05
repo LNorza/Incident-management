@@ -1,20 +1,63 @@
 import { IOptions } from "../interface";
 
+export const getIncidentStateOptions = (select?: string): IOptions[] => {
+  if (select === 'ALL') {
+    return [
+      { label: 'Todos', value: 'ALL' },
+      { label: 'Enviado', value: 'SENT' },
+      { label: 'Asignado', value: 'ASSIGNED' },
+      { label: 'En proceso', value: 'IN_PROCESS' },
+      { label: 'Liberado', value: 'RELEASED' },
+      { label: 'Rechazado', value: 'REJECTED' },
+      {
+        label: 'Finalizado', value: 'FINISHED'
+      }
+    ]
+  } else {
+    return [
+      { label: 'Enviado', value: 'SENT' },
+      { label: 'Asignado', value: 'ASSIGNED' },
+      { label: 'En proceso', value: 'IN_PROCESS' },
+      { label: 'Liberado', value: 'RELEASED' },
+      { label: 'Rechazado', value: 'REJECTED' },
+      { label: 'Finalizado', value: 'FINISHED' },
+    ]
+  }
+}
 
-export const getIncidentStateOptions: IOptions[] = [
-  { label: 'Enviado', value: 'SENT' },
-  { label: 'Asignado', value: 'ASSIGNED' },
-  { label: 'En proceso', value: 'IN_PROCESS' },
-  { label: 'Liberado', value: 'RELEASED' },
-  { label: 'Rechazado', value: 'REJECTED' },
-  { label: 'Finalizado', value: 'FINISHED' },
-]
+export const getIncidentTypeOptions = (select?: string): IOptions[] => {
+  if (select === 'ALL') {
+    return [
+      { label: 'Todos', value: 'ALL' },
+      { label: 'Computo', value: 'COMPUTER' },
+      { label: 'Reparación', value: 'REPAIR' },
+      { label: 'Mantenimiento', value: 'MAINTANCE' },
+    ]
+  } else {
+    return [
+      { label: 'Computo', value: 'COMPUTER' },
+      { label: 'Reparación', value: 'REPAIR' },
+      { label: 'Mantenimiento', value: 'MAINTANCE' },
+    ]
+  }
+}
 
-export const getIncidentTypeOptions: IOptions[] = [
-  { label: 'Computo', value: 'COMPUTER' },
-  { label: 'Reparación', value: 'REPAIR' },
-  { label: 'Mantenimiento', value: 'MAINTANCE' },
-]
+// export const getIncidentStateOptions: IOptions[] = [
+//   { label: 'Todos', value: 'ALL' },
+//   { label: 'Enviado', value: 'SENT' },
+//   { label: 'Asignado', value: 'ASSIGNED' },
+//   { label: 'En proceso', value: 'IN_PROCESS' },
+//   { label: 'Liberado', value: 'RELEASED' },
+//   { label: 'Rechazado', value: 'REJECTED' },
+//   { label: 'Finalizado', value: 'FINISHED' },
+// ]
+
+// export const getIncidentTypeOptions: IOptions[] = [
+//   { label: 'Todos', value: 'ALL' },
+//   { label: 'Computo', value: 'COMPUTER' },
+//   { label: 'Reparación', value: 'REPAIR' },
+//   { label: 'Mantenimiento', value: 'MAINTANCE' },
+// ]
 
 export const getIncidentPriorityOptions: IOptions[] = [
   { label: 'Alta', value: 'HIGH' },

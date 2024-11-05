@@ -10,7 +10,8 @@ import { getActionIncident } from '../../utils'
 
 interface IncidentTableProps {
     refresh: boolean
-    building: string
+    typeIncident: string
+    statusIncident: string
     typeincidentModal?: (
         deviceId: string,
         type?: IncidentModalType,
@@ -22,7 +23,8 @@ interface IncidentTableProps {
 
 export const IncidentTable: React.FC<IncidentTableProps> = ({
     refresh,
-    building,
+    typeIncident,
+    statusIncident,
     typeincidentModal,
     deleteIncident,
 }) => {
@@ -115,11 +117,20 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                     }
                 }),
             )
-            setRowData(formattedData)
+            const filteredData = formattedData.filter(
+                (incident: IIncident) =>
+                    (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
+                    (statusIncident === 'ALL' || incident.status === statusIncident),
+            )
+            if (typeIncident === 'ALL' && statusIncident === 'ALL') {
+                return setRowData(formattedData)
+            } else {
+                return setRowData(filteredData)
+            }
         } catch (err) {
             console.error(err)
         }
-    }, [building])
+    }, [typeIncident, statusIncident])
 
     useEffect(() => {
         fetchRole()
@@ -127,7 +138,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
 
     useEffect(() => {
         fetchIncident()
-    }, [fetchIncident, refresh, building])
+    }, [fetchIncident, refresh, typeIncident, statusIncident])
 
     const colDefs: ColDef[] = [
         { field: 'folio', headerName: 'Folio', sortable: true, width: 100 },
