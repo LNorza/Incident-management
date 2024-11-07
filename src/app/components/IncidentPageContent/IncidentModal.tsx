@@ -27,6 +27,8 @@ export const IncidentModal = ({
     deleteFunction,
     onClose,
 }: Props) => {
+    console.log('action', nameAction)
+
     return (
         <>
             {isOpen && (
@@ -45,7 +47,7 @@ export const IncidentModal = ({
                     {type === 'FinishedIncident' && (
                         <section
                             className={`${
-                                nameAction == 'FINISHED' ? style.largeModalInfoContainer : style.modalInfoContainer
+                                nameAction != 'FINISHED' ? style.largeModalInfoContainer : style.modalInfoContainer
                             }`}
                         >
                             <FinishIncidentModal onClose={onClose} incidentId={incidentId} action={nameAction} />
@@ -54,7 +56,6 @@ export const IncidentModal = ({
                     {type === 'AssignedIncident' && (
                         <section className={style.largeModalInfoContainer}>
                             <AssigmedModal onClose={onClose} incidentId={incidentId} action={nameAction} />
-                            {/* <FinishIncidentModal onClose={onClose} incidentId={incidentId} action={nameAction} /> */}
                         </section>
                     )}
                     {type === 'InfoIncident' && (

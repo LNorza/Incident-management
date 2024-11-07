@@ -250,10 +250,12 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 work: workType,
                 description: formState.description,
             })
+        }
+        if (action == 'FINISHED') {
+            setUpdateIncident({
+                status: 'FINISHED',
+            })
         } else {
-            console.log('calification', calification)
-            console.log('formState.comments', formState.comments)
-
             setUpdateIncident({
                 status: 'RELEASED',
                 qualification: calification,
@@ -266,184 +268,209 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         <>
             <div className={style.titleModal}>
                 <CheckCheck size={40} />
-                <h2>{action === 'RESENT' ? 'Reenviar incidencia' : 'Liberar incidencia'}</h2>
+                <h2>
+                    {action == 'FINISHED'
+                        ? 'Finalizar incidencia'
+                        : action === 'RESENT'
+                        ? 'Reenviar incidencia'
+                        : 'Liberar incidencia'}
+                </h2>
             </div>
             <div className={style.modalDetail}>
-                <div className={style.columnModal}>
-                    <div className={style.rowModal}>
-                        <section className={style.disabled}>
-                            Folio
-                            <div className={style.formInput}>
-                                <CustomInput
-                                    isFormInput
-                                    name="folio"
-                                    value={formState.folio}
-                                    type="text"
-                                    onChange={onInputChange}
-                                    autoComplete="folio"
-                                />
-                            </div>
-                        </section>
-
-                        <section className={style.disabled}>
-                            Equipo
-                            <div className={style.formInput}>
-                                <CustomInput
-                                    isFormInput
-                                    name="device"
-                                    value={formState.device_id.name}
-                                    type="text"
-                                    onChange={onInputChange}
-                                />
-                            </div>
-                        </section>
-                    </div>
-
-                    {action === 'RESENT' ? (
+                {action == 'FINISHED' ? (
+                    <>
+                        <div className={style.modalDeleteText}>
+                            <span className={style.p1}>¿Estás seguro de que quieres finalizar la incidencia?</span>
+                            <span className={style.p2}>
+                                Una vez finalizada no podrás hacer ningún cambio en el equipo asignado y serás
+                                calificado por el usuario
+                            </span>
+                        </div>
+                    </>
+                ) : (
+                    <div className={style.columnModal}>
                         <div className={style.rowModal}>
-                            <section>
-                                Tipo de Incidencia
+                            <section className={style.disabled}>
+                                Folio
                                 <div className={style.formInput}>
-                                    <CustomSelect
-                                        value={incidentType}
-                                        options={incidentTypeOptions}
-                                        onSelect={(selected) => setIncidentType(selected.value)}
+                                    <CustomInput
+                                        isFormInput
+                                        name="folio"
+                                        value={formState.folio}
+                                        type="text"
+                                        onChange={onInputChange}
+                                        autoComplete="folio"
                                     />
                                 </div>
                             </section>
-                            <section>
-                                Trabajo
+
+                            <section className={style.disabled}>
+                                Equipo
                                 <div className={style.formInput}>
-                                    <CustomSelect
-                                        value={workType}
-                                        options={workTypeOptions ?? []}
-                                        onSelect={(selected) => setWorkType(selected.value)}
+                                    <CustomInput
+                                        isFormInput
+                                        name="device"
+                                        value={formState.device_id.name}
+                                        type="text"
+                                        onChange={onInputChange}
                                     />
                                 </div>
                             </section>
                         </div>
-                    ) : (
-                        <>
+
+                        {action === 'RESENT' ? (
                             <div className={style.rowModal}>
-                                <section className={style.disabled}>
-                                    Técnico
+                                <section>
+                                    Tipo de Incidencia
                                     <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="technician"
-                                            value={technicianName || 'No asignado'}
-                                            type="text"
-                                            onChange={onInputChange}
+                                        <CustomSelect
+                                            value={incidentType}
+                                            options={incidentTypeOptions}
+                                            onSelect={(selected) => setIncidentType(selected.value)}
                                         />
                                     </div>
                                 </section>
-                                <section className={style.disabled}>
-                                    Prioridad asignada
-                                    <div className={`${style.formInput}`}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="priority"
-                                            value={formState.priority}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                            </div>
-                            <div className={style.rowModal}>
-                                <section className={style.disabled}>
+                                <section>
                                     Trabajo
                                     <div className={style.formInput}>
                                         <CustomSelect
                                             value={workType}
-                                            options={workTypeOptions}
+                                            options={workTypeOptions ?? []}
                                             onSelect={(selected) => setWorkType(selected.value)}
                                         />
                                     </div>
                                 </section>
-
-                                <section className={style.disabled}>
-                                    Fecha de inicio
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="durationtime"
-                                            value={formState.date}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
                             </div>
+                        ) : (
+                            <>
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Técnico
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="technician"
+                                                value={technicianName || 'No asignado'}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Prioridad asignada
+                                        <div className={`${style.formInput}`}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="priority"
+                                                value={formState.priority}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Trabajo
+                                        <div className={style.formInput}>
+                                            <CustomSelect
+                                                value={workType}
+                                                options={workTypeOptions}
+                                                onSelect={(selected) => setWorkType(selected.value)}
+                                            />
+                                        </div>
+                                    </section>
 
-                            <div className={style.rowModal}>
-                                <section className={style.disabled}>
-                                    Hora de llegada
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="arrivaltime"
-                                            value={formState.arrival_time}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                                <section className={style.disabled}>
-                                    Tiempo de duración
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="durationtime"
-                                            value={formState.time_duration}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                            </div>
-                        </>
-                    )}
+                                    <section className={style.disabled}>
+                                        Fecha de inicio
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="durationtime"
+                                                value={formState.date}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
 
-                    {action != 'RESENT' && <Calification onRatingChange={(rating) => setCalification(rating)} />}
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Hora de llegada
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="arrivaltime"
+                                                value={formState.arrival_time}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Tiempo de duración
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="durationtime"
+                                                value={formState.time_duration}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
+                            </>
+                        )}
 
-                    {action === 'RESENT' ? (
-                        <section>
-                            Nueva descripción
-                            <div className={style.formDescription}>
-                                <CustomTextArea
-                                    isFormInput
-                                    name="description"
-                                    value={formState.description}
-                                    placeholder="Ingresa la nueva descripción "
-                                    type="description"
-                                    onChange={onTextAreaChange}
-                                />
-                            </div>
-                        </section>
-                    ) : (
-                        <section>
-                            Comentarios
-                            <div className={style.formDescription}>
-                                <CustomTextArea
-                                    isFormInput
-                                    name="comments"
-                                    value={formState.comments}
-                                    placeholder="Ingresa algún comentario sobre el servicio"
-                                    type="description"
-                                    onChange={onTextAreaChange}
-                                />
-                            </div>
-                        </section>
-                    )}
-                </div>
+                        {action != 'RESENT' && <Calification onRatingChange={(rating) => setCalification(rating)} />}
+
+                        {action === 'RESENT' ? (
+                            <section>
+                                Nueva descripción
+                                <div className={style.formDescription}>
+                                    <CustomTextArea
+                                        isFormInput
+                                        name="description"
+                                        value={formState.description}
+                                        placeholder="Ingresa la nueva descripción "
+                                        type="description"
+                                        onChange={onTextAreaChange}
+                                    />
+                                </div>
+                            </section>
+                        ) : (
+                            <section>
+                                Comentarios
+                                <div className={style.formDescription}>
+                                    <CustomTextArea
+                                        isFormInput
+                                        name="comments"
+                                        value={formState.comments}
+                                        placeholder="Ingresa algún comentario sobre el servicio"
+                                        type="description"
+                                        onChange={onTextAreaChange}
+                                    />
+                                </div>
+                            </section>
+                        )}
+                    </div>
+                )}
+
                 <div className={`${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.cancelButton}>
                         Cancelar
                     </button>
-                    <button onClick={saveIncident} className={style.saveButton}>
-                        {action === 'RESENT' ? 'Reenviar' : 'Liberar'}
-                    </button>
+                    {action == 'FINISHED' ? (
+                        <button onClick={saveIncident} className={style.saveButton}>
+                            Finalizar
+                        </button>
+                    ) : (
+                        <button onClick={saveIncident} className={style.saveButton}>
+                            {action === 'RESENT' ? 'Reenviar' : 'Liberar'}
+                        </button>
+                    )}
                 </div>
             </div>
         </>
