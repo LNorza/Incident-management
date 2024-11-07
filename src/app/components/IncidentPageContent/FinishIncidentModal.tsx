@@ -240,7 +240,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
             arrival_time: arriveHour,
             time_duration: timeDuration,
         })
-    }, [formState.folio, arriveHourOptions, timeDurationOptions])
+    }, [formState.folio, arriveHourOptions, timeDurationOptions, arriveHour, timeDuration])
 
     useEffect(() => {
         if (action == 'RESENT') {

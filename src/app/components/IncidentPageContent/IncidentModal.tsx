@@ -45,7 +45,7 @@ export const IncidentModal = ({
                     {type === 'FinishedIncident' && (
                         <section
                             className={`${
-                                nameAction == 'FINISHED' ? style.modalInfoContainer : style.largeModalInfoContainer
+                                nameAction == 'FINISHED' ? style.largeModalInfoContainer : style.modalInfoContainer
                             }`}
                         >
                             <FinishIncidentModal onClose={onClose} incidentId={incidentId} action={nameAction} />
