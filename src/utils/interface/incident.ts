@@ -25,6 +25,7 @@ export interface IIncident {
   incident_type: string,
   description: string,
   status: IncidentState,
+  technician_id: string,
 }
 
 export interface Incident {

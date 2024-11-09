@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IncidentModalType, IncidentState, myTheme } from '../../../utils'
-import { API_BASE_URL, getUserRole } from '../../../utils/api'
+import { IncidentModalType, IncidentState, IUserData, myTheme } from '../../../utils'
+import { API_BASE_URL, getUserData, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { IIncident } from '../../../utils/interface/incident'
 import { dateFormatter } from '../../../utils/formatter/date.formatter'
 import { getActionIncident } from '../../utils'
+import { te } from 'date-fns/locale'
 
 interface IncidentTableProps {
     refresh: boolean
@@ -32,6 +33,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
 
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
+    const [userData, setUserData] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
 
     const handleReleasedClick = useCallback(
@@ -72,6 +74,21 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         const role = await getUserRole() // Obtener el rol del usuario
         setUserRole(role) // Guardar el rol en el estado
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const userData = await getUserData()
+                setUserData(userData?._id)
+            } catch (error) {
+                console.error('Error fetching data:', error)
+            }
+        }
+        fetchData()
+    }, [])
+
+    console.log('userData', userData)
+
     // Función para obtener el dispositivo
     const fetchDeviceById = async (deviceId: string) => {
         try {
@@ -98,47 +115,77 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
             const deviceCache: { [key: string]: string } = {}
 
             const formattedData = await Promise.all(
-                data.map(async ({ _id, folio, date, device_id, incident_type, description, status }: IIncident) => {
-                    const formattedDate = dateFormatter(new Date(date))
-
-                    // Revisa si el dispositivo ya está en la caché
-                    if (!deviceCache[device_id]) {
-                        deviceCache[device_id] = await fetchDeviceById(device_id)
-                    }
-
-                    return {
+                data.map(
+                    async ({
                         _id,
                         folio,
-                        date: formattedDate,
-                        device_id: deviceCache[device_id], // Usa el nombre del dispositivo desde la caché
+                        date,
+                        device_id,
                         incident_type,
                         description,
                         status,
-                    }
-                }),
+                        technician_id,
+                    }: IIncident) => {
+                        const formattedDate = dateFormatter(new Date(date))
+
+                        // Revisa si el dispositivo ya está en la caché
+                        if (!deviceCache[device_id]) {
+                            deviceCache[device_id] = await fetchDeviceById(device_id)
+                        }
+
+                        return {
+                            _id,
+                            folio,
+                            date: formattedDate,
+                            device_id: deviceCache[device_id], // Usa el nombre del dispositivo desde la caché
+                            incident_type,
+                            description,
+                            status,
+                            technician_id,
+                        }
+                    },
+                ),
             )
-            const filteredData = formattedData.filter(
-                (incident: IIncident) =>
-                    (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
-                    (statusIncident === 'ALL' || incident.status === statusIncident),
-            )
-            if (typeIncident === 'ALL' && statusIncident === 'ALL') {
-                return setRowData(formattedData)
+
+            //filtra las incidencias por tecnico
+            if (userRole == 'TECHNICIAN') {
+                // Filtrar por `technician_id` (userData)
+                const incidentAssigned = formattedData.filter(
+                    (incident: IIncident) => incident.technician_id === userData,
+                )
+
+                // Filtrar además por `typeIncident` y `statusIncident`
+                const filteredByTypeAndStatus = incidentAssigned.filter(
+                    (incident: IIncident) =>
+                        (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
+                        (statusIncident === 'ALL' || incident.status === statusIncident),
+                )
+
+                // Asignar los datos filtrados a `rowData`
+                return setRowData(filteredByTypeAndStatus)
             } else {
+                // Si no hay `userData`, filtrar solo por `typeIncident` y `statusIncident`
+                const filteredData = formattedData.filter(
+                    (incident: IIncident) =>
+                        (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
+                        (statusIncident === 'ALL' || incident.status === statusIncident),
+                )
+
+                // Asignar los datos filtrados a `rowData`
                 return setRowData(filteredData)
             }
         } catch (err) {
             console.error(err)
         }
-    }, [typeIncident, statusIncident])
+    }, [typeIncident, statusIncident, userRole, userData])
 
     useEffect(() => {
         fetchRole()
-    }, [])
+    }, [userData])
 
     useEffect(() => {
         fetchIncident()
-    }, [fetchIncident, refresh, typeIncident, statusIncident])
+    }, [fetchIncident, refresh, typeIncident, statusIncident, userRole, userData])
 
     const colDefs: ColDef[] = [
         { field: 'folio', headerName: 'Folio', sortable: true, width: 100 },
