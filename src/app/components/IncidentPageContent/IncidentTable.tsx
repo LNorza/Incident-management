@@ -87,8 +87,6 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         fetchData()
     }, [])
 
-    console.log('userData', userData)
-
     // Función para obtener el dispositivo
     const fetchDeviceById = async (deviceId: string) => {
         try {

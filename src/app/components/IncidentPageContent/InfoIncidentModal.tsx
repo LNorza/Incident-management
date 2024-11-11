@@ -36,6 +36,55 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
 
     const incidentFetched = useRef(false) // Se asegura de que fetchIncident solo se ejecute una vez por cambio en incidentId.
 
+    const [incidentData, setIncidentData] = useState<Incident>({
+        date: '',
+        location_id: '',
+        description: '',
+        device_id: {
+            _id: '',
+            name: '',
+            type: '',
+            brand: '',
+            specs: {},
+            location_id: {
+                _id: '',
+                name: '',
+                building_id: {
+                    _id: '',
+                    name: '',
+                    description: '',
+                    isShared: false,
+                    departments: [
+                        {
+                            department_id: '',
+                            build_manager: {
+                                _id: '',
+                                name: '',
+                            },
+                            _id: '',
+                        },
+                    ],
+                    totalDevices: 0,
+                },
+            },
+            status: '',
+            purchaseDate: '',
+            warrantyYears: 0,
+            deviceModel: '',
+        },
+        folio: '',
+        incident_type: '',
+        period: 0,
+        status: '',
+        updated_at: '',
+        work: '',
+        _id: '',
+        technician_id: '',
+        priority: '',
+        arrival_time: '',
+        time_duration: '',
+    })
+
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
         folio: '',
         location_id: '',
@@ -130,7 +179,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         try {
             const response = await fetch(`${API_BASE_URL}/incidents/${incidentId}`, { credentials: 'include' })
             const data = await response.json()
-            updateFields(data) // Actualizar campos solo cuando cambia incidentId
+            setIncidentData(data)
             incidentFetched.current = true
         } catch (error) {
             console.error('Error fetching device:', error)
@@ -138,10 +187,19 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
     }, [incidentId, updateFields])
 
     useEffect(() => {
-        fetchIncident()
-        fetchRole()
-        fetchDepartment()
+        const fetchData = async () => {
+            await fetchDepartment()
+            await fetchIncident()
+            await fetchRole()
+        }
+        fetchData()
     }, [fetchIncident, fetchRole, fetchDepartment])
+
+    useEffect(() => {
+        if (incidentData) {
+            updateFields(incidentData)
+        }
+    }, [incidentData.folio])
 
     useEffect(() => {
         fetchUsers()
@@ -171,41 +229,20 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         } else if (formState.status !== 'REJECTED' && colorState !== undefined) {
             setColorState(undefined)
         }
-    }, [
-        formState.arrival_time,
-        formState.time_duration,
-        formState.status,
-        arriveHour, // Esto previene que se cambie innecesariamente
-        timeDuration, // Previene cambios innecesarios
-        colorState, // Asegura que el color solo cambie cuando sea necesario
-    ])
+    }, [formState.arrival_time, formState.time_duration, formState.status, arriveHour, timeDuration, colorState])
 
     useEffect(() => {
-        // Si alguna de las dependencias importantes cambia, actualizar solo los campos necesarios una vez
         updateFields({
-            priority: formState.priority ? translateIncident(formState.priority, 'priority') : 'No asignado',
-            work: formState.work ? translateIncident(formState.work, 'work') : '',
-            incident_type: formState.incident_type ? translateIncident(formState.incident_type, 'incident') : '',
             department_name: departmentName,
-            status: formState.status ? translateIncident(formState.status, 'status') : '',
-            date: formState.date ? new Date(formState.date).toLocaleDateString() : '',
             created_at: formState.created_at ? new Date(formState.created_at).toLocaleDateString() : '',
+            incident_type: formState.incident_type ? translateIncident(formState.incident_type, 'incident') : '',
+            work: formState.work ? translateIncident(formState.work, 'work') : '',
+            priority: formState.priority ? translateIncident(formState.priority, 'priority') : 'No asignado',
             arrival_time: arriveHour,
             time_duration: timeDuration,
+            date: formState.date ? new Date(formState.date).toLocaleDateString() : '',
         })
-    }, [
-        formState.priority,
-        formState.work,
-        formState.incident_type,
-        departmentName,
-        formState.status,
-        formState.date,
-        formState.created_at,
-        arriveHour,
-        timeDuration,
-    ])
-
-    console.log('formsate', formState)
+    }, [incidentId, status, departmentId, departmentName, arriveHour, timeDuration])
 
     return (
         <>
