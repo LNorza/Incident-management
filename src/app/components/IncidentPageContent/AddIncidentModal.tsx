@@ -142,10 +142,14 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
 
     const fetchDevices = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/devices-search?locationId=${location}`, {
+            const response = await fetch(`${API_BASE_URL}/devices-search?location_id=${location}`, {
                 credentials: 'include',
             })
             const data = await response.json()
+            console.log('building', building)
+            console.log('location', location)
+            console.log('data', data)
+
             setDeviceOptions(
                 data.map((building: { _id: string; name: string }) => ({
                     label: building.name,
@@ -247,8 +251,11 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
 
     useEffect(() => {
         fetchOffices()
-        fetchDevices()
-    }, [buildingId, fetchOffices])
+        if (building != undefined && location != undefined) {
+            console.log('entre')
+            fetchDevices()
+        }
+    }, [buildingId, fetchOffices, location])
 
     useEffect(() => {
         const fetchData = async () => {
@@ -319,8 +326,6 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             worktype: workType,
         })
     }, [incidentData, incidentId])
-
-    console.log('location', officesOptions)
 
     return (
         <>
