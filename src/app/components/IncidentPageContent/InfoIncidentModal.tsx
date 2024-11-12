@@ -559,63 +559,64 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                         </>
                     )}
 
-                    {status == undefined && status != 'SENT' && (
-                        <>
-                            <div className={style.rowModal}>
-                                <section className={style.disabled}>
-                                    Fecha de solicitud
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="created_at"
-                                            value={formState.created_at || ''}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                                <section className={style.disabled}>
-                                    Fecha de inicio
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="date_start"
-                                            value={formState.date || ''}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                            </div>
+                    {(status == undefined && status != 'SENT') ||
+                        (userRole == 'ADMIN_DEPARTMENT' && (
+                            <>
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Fecha de solicitud
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="created_at"
+                                                value={formState.created_at || ''}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Fecha de inicio
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="date_start"
+                                                value={formState.date || ''}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
 
-                            <div className={style.rowModal}>
-                                <section className={style.disabled}>
-                                    Hora de llegada
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="arrivaltime"
-                                            value={formState.arrival_time || ''}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                                <section className={style.disabled}>
-                                    Tiempo de duración
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="durationtime"
-                                            value={formState.time_duration || ''}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                            </div>
-                        </>
-                    )}
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Hora de llegada
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="arrivaltime"
+                                                value={formState.arrival_time || ''}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Tiempo de duración
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="durationtime"
+                                                value={formState.time_duration || ''}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
+                            </>
+                        ))}
                     {status == 'REJECTED' ? (
                         <section className={style.disabled}>
                             Motivos

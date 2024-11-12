@@ -243,26 +243,31 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     }, [formState.folio, arriveHourOptions, timeDurationOptions, arriveHour, timeDuration])
 
     useEffect(() => {
-        if (action == 'RESENT') {
-            setUpdateIncident({
-                status: 'SENT',
-                incident_type: incidentType,
-                work: workType,
-                description: formState.description,
-            })
+        console.log('action', action)
+
+        switch (action) {
+            case 'RESENT':
+                setUpdateIncident({
+                    status: 'SENT',
+                    incident_type: incidentType,
+                    work: workType,
+                    description: formState.description,
+                })
+                break
+            case 'FINISHED':
+                setUpdateIncident({
+                    status: 'FINISHED',
+                })
+                break
+            default:
+                setUpdateIncident({
+                    status: 'RELEASED',
+                    qualification: calification,
+                    comments: formState.comments,
+                })
+                break
         }
-        if (action == 'FINISHED') {
-            setUpdateIncident({
-                status: 'FINISHED',
-            })
-        } else {
-            setUpdateIncident({
-                status: 'RELEASED',
-                qualification: calification,
-                comments: formState.comments,
-            })
-        }
-    }, [incidentType, workType])
+    }, [incidentType, workType, formState.description, formState.comments, calification])
 
     return (
         <>
