@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CustomSelect } from '../../ui'
 import {
     API_BASE_URL,
     getIncidentStateOptions,
     getIncidentTypeOptions,
+    getUserRole,
     IncidentModalType,
     IncidentState,
     IOptions,
@@ -21,13 +22,18 @@ export const IncidentPage = () => {
     const [incidentStatus, setIncidentStatus] = useState<IncidentState>()
     const [nameAction, setNameAction] = useState('')
 
-    const [incident] = useState<string>('ALL')
     const [incidentId, setIncidentId] = useState<string | undefined>(undefined)
+    const [userRole, setUserRole] = useState<string | null>(null)
 
     const [typeIncidentOptions] = useState<IOptions[]>(getIncidentTypeOptions('ALL'))
     const [statusIncidentOptions] = useState<IOptions[]>(getIncidentStateOptions('ALL'))
     const [typeIncident, setTypeIncident] = useState<string>('ALL')
     const [statusIncident, setstatusIncident] = useState<string>('ALL')
+
+    const fetchRole = useCallback(async () => {
+        const role = await getUserRole()
+        setUserRole(role)
+    }, [])
 
     const onOpenModal = () => {
         setTypeModal('AddIncident')
@@ -91,6 +97,14 @@ export const IncidentPage = () => {
             console.error(error)
         }
     }
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchRole()
+        }
+        fetchData()
+    }, [])
+
     return (
         <>
             <div className={style.container}>
@@ -127,12 +141,14 @@ export const IncidentPage = () => {
                                 </div>
                             </div>
                         </div>
-                        <div className={style.actioncontainer}>
-                            <span className={style.hideText}>add</span>
-                            <button onClick={onOpenModal} className={style.button}>
-                                <Plus /> Agregar
-                            </button>
-                        </div>
+                        {userRole == 'ADMIN_DEPARTMENT' && (
+                            <div className={style.actioncontainer}>
+                                <span className={style.hideText}>add</span>
+                                <button onClick={onOpenModal} className={style.button}>
+                                    <Plus /> Agregar
+                                </button>
+                            </div>
+                        )}
                     </article>
                 </section>
 
