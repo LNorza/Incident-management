@@ -1,17 +1,22 @@
 import { useState } from 'react'
-import { CustomInput, CustomSelect } from '../../ui'
+import { CustomInput } from '../../ui'
 import style from '../style/deviceContainer.module.css'
 import { Plus } from 'lucide-react'
-import { DeviceTable, SparePartsTable } from '../components'
+import { SparePartModal, SparePartsTable } from '../components'
 
 export const SparePartsPage = () => {
     const [showModal, setShowModal] = useState(false)
     const [refreshTable, setRefreshTable] = useState(false)
-    // const [typeModal, setTypeModal] = useState<>()
+
     const onOpenModal = () => {
         // setTypeModal('AddDevice')
         // setDeviceId(undefined)
         setShowModal(true)
+    }
+
+    const onCloseModal = () => {
+        setRefreshTable(true)
+        setShowModal(false)
     }
 
     return (
@@ -44,22 +49,10 @@ export const SparePartsPage = () => {
                 </section>
 
                 <section>
-                    <SparePartsTable
-                    // refresh={refreshTable}
-                    // building={building}
-                    // editDevice={handleEditModal}
-                    // deleteDevice={handleDeleteModal}
-                    />
+                    <SparePartsTable />
                 </section>
 
-                {/* <section>
-                    <DeviceTable
-                        refresh={refreshTable}
-                        building={building}
-                        editDevice={handleEditModal}
-                        deleteDevice={handleDeleteModal}
-                    />
-                </section> */}
+                <SparePartModal isOpen={showModal} onClose={onCloseModal} />
             </div>
         </>
     )
