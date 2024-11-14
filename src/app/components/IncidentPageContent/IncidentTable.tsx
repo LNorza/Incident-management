@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IncidentModalType, IncidentState, IUserData, myTheme } from '../../../utils'
+import { IncidentModalType, IncidentState, myTheme } from '../../../utils'
 import { API_BASE_URL, getUserData, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { IIncident } from '../../../utils/interface/incident'
 import { dateFormatter } from '../../../utils/formatter/date.formatter'
 import { getActionIncident } from '../../utils'
-import { te } from 'date-fns/locale'
 
 interface IncidentTableProps {
     refresh: boolean
