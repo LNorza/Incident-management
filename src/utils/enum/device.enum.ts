@@ -1,6 +1,7 @@
 export type DeviceState = 'Activo' | 'En reparación' | 'Inactivo'
 export type DeviceModalType = 'AddDevice' | 'EditDevice' | 'DeleteDevice'
 
+export type DeviceType = 'COMPUTER' | 'LAPTOP' | 'PRINTER' | 'SWITCH' | 'ROUTER' | 'NO_BREAK' | 'VOLTAGE_REGULATOR' | 'PROJECTOR'
 export enum DeviceStatus {
   ACTIVE = 'Activo',
   UnderRepair = 'En reparación',

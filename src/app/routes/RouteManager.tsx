@@ -33,11 +33,10 @@ export const RouteManager = () => {
                     <Route path="home" element={<Dashboard />} />
                     <Route path="user" element={<UserPage />} />
                     <Route path="build" element={<BuildingPage />} />
-                    <Route path="change" element={<DevicePage />} />
+                    <Route path="device" element={<DevicePage />} />
                     <Route path="incident" element={<IncidentPage />} />
-
-                    <Route path="spare-parts" element={<ChangePage />} />
-                    <Route path="device" element={<SparePartsPage />} />
+                    <Route path="change" element={<ChangePage />} />
+                    <Route path="spare-parts" element={<SparePartsPage />} />
 
                     <Route path="profile" element={<ProfilePage />} />
                     {/* DefaultRoute */}

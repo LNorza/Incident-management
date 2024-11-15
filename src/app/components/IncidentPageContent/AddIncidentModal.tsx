@@ -146,9 +146,6 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            console.log('building', building)
-            console.log('location', location)
-            console.log('data', data)
 
             setDeviceOptions(
                 data.map((building: { _id: string; name: string }) => ({

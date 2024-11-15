@@ -1,12 +1,23 @@
-import { useState } from 'react'
-import { CustomInput } from '../../ui'
+import { useCallback, useEffect, useState } from 'react'
+import { CustomInput, CustomSelect } from '../../ui'
 import style from '../style/deviceContainer.module.css'
 import { Plus } from 'lucide-react'
 import { SparePartModal, SparePartsTable } from '../components'
+import { getDeviceTypeOptions, getUserRole, IOptions } from '../../utils'
 
 export const SparePartsPage = () => {
     const [showModal, setShowModal] = useState(false)
     const [refreshTable, setRefreshTable] = useState(false)
+
+    const [device, setDevice] = useState<string>()
+    const [userRole, setUserRole] = useState<string | null>(null)
+
+    const [deviceOptions] = useState<IOptions[]>(getDeviceTypeOptions)
+
+    const fetchRole = useCallback(async () => {
+        const role = await getUserRole()
+        setUserRole(role)
+    }, [])
 
     const onOpenModal = () => {
         // setTypeModal('AddDevice')
@@ -19,6 +30,10 @@ export const SparePartsPage = () => {
         setShowModal(false)
     }
 
+    useEffect(() => {
+        fetchRole()
+    }, [])
+
     return (
         <>
             <div className={style.container}>
@@ -27,23 +42,22 @@ export const SparePartsPage = () => {
                     <article>
                         <span>Equipo</span>
                         <div className={style.actionSection}>
-                            <CustomInput
-                                placeholder="Buscar equipo"
-                                // value={search}
-                                onChange={(e) => e.target.value}
+                            <CustomSelect
+                                menu
+                                value={device}
+                                options={deviceOptions}
+                                onSelect={(selected: { label: string; value: string }) => {
+                                    setDevice(selected.value)
+                                }}
+                                placeholder="Todos"
                             />
-                            {/* <CustomSelect menu value={building} options={buildingsOptions} onSelect={handleSelect} /> */}
-                            {/* {userRole === 'TECHNICIAN' ? (
+                            {userRole === 'TECHNICIAN' ? (
                                 <></>
                             ) : (
                                 <button onClick={onOpenModal} className={style.button}>
                                     <Plus /> Agregar
                                 </button>
-                            )} */}
-
-                            <button onClick={onOpenModal} className={style.button}>
-                                <Plus /> Agregar
-                            </button>
+                            )}
                         </div>
                     </article>
                 </section>

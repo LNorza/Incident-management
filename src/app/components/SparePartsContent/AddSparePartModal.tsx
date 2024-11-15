@@ -1,22 +1,22 @@
+import { API_BASE_URL, getDeviceTypeOptions, IOptions, ISparePartsModal } from '../../../utils'
+import { Cpu } from 'lucide-react'
+import { CustomInput, CustomSelect } from '../../../ui'
+import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
 import { useForm } from '../../../hooks'
-import { CustomInput, CustomSelect } from '../../../ui'
 import style from '../../style/modal.module.css'
-import { Cpu } from 'lucide-react'
-import { IOptions, ISparePartsModal } from '../../../utils'
-import { toast } from 'sonner'
 
 interface Props {
     onClose: () => void
-    incidentId?: string | undefined
+    spareId?: string | undefined
 }
 
-export const AddSparePartModal = ({ onClose, incidentId }: Props) => {
+export const AddSparePartModal = ({ onClose, spareId }: Props) => {
     const [device, setDevice] = useState<string | undefined>(undefined)
     const [spareType, setSpareType] = useState<string | undefined>(undefined)
     const [spareUnits, setSpareUnits] = useState<string | undefined>(undefined)
 
-    const [deviceTypeOptions, setDeviceTypeOptions] = useState<IOptions[]>([])
+    const [deviceOptions] = useState<IOptions[]>(getDeviceTypeOptions)
     const [spareTypeOptions, setSpareTypeOptions] = useState<IOptions[]>([])
     const [spareUnitsOptions, setSpareUnitsOptions] = useState<IOptions[]>([])
 
@@ -30,9 +30,34 @@ export const AddSparePartModal = ({ onClose, incidentId }: Props) => {
     })
 
     const saveIncident = async () => {
-        toast.success('Pieza de repuesto agregada correctamente')
-        console.log('formState', formState)
-        onClose()
+        const url = `${API_BASE_URL}/spare-parts`
+        const method = 'POST'
+
+        try {
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(formState),
+            })
+
+            if (response.ok) {
+                toast.success(`Se creó la pieza de repuesto correctamente`)
+                onClose()
+            } else {
+                const errorData = await response.json()
+                console.error('Error en la respuesta:', errorData)
+                toast.error('Error en la solicitud')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            toast.error('Error al procesar la solicitud')
+        }
+        // toast.success('Pieza de repuesto agregada correctamente')
+        // console.log('formState', formState)
+        // onClose()
     }
 
     useEffect(() => {
@@ -69,17 +94,15 @@ export const AddSparePartModal = ({ onClose, incidentId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
                             Tipo de equipo
                             <div className={style.formInput}>
                                 <CustomSelect
                                     value={device}
                                     placeholder="Selecciona el tipo de equipo"
-                                    options={deviceTypeOptions}
+                                    options={deviceOptions}
                                     onSelect={(selected: { label: string; value: string }) => {
                                         setDevice(selected.value)
-                                        // setBuildingId(selected.value)
-                                        // setBuilding(selected.value)
                                     }}
                                 />
                             </div>
@@ -87,7 +110,7 @@ export const AddSparePartModal = ({ onClose, incidentId }: Props) => {
                     </div>
 
                     <div className={style.rowModal}>
-                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
                             Tipo de pieza
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -100,7 +123,7 @@ export const AddSparePartModal = ({ onClose, incidentId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={`${incidentId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
                             Unidades
                             <div className={style.formInput}>
                                 <CustomSelect
