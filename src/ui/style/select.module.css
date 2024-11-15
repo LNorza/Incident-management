@@ -25,6 +25,14 @@
     transition: all 0.3s;
 }
 
+.selected span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
+}
+
 .selected:hover {
     filter: brightness(1.1);
 }
