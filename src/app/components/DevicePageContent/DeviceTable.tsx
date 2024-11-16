@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { DeviceProps, IDevice, myTheme } from '../../../utils'
+import { DeviceProps, IDevice, myTheme, deviceFormatOptions } from '../../../utils'
 import { API_BASE_URL, getUserDepartment, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { Trash2, Pencil } from 'lucide-react'
@@ -46,7 +46,6 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
     const fetchDevices = useCallback(async () => {
         if (!departmentId) return
         try {
-            console.log(building)
             const url = isTechnician
                 ? `${API_BASE_URL}/devices-by-department-search?building_id=${building}`
                 : `${API_BASE_URL}/devices-by-department-search?department_id=${departmentId}&building_id=${building}`
@@ -61,7 +60,7 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                     return {
                         _id,
                         name,
-                        type,
+                        type: deviceFormatOptions(type),
                         brand,
                         specs,
                         user: userName,
@@ -113,28 +112,6 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
             headerName: 'Tipo',
             sortable: true,
             flex: 1,
-            cellRenderer: (params: ICellRendererParams) => {
-                switch (params.value) {
-                    case 'LAPTOP':
-                        return 'Laptop'
-                    case 'PC':
-                        return 'Escritorio'
-                    case 'PRINTER':
-                        return 'Impresora'
-                    case 'SWITCH':
-                        return 'Switch'
-                    case 'ROUTER':
-                        return 'Router'
-                    case 'PROJECTOR':
-                        return 'Proyector'
-                    case 'VOLTAGE-REGULATOR':
-                        return 'Regulador de voltaje'
-                    case 'NO-BREAK':
-                        return 'No-break'
-                    default:
-                        return 'Desconocido'
-                }
-            },
         },
         {
             field: 'brand',

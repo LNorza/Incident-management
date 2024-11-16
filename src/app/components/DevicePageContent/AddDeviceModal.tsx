@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState, useCallback } from 'react'
 import {
-    Device,
     IComputerSpecs,
     ILaptop,
     IPrinter,

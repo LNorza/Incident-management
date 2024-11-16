@@ -75,7 +75,7 @@ export const Dashboard = () => {
                         <h2>Incidencias en este mes</h2>
                         <p className={`${style.pSubTitle}`}>Resumen general</p>
                     </div>
-                    <IncidentsOfMonth />
+                    <IncidentsOfMonth departmentId={userData?.department._id} userRole={role} userData={userData} />
                 </section>
 
                 <section className={`${style.middleCard}`}>

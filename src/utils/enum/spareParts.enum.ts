@@ -1,3 +1,1 @@
-export type SparePartsType =
-  | 'AddSparePart'
-  | 'EditIncident'
+export type SparePartsType = 'AddSparePart' | 'EditSparePart' | 'DeleteSparePart'

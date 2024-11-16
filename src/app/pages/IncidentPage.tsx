@@ -121,7 +121,6 @@ export const IncidentPage = () => {
                                     onSelect={(selected: { label: string; value: string }) => {
                                         setTypeIncident(selected.value)
                                     }}
-                                    placeholder="Todos"
                                 />
                             </div>
                         </div>
@@ -136,7 +135,6 @@ export const IncidentPage = () => {
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setstatusIncident(selected.value)
                                         }}
-                                        placeholder="Todos"
                                     />
                                 </div>
                             </div>

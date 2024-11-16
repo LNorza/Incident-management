@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IncidentModalType, IncidentState, myTheme } from '../../../utils'
+import { IncidentModalType, IncidentState, myTheme, getUserDepartment } from '../../../utils'
 import { API_BASE_URL, getUserData, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
@@ -34,6 +34,7 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
     const parentRef = useRef<HTMLDivElement>(null)
     const [userData, setUserData] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
+    const [departmentId, setDepartmentId] = useState<string | null>(null)
 
     const handleReleasedClick = useCallback(
         (row: IIncident, type?: IncidentModalType, action?: string) => {
@@ -67,6 +68,11 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         },
         [deleteIncident],
     )
+
+    const fetchDepartment = async () => {
+        const department = await getUserDepartment()
+        setDepartmentId(department)
+    }
 
     // Función para obtener el rol del usuario
     const fetchRole = async () => {
@@ -103,7 +109,11 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
     // Función principal para obtener los incidentes
     const fetchIncident = useCallback(async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/incidents`, {
+            const url =
+                userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
+                    ? `${API_BASE_URL}/incidents`
+                    : `${API_BASE_URL}/incidents-search?department_id=${departmentId}`
+            const response = await fetch(url, {
                 credentials: 'include',
             })
             const data = await response.json()
@@ -174,11 +184,16 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         } catch (err) {
             console.error(err)
         }
-    }, [typeIncident, statusIncident, userRole, userData])
+    }, [typeIncident, statusIncident, userRole, userData, departmentId])
 
     useEffect(() => {
-        fetchRole()
-    }, [userData])
+        const initialize = async () => {
+            await fetchRole()
+            await fetchDepartment()
+        }
+
+        initialize()
+    }, [])
 
     useEffect(() => {
         fetchIncident()

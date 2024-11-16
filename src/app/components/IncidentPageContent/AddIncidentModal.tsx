@@ -174,7 +174,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     const fetchBuildings = useCallback(async () => {
         if (departmentId) {
             try {
-                const response = await fetch(`${API_BASE_URL}/buildings-search?location_id=${departmentId}`, {
+                const response = await fetch(`${API_BASE_URL}/buildings-search?department_id=${departmentId}`, {
                     credentials: 'include',
                 })
                 const data = await response.json()
@@ -290,7 +290,7 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             work: formState.worktype,
             period: 1,
             description: formState.description,
-            department_id: formState.location,
+            department_id: departmentId ?? '',
         })
     }, [formState.description])
 

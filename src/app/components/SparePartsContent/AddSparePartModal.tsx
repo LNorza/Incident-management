@@ -1,4 +1,14 @@
-import { API_BASE_URL, getDeviceTypeOptions, IOptions, ISparePartsModal } from '../../../utils'
+import {
+    API_BASE_URL,
+    getDeviceTypeOptions,
+    IOptions,
+    ISparePartsModal,
+    ISpareParts,
+    getSparePartOptions,
+    formatSparePartType,
+    formatDeviceType,
+    getSpareUnitsOptions,
+} from '../../../utils'
 import { Cpu } from 'lucide-react'
 import { CustomInput, CustomSelect } from '../../../ui'
 import { toast } from 'sonner'
@@ -8,30 +18,69 @@ import style from '../../style/modal.module.css'
 
 interface Props {
     onClose: () => void
-    spareId?: string | undefined
+    spareData?: ISpareParts | undefined
 }
 
-export const AddSparePartModal = ({ onClose, spareId }: Props) => {
-    const [device, setDevice] = useState<string | undefined>(undefined)
-    const [spareType, setSpareType] = useState<string | undefined>(undefined)
-    const [spareUnits, setSpareUnits] = useState<string | undefined>(undefined)
-
+export const AddSparePartModal = ({ onClose, spareData }: Props) => {
     const [deviceOptions] = useState<IOptions[]>(getDeviceTypeOptions)
+    const [device, setDevice] = useState<string | undefined>(undefined)
     const [spareTypeOptions, setSpareTypeOptions] = useState<IOptions[]>([])
-    const [spareUnitsOptions, setSpareUnitsOptions] = useState<IOptions[]>([])
+    const [spareType, setSpareType] = useState<string | undefined>(undefined)
+    const [spareQuantityOptions] = useState<IOptions[]>(getSpareUnitsOptions)
+    const [spareQuantity, setSpareQuantity] = useState<string | undefined>(undefined)
 
     const { onInputChange, formState, updateFields } = useForm<ISparePartsModal>({
         name: '',
         device_type: '',
-        spare_Type: '',
-        units: '',
+        type: '',
+        quantity: '',
         description: '',
-        unit_price: '',
+        price: '',
     })
+    useEffect(() => {
+        if (spareData) {
+            updateFields({
+                name: spareData.name,
+                description: spareData.description,
+                price: spareData.price.toString(),
+            })
+            const formattedData = {
+                ...spareData,
+                device_type: formatDeviceType(spareData.device_type),
+            }
+            setDevice(formattedData.device_type)
+            const selectedQuantity = spareQuantityOptions.find(
+                (option) => option.value === formattedData.quantity.toString(),
+            )?.value
+            setSpareQuantity(selectedQuantity)
+        }
+    }, [spareData, deviceOptions, spareQuantityOptions])
+
+    useEffect(() => {
+        if (device) {
+            const options = getSparePartOptions(device)
+            setSpareTypeOptions(options)
+        }
+    }, [device])
+
+    useEffect(() => {
+        if (spareData && spareTypeOptions.length > 0) {
+            const formattedType = formatSparePartType(spareData.type)
+            setSpareType(spareTypeOptions.find((option) => option.value === formattedType)?.value)
+        }
+    }, [spareData, spareTypeOptions])
 
     const saveIncident = async () => {
-        const url = `${API_BASE_URL}/spare-parts`
-        const method = 'POST'
+        const url = `${API_BASE_URL}/spare-parts${spareData ? `/${spareData._id}` : ''}`
+        const method = spareData ? 'PUT' : 'POST'
+        const data = {
+            name: formState.name,
+            device_type: device,
+            type: spareType,
+            quantity: spareQuantity,
+            description: formState.description,
+            price: formState.price,
+        }
 
         try {
             const response = await fetch(url, {
@@ -40,11 +89,12 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(formState),
+                body: JSON.stringify(data),
             })
 
             if (response.ok) {
-                toast.success(`Se creó la pieza de repuesto correctamente`)
+                const message = spareData ? 'actualizó' : 'creó'
+                toast.success(`Se ${message} la pieza de repuesto correctamente`)
                 onClose()
             } else {
                 const errorData = await response.json()
@@ -55,21 +105,7 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
             console.error('Error:', error)
             toast.error('Error al procesar la solicitud')
         }
-        // toast.success('Pieza de repuesto agregada correctamente')
-        // console.log('formState', formState)
-        // onClose()
     }
-
-    useEffect(() => {
-        updateFields({
-            name: formState.name,
-            device_type: device,
-            spare_Type: spareType,
-            units: spareUnits,
-            description: formState.description,
-            unit_price: formState.unit_price,
-        })
-    }, [formState.description, device, spareType, spareUnits])
 
     return (
         <>
@@ -94,7 +130,7 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareData != undefined ? style.disabled : ''}`}>
                             Tipo de equipo
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -110,7 +146,7 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
                     </div>
 
                     <div className={style.rowModal}>
-                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareData != undefined ? style.disabled : ''}`}>
                             Tipo de pieza
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -123,15 +159,15 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={`${spareId != undefined ? style.disabled : ''}`}>
+                        <section className={`${spareData != undefined ? style.disabled : ''}`}>
                             Unidades
                             <div className={style.formInput}>
                                 <CustomSelect
-                                    value={spareUnits}
+                                    value={spareQuantity}
                                     placeholder="Selecciona las unidades"
-                                    options={spareUnitsOptions}
+                                    options={spareQuantityOptions}
                                     onSelect={(selected: { label: string; value: string }) => {
-                                        setSpareUnits(selected.value)
+                                        setSpareQuantity(selected.value)
                                     }}
                                 />
                             </div>
@@ -158,12 +194,12 @@ export const AddSparePartModal = ({ onClose, spareId }: Props) => {
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="unit_price"
-                                    value={formState.unit_price}
+                                    name="price"
+                                    value={formState.price}
                                     placeholder="Ingresa el precio"
                                     type="number"
                                     onChange={onInputChange}
-                                    autoComplete="unit_price"
+                                    autoComplete="price"
                                 />
                             </div>
                         </section>
