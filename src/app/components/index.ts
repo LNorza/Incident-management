@@ -1,4 +1,5 @@
 export * from './BuildPageContent'
+export * from './ChangePageContent'
 export * from './charts'
 export * from './DevicePageContent'
 export * from './IncidentPageContent'

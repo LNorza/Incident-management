@@ -1,4 +1,5 @@
 export * from './build'
+export * from './change'
 export * from './device'
 export * from './incident'
 export * from './options'
