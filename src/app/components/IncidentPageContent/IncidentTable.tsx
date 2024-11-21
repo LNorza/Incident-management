@@ -42,6 +42,9 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                 if (type == 'EditIncident') {
                     typeincidentModal(row._id)
                 }
+                if (type == 'ChangeModal') {
+                    typeincidentModal(row._id, 'ChangeModal', row.status)
+                }
                 if (type == 'InfoIncident') {
                     if (row.status != 'SENT') {
                         typeincidentModal(row._id, 'InfoIncident', row.status)

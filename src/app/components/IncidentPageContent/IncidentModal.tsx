@@ -4,6 +4,7 @@ import style from '../../style/modal.module.css'
 import { AddIncidentModal } from './AddIncidentModal'
 import { AssigmedModal } from './AssigmedModal'
 import { FinishIncidentModal } from './FinishIncidentModal'
+import { IncidentChangeModal } from './IncidentChangeModal'
 import { InfoIncidentModal } from './InfoIncidentModal'
 
 interface Props {
@@ -27,8 +28,6 @@ export const IncidentModal = ({
     deleteFunction,
     onClose,
 }: Props) => {
-    console.log('action', nameAction)
-
     return (
         <>
             {isOpen && (
@@ -37,6 +36,11 @@ export const IncidentModal = ({
                     {type === 'AddIncident' && (
                         <section className={style.largeModalInfoContainer}>
                             <AddIncidentModal onClose={onClose} />
+                        </section>
+                    )}
+                    {type === 'ChangeModal' && (
+                        <section className={style.largeModalInfoContainer}>
+                            <IncidentChangeModal onClose={onClose} incidentId={incidentId} status={status} />
                         </section>
                     )}
                     {type === 'EditIncident' && (

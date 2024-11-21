@@ -4,7 +4,7 @@ export interface ICreateChange {
   device_type?: string
   make_request: boolean
   name?: string
-  price?: number
+  price?: string
   piece_type?: string
   description?: string
   incident: string
@@ -14,7 +14,7 @@ export interface IUpdateChange {
   piece_to_change?: string
   spare_part?: string
   name?: string
-  price?: number
+  price?: string
   piece_type?: string
   description?: string
   status?: string

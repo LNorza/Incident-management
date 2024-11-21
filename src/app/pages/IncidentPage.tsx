@@ -58,6 +58,11 @@ export const IncidentPage = () => {
             setIncidentStatus(incidentStatus)
             setRefreshTable(false)
         }
+        if (type == 'ChangeModal') {
+            setTypeModal('ChangeModal')
+            setIncidentStatus(incidentStatus)
+            setRefreshTable(false)
+        }
         if (type == 'AssignedIncident') {
             setTypeModal('AssignedIncident')
             setIncidentStatus(incidentStatus)

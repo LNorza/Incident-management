@@ -21,6 +21,7 @@ export type WorkType =
 
 export type IncidentModalType =
   | 'AddIncident'
+  | 'ChangeModal'
   | 'EditIncident'
   | 'AssignedIncident'
   | 'DeleteIncident'
