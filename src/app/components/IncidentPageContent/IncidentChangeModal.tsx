@@ -1,15 +1,16 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { CustomCheckBox, CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
 import {
     API_BASE_URL,
     getUserDepartment,
-    getUserRole,
     ICreateChange,
     Incident,
     IncidentState,
     IOptions,
+    getSparePartOptions,
 } from '../../../utils'
 import { ArrowLeftRight } from 'lucide-react'
+import { toast } from 'sonner'
 import style from '../../style/modal.module.css'
 import { useForm } from '../../../hooks'
 
@@ -80,7 +81,7 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
         time_duration: '',
     })
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<ICreateChange>({
+    const { onInputChange, onTextAreaChange, formState } = useForm<ICreateChange>({
         piece_to_change: '',
         spare_part: '',
         device_type: '',
@@ -113,14 +114,100 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
         }
     }, [incidentId])
 
+    const specsWhitelist = useMemo(
+        () =>
+            ({
+                PC: ['motherboard', 'cpu', 'gpu', 'ram', 'storage', 'powerSupply'],
+                LAPTOP: ['cpu', 'gpu', 'ram', 'storage'],
+            } as { [key: string]: string[] }),
+        [],
+    )
+
+    const assignPartsOptions = useCallback(() => {
+        const deviceType = incidentData.device_id.type
+        const allowedSpecs = specsWhitelist[deviceType] || []
+
+        const options = Object.entries(incidentData.device_id.specs)
+            .filter(([key, value]) => allowedSpecs.includes(key) && value)
+            .map(([key, value]) => ({
+                label: value,
+                value: key,
+            }))
+
+        setPartsToChangeOptions(options)
+    }, [incidentData, specsWhitelist])
+
+    const fetchSparePartsOptions = useCallback(async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/spare-parts-search?device_id=${incidentData.device_id._id}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            const options = data.map((part: { _id: string; name: string }) => ({
+                label: part.name,
+                value: part._id,
+            }))
+            setPartsToReplaceOptions(options)
+        } catch (error) {
+            console.error('Error fetching spare parts:', error)
+        }
+    }, [incidentData])
+
     useEffect(() => {
         const fetchData = async () => {
             await fetchDepartment()
             await fetchIncident()
+            await fetchSparePartsOptions()
         }
         fetchData()
     }, [])
 
+    useEffect(() => {
+        if (incidentData.device_id.type) {
+            const options = getSparePartOptions(incidentData.device_id.type)
+            setPartTypeOptions(options)
+        }
+    }, [incidentData])
+
+    useEffect(() => {
+        if (Object.keys(incidentData.device_id.specs).length > 0) {
+            assignPartsOptions()
+        }
+    }, [incidentData, assignPartsOptions])
+
+    const saveChangeRequest = async () => {
+        const data = {
+            piece_to_change: partsToChange,
+            spare_part: partsToReplace,
+            device_type: incidentData.device_id.type,
+            make_request: existPart,
+            name: formState.name,
+            price: formState.price,
+            piece_type: partType,
+            description: formState.description,
+            incident: incidentId,
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/change-requests`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+                body: JSON.stringify(data),
+            })
+            if (response.ok) {
+                toast.success('Solicitud de cambio creada')
+                onClose()
+            } else {
+                toast.error('Error al crear la solicitud de cambio')
+            }
+        } catch (error) {
+            console.error('Error creating change request:', error)
+            toast.error('Error al crear la solicitud de cambio')
+        }
+    }
     return (
         <>
             <div className={style.titleModal}>
@@ -207,7 +294,7 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                                     placeholder="Selecciona la pieza de repuesto"
                                     options={partsToReplaceOptions}
                                     onSelect={(selected: { label: string; value: string }) => {
-                                        setPartsToReplace(selected.value)
+                                        setPartsToReplace(selected.label)
                                     }}
                                 />
                             </div>
@@ -220,13 +307,13 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                             <CustomCheckBox checked={existPart} setChecked={setExistPart} />
                         </section>
 
-                        <section>
+                        <section className={`${!existPart ? style.disabled : ''} `}>
                             Nombre de la pieza
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="namePart"
-                                    value={''}
+                                    name="name"
+                                    value={formState.name}
                                     placeholder="Ingresa el nombre"
                                     type="text"
                                     onChange={onInputChange}
@@ -236,13 +323,13 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                     </div>
 
                     <div className={style.rowModal}>
-                        <section>
+                        <section className={`${!existPart ? style.disabled : ''} `}>
                             Precio aproximado
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
                                     name="price"
-                                    value={''}
+                                    value={formState.price}
                                     placeholder="Ingresa el precio"
                                     type="text"
                                     onChange={onInputChange}
@@ -250,7 +337,7 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                             </div>
                         </section>
 
-                        <section className={style.disabled}>
+                        <section className={`${!existPart ? style.disabled : ''} `}>
                             Tipo de pieza
                             <div className={style.formInput}>
                                 <CustomSelect
@@ -278,10 +365,12 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                         </div>
                     </section>
                 </div>
-
-                <div className={`${style.modalButtonContainer} ${style.add}`}>
-                    <button onClick={onClose} className={style.saveButton}>
-                        Cerrar
+                <div className={` ${style.modalButtonContainer} ${style.add}`}>
+                    <button onClick={onClose} className={style.cancelButton}>
+                        Cancelar
+                    </button>
+                    <button onClick={saveChangeRequest} className={style.saveButton}>
+                        Guardar
                     </button>
                 </div>
             </div>
