@@ -1,5 +1,5 @@
 import { CheckCheck } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import style from '../../style/modal.module.css'
 import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
 import { useForm } from '../../../hooks'
@@ -13,6 +13,7 @@ import {
     IOptions,
     translateIncident,
     UpdateIncidentDto,
+    FinishIncident,
 } from '../../../utils'
 import { toast } from 'sonner'
 import { Calification } from '../../../ui/components/calification'
@@ -27,124 +28,47 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     const [incidentTypeOptions] = useState<IOptions[]>(getIncidentTypeOptions)
     const [workTypeOptions, setWorkTypeOptions] = useState<IOptions[]>([])
 
-    const [dateStart, setDateStart] = useState<Date | null>(null)
-    const [calification, setCalification] = useState(0)
     const [incidentType, setIncidentType] = useState<string | undefined>(undefined)
     const [workType, setWorkType] = useState<string | undefined>(undefined)
-
-    const [rol] = useState('TECHNICIAN')
-    const [departmentId] = useState('67206b309acf1976ca32173b')
     const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
     const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
-    const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
-    const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
-    const [technicianName, setTechnicianName] = useState<string | undefined>(undefined)
 
     const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
         incident_type: '',
         work: '',
         description: '',
+        qualification: 0,
     })
 
-    const [incidentData, setIncidentData] = useState<Incident>({
-        date: '',
-        location_id: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
+    const [incidentData, setIncidentData] = useState<Incident | null>(null)
+
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<FinishIncident>({
         folio: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
-        work: '',
-        _id: '',
-        technician_id: '',
+        deviceName: '',
+        technicianName: '',
         priority: '',
+        start_date: '',
         arrival_time: '',
         time_duration: '',
+        description: '',
+        comments: '',
+        diagnostic: '',
+        initial_time: '',
+        end_time: '',
+        qualification: 0,
     })
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
-        folio: '',
-        location_id: '',
-        department_name: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
-        date: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
-        created_at: '',
-        arrival_time: '',
-        time_duration: '',
-        technician_id: '',
-        priority: '',
-        work: '',
-        _id: '',
-    })
+    const getTechnicianName = async (technicianId: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${technicianId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            return data.name
+        } catch (error) {
+            console.error('Error fetching technician:', error)
+        }
+    }
 
     const fetchIncident = async () => {
         try {
@@ -152,28 +76,34 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            updateFields(data)
             setIncidentData(data)
+
+            const formatTime = (dateString: string) => {
+                if (!dateString) return ''
+                const date = new Date(dateString)
+                const hours = String(date.getHours()).padStart(2, '0')
+                const minutes = String(date.getMinutes()).padStart(2, '0')
+                return `${hours}:${minutes}`
+            }
+
+            updateFields({
+                folio: data.folio,
+                deviceName: data.device_id.name,
+                technicianName: await getTechnicianName(data.technician_id),
+                priority: translateIncident(data.priority, 'priority') || 'No asignado',
+                start_date: data.start_date ? new Date(data.start_date).toLocaleDateString() : '',
+                arrival_time: arriveHourOptions.find((option) => option.value === data.arrival_time)?.label,
+                time_duration: timeDurationOptions.find((option) => option.value === data.time_duration)?.label,
+                description: data.description,
+                comments: data.comments,
+                diagnostic: data.diagnostic,
+                initial_time: formatTime(data.start_date),
+                end_time: data.end_date ? formatTime(data.end_date) : '',
+            })
         } catch (error) {
             console.error('Error fetching device:', error)
         }
     }
-
-    const fetchUsers = useCallback(async () => {
-        try {
-            const response = await fetch(`${API_BASE_URL}/users-search?department_id=${departmentId}&position=${rol}`, {
-                credentials: 'include',
-            })
-            const data = await response.json()
-            data.forEach((user: any) => {
-                if (user._id === formState.technician_id) {
-                    setTechnicianName(user.name)
-                }
-            })
-        } catch (err) {
-            console.error(err)
-        }
-    }, [departmentId, formState.technician_id])
 
     const saveIncident = async () => {
         try {
@@ -199,12 +129,12 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
     }
 
     useEffect(() => {
-        fetchIncident()
-    }, [incidentId])
+        const fetchData = async () => {
+            await fetchIncident()
+        }
 
-    useEffect(() => {
-        fetchUsers()
-    }, [departmentId, rol, formState.technician_id])
+        fetchData()
+    }, [])
 
     useEffect(() => {
         if (incidentType) {
@@ -216,35 +146,10 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         if (incidentData) {
             setIncidentType(incidentData.incident_type)
             setWorkType(incidentData.work)
-            setDateStart(new Date(incidentData.date))
         }
     }, [incidentData])
 
     useEffect(() => {
-        const createdAt = formState.created_at
-        if (formState.arrival_time) {
-            setArriveHour(arriveHourOptions.find((option) => option.value === formState.arrival_time)?.label)
-        }
-        if (formState.time_duration) {
-            setTimeDuration(timeDurationOptions.find((option) => option.value === formState.time_duration)?.label)
-        }
-
-        updateFields({
-            description: '',
-            priority: translateIncident(formState.priority, 'priority') || 'No asignado',
-            work: translateIncident(formState.work, 'work'),
-            incident_type: translateIncident(formState.incident_type, 'incident'),
-            status: translateIncident(formState.status, 'status'),
-            date: new Date(formState.date).toLocaleDateString(),
-            created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
-            arrival_time: arriveHour,
-            time_duration: timeDuration,
-        })
-    }, [formState.folio, arriveHourOptions, timeDurationOptions, arriveHour, timeDuration])
-
-    useEffect(() => {
-        console.log('action', action)
-
         switch (action) {
             case 'RESENT':
                 setUpdateIncident({
@@ -257,17 +162,18 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
             case 'FINISHED':
                 setUpdateIncident({
                     status: 'FINISHED',
+                    end_date: new Date(),
                 })
                 break
             default:
                 setUpdateIncident({
                     status: 'RELEASED',
-                    qualification: calification,
+                    qualification: formState.qualification,
                     comments: formState.comments,
                 })
                 break
         }
-    }, [incidentType, workType, formState.description, formState.comments, calification])
+    }, [incidentType, workType, formState.description, formState.comments, formState.qualification, action])
 
     return (
         <>
@@ -315,7 +221,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                     <CustomInput
                                         isFormInput
                                         name="device"
-                                        value={formState.device_id.name}
+                                        value={formState.deviceName}
                                         type="text"
                                         onChange={onInputChange}
                                     />
@@ -355,7 +261,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                             <CustomInput
                                                 isFormInput
                                                 name="technician"
-                                                value={technicianName || 'No asignado'}
+                                                value={formState.technicianName}
                                                 type="text"
                                                 onChange={onInputChange}
                                             />
@@ -391,8 +297,8 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                         <div className={style.formInput}>
                                             <CustomInput
                                                 isFormInput
-                                                name="durationtime"
-                                                value={formState.date}
+                                                name="date"
+                                                value={formState.start_date}
                                                 type="text"
                                                 onChange={onInputChange}
                                             />
@@ -426,10 +332,43 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                         </div>
                                     </section>
                                 </div>
+
+                                <div className={style.rowModal}>
+                                    <section className={style.disabled}>
+                                        Hora de inicio
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="initialTime"
+                                                value={formState.initial_time}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                    <section className={style.disabled}>
+                                        Hora de terminación
+                                        <div className={style.formInput}>
+                                            <CustomInput
+                                                isFormInput
+                                                name="endTime"
+                                                value={formState.end_time}
+                                                type="text"
+                                                onChange={onInputChange}
+                                            />
+                                        </div>
+                                    </section>
+                                </div>
                             </>
                         )}
 
-                        {action != 'RESENT' && <Calification onRatingChange={(rating) => setCalification(rating)} />}
+                        {action != 'RESENT' && (
+                            <Calification
+                                onRatingChange={(rating) => {
+                                    updateFields({ qualification: rating })
+                                }}
+                            />
+                        )}
 
                         {action === 'RESENT' ? (
                             <section>

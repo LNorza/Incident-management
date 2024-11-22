@@ -54,9 +54,13 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
             })
             const data = await response.json()
 
+            console.log('Datos que trae', data)
+
             const formattedData = await Promise.all(
                 data.map(async ({ _id, name, type, brand, specs, location_id, status }: DeviceProps) => {
                     const userName = await getUserName(specs?.user_id ? specs.user_id : '')
+                    console.log('Nombre de usuario', userName)
+
                     return {
                         _id,
                         name,
@@ -161,6 +165,8 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                         return 'Activo'
                     case 'INACTIVE':
                         return 'Inactivo'
+                    case 'MAINTENANCE':
+                        return 'En mantenimiento'
                     default:
                         return 'En reparación'
                 }
@@ -171,6 +177,8 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                         return { color: '#A9DFD8' }
                     case 'INACTIVE':
                         return { color: '#C84242' }
+                    case 'MAINTENANCE':
+                        return { color: '#20AEF3' }
                     default:
                         return { color: '#FEAF5A' }
                 }

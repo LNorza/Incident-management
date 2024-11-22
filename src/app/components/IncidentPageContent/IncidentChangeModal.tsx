@@ -79,6 +79,8 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
         priority: '',
         arrival_time: '',
         time_duration: '',
+        technician_specialty: '',
+        diagnostic: '',
     })
 
     const { onInputChange, onTextAreaChange, formState } = useForm<ICreateChange>({
@@ -353,7 +355,7 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                     </div>
 
                     <section>
-                        Descripción
+                        Descripción de la solicitud
                         <div className={style.formDescription}>
                             <CustomTextArea
                                 isFormInput

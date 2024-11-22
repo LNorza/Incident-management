@@ -102,6 +102,8 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         priority: '',
         arrival_time: '',
         time_duration: '',
+        technician_specialty: '',
+        diagnostic: '',
     })
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IFormIncident>({
@@ -212,7 +214,46 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         }
     }, [building])
 
+    const validateFields = () => {
+        if (building === undefined) {
+            toast.error('Selecciona un edificio')
+            return false
+        }
+
+        if (location === undefined) {
+            toast.error('Selecciona una sublocalización')
+            return false
+        }
+
+        if (device === undefined) {
+            toast.error('Selecciona un equipo')
+            return false
+        }
+
+        if (incidentType === undefined) {
+            toast.error('Selecciona un tipo de incidencia')
+            return false
+        }
+
+        if (workType === undefined) {
+            toast.error('Selecciona un tipo de trabajo')
+            return false
+        }
+
+        if (formState.description === '') {
+            toast.error('Ingresa una descripción')
+            return false
+        }
+        return true
+    }
+
     const saveIncident = async () => {
+        const validate = validateFields()
+
+        if (validate === false) {
+            return
+        }
+
         const url = `${API_BASE_URL}/incidents${incidentId ? `/${incidentId}` : ''}`
         const method = incidentId ? 'PUT' : 'POST'
         const incidentData = incidentId ? updateIncident : newIncident

@@ -1,5 +1,5 @@
 export * from './AddIncidentModal'
-export * from './AssigmedModal'
+export * from './AssignedModal'
 export * from './FinishIncidentModal'
 export * from './IncidentModal'
 export * from './IncidentTable'

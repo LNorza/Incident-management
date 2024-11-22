@@ -13,8 +13,8 @@ export const getPosition = (position: string): string => {
             return 'Jefe de laboratorio'
         case 'TECHNICIAN':
             return 'Técnico'
-        case 'TECHNICIAN_SYSTEMS':
-            return 'Técnico de sistemas'
+        case 'TECHNICIAN_DEVELOPMENT':
+            return 'Técnico de desarrollo'
         case 'TECHNICIAN_NETWORKS':
             return 'Técnico de redes'
         case 'TECHNICIAN_SOFTWARE':
@@ -42,6 +42,25 @@ export const getRole = (role: string): string => {
             return 'Administrador de laboratorio'
         case 'ONLY_READ':
             return 'Solo lectura'
+        default:
+            return 'Usuario'
+    }
+}
+
+export const translateRole = (role: string): string => {
+    switch (role) {
+        case 'Administrador':
+            return 'ADMIN'
+        case 'Administrador de departamento':
+            return 'ADMIN_DEPARTMENT'
+        case 'Administrador de técnicos':
+            return 'ADMIN_TECHNICIANS'
+        case 'Técnico':
+            return 'TECHNICIAN'
+        case 'Administrador de laboratorio':
+            return 'ADMIN_LAB'
+        case 'Solo lectura':
+            return 'ONLY_READ'
         default:
             return 'Usuario'
     }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { AreaChart, IncidentsOfMonth, SemiCircleChart } from '../components'
-import { API_BASE_URL, getUserData, getUserRole, IUserData } from '../../utils'
+import { API_BASE_URL, getUserData, IUserData, translateRole } from '../../utils'
 import style from '../style/cardContainer.module.css'
 
 export const Dashboard = () => {
@@ -11,7 +11,6 @@ export const Dashboard = () => {
     useEffect(() => {
         const fetchData = async () => {
             await fetchUserData()
-            await fetchUserRole()
         }
         fetchData()
     }, [])
@@ -20,17 +19,9 @@ export const Dashboard = () => {
         try {
             const userData = await getUserData()
             setUserData(userData)
+            setRole(userData ? translateRole(userData.role) : null)
         } catch (error) {
             console.error('Error fetching data:', error)
-        }
-    }
-
-    const fetchUserRole = async () => {
-        try {
-            const role = await getUserRole()
-            setRole(role)
-        } catch (error) {
-            console.error('Error fetching role:', error)
         }
     }
 
@@ -61,7 +52,8 @@ export const Dashboard = () => {
                     console.error(error)
                 }
             }
-
+            console.log(role)
+            if (role === 'TECHNICIAN') return
             const departmentId = userData.department._id || ''
             fetchDevicesNumber(departmentId)
         }

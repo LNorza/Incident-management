@@ -6,8 +6,7 @@ export const getUserPositionOptions: IOptions[] = [
 ]
 
 export const getUserPositionTechniciansOptions: IOptions[] = [
-    { label: 'Técnico', value: 'TECHNICIAN' },
-    { label: 'Técnico de sistemas', value: 'TECHNICIAN_SYSTEMS' },
+    { label: 'Técnico de desarrollo', value: 'TECHNICIAN_DEVELOPMENT' },
     { label: 'Técnico de redes', value: 'TECHNICIAN_NETWORKS' },
     { label: 'Técnico de software', value: 'TECHNICIAN_SOFTWARE' },
     { label: 'Técnico de hardware', value: 'TECHNICIAN_HARDWARE' },

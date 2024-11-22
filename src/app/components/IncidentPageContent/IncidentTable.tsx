@@ -129,14 +129,14 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                     async ({
                         _id,
                         folio,
-                        date,
+                        created_at,
                         device_id,
                         incident_type,
                         description,
                         status,
                         technician_id,
                     }: IIncident) => {
-                        const formattedDate = dateFormatter(new Date(date))
+                        const formattedDate = dateFormatter(new Date(created_at))
 
                         // Revisa si el dispositivo ya está en la caché
                         if (!deviceCache[device_id]) {

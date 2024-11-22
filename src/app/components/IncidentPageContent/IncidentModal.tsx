@@ -2,7 +2,7 @@ import { DeleteModal } from '../../../ui'
 import { IncidentModalType, IncidentState } from '../../../utils'
 import style from '../../style/modal.module.css'
 import { AddIncidentModal } from './AddIncidentModal'
-import { AssigmedModal } from './AssigmedModal'
+import { AssignedModal } from './AssignedModal'
 import { FinishIncidentModal } from './FinishIncidentModal'
 import { IncidentChangeModal } from './IncidentChangeModal'
 import { InfoIncidentModal } from './InfoIncidentModal'
@@ -59,7 +59,7 @@ export const IncidentModal = ({
                     )}
                     {type === 'AssignedIncident' && (
                         <section className={style.largeModalInfoContainer}>
-                            <AssigmedModal onClose={onClose} incidentId={incidentId} action={nameAction} />
+                            <AssignedModal onClose={onClose} incidentId={incidentId} action={nameAction} />
                         </section>
                     )}
                     {type === 'InfoIncident' && (

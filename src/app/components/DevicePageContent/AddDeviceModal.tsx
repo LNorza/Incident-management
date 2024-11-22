@@ -532,7 +532,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
         const commonSpecs = {
             name: formState.name,
             type: selectedDeviceType?.value,
-            status: 'ACTIVE',
+            status: deviceId ? deviceData.status : 'ACTIVE',
             deviceModel: formState.model,
             brand: brand,
             purchaseDate: buyDate,
@@ -624,7 +624,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
             },
         }
 
-        const deviceData = {
+        const device = {
             ...commonSpecs,
             ...(selectedDeviceType ? deviceSpecsByType[selectedDeviceType.value] || {} : {}),
         }
@@ -639,7 +639,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify(deviceData),
+                body: JSON.stringify(device),
             }).then((response) => {
                 if (response.ok) {
                     toast.success(`${!deviceId ? 'Dispositivo agregado' : 'Dispositivo actualizado'}`)
@@ -733,7 +733,7 @@ export const AddDeviceModal = ({ deviceId, onClose }: Props) => {
                         </div>
                     </section>
                     <section>
-                        Oficina/Salon
+                        Sublocalización
                         <div className={style.formInput}>
                             <CustomSelect
                                 value={location}

@@ -5,9 +5,10 @@ import {
     getArriveHourOptions,
     getIncidentPriorityOptions,
     getTimeDurationOptions,
-    getUserDepartment,
+    getSpecialtyOptions,
     getUserRole,
     Incident,
+    FormIncident,
     IOptions,
     translateIncident,
     UpdateIncidentDto,
@@ -16,7 +17,6 @@ import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
 import style from '../../style/modal.module.css'
 import { Ban, UserRoundPlus } from 'lucide-react'
 import { toast } from 'sonner'
-import { getHoursIncident } from '../../utils'
 
 interface Props {
     onClose: () => void
@@ -24,139 +24,53 @@ interface Props {
     action?: string
 }
 
-export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
-    const rol = 'TECHNICIAN'
-    const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const [departmentName, setDepartmentName] = useState<string | undefined>(undefined)
+export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
+    const [specialty, setSpecialty] = useState<string | undefined>(undefined)
     const [priority, setPriority] = useState<string | undefined>(undefined)
     const [technicians, setTechnicians] = useState<string | undefined>(undefined)
     const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
     const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
 
+    const [specialtyOptions] = useState<IOptions[]>(getSpecialtyOptions)
     const [priorityOptions] = useState<IOptions[]>(getIncidentPriorityOptions)
     const [technicianOptions, setTechnicianOptions] = useState<IOptions[]>([])
     const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
     const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<FormIncident>({
         folio: '',
-        department_name: '',
-        location_id: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
-        date: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
+        buildName: '',
+        deviceName: '',
+        locationName: '',
+        departmentName: '',
         created_at: '',
-        technician_id: '',
-        arrival_time: '',
-        time_duration: '',
-        comments: '',
-        priority: '',
+        incident_type: '',
         work: '',
-        _id: '',
+        description: '',
+        comments: '',
+        diagnostic: '',
     })
 
-    const [incidentData, setIncidentData] = useState<Incident>({
-        date: '',
-        location_id: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
-        folio: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
-        work: '',
-        _id: '',
-        technician_id: '',
-        priority: '',
-        arrival_time: '',
-        time_duration: '',
-    })
+    const [incidentData, setIncidentData] = useState<Incident | null>(null)
+
     const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
         status: '',
         technician_id: '',
         priority: '',
         time_duration: '',
         arrival_time: '',
+        technician_specialty: '',
     })
 
     const fetchRole = async () => {
-        const role = await getUserRole() // Obtener el rol del usuario
-        setUserRole(role) // Guardar el rol en el estado
+        const role = await getUserRole()
+        setUserRole(role)
     }
 
-    const fetchUsers = useCallback(async () => {
-        if (!departmentId) return
+    const fetchUsers = useCallback(async (position: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users-search?department_id=${departmentId}&position=${rol}`, {
+            const response = await fetch(`${API_BASE_URL}/users-search?position=${position}`, {
                 credentials: 'include',
             })
             const data = await response.json()
@@ -169,26 +83,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
         } catch (err) {
             console.error(err)
         }
-    }, [departmentId])
-
-    const fetchDepartment = async () => {
-        try {
-            const id = await getUserDepartment()
-            setDepartmentId(id ?? undefined)
-        } catch (err) {
-            console.error(err)
-        }
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/departments/${departmentId}`, {
-                credentials: 'include',
-            })
-            const data = await response.json()
-            setDepartmentName(data.name)
-        } catch (err) {
-            console.error(err)
-        }
-    }
+    }, [])
 
     const fetchIncident = async () => {
         try {
@@ -196,8 +91,18 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            updateFields(data)
             setIncidentData(data)
+            updateFields({
+                folio: data.folio,
+                buildName: data.device_id.location_id.building_id.name,
+                deviceName: data.device_id.name,
+                locationName: data.device_id.location_id.name,
+                departmentName: data.department_id.name,
+                created_at: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
+                incident_type: data.incident_type ? translateIncident(data.incident_type, 'incident') : '',
+                work: data.work ? translateIncident(data.work, 'work') : '',
+                description: data.description,
+            })
         } catch (error) {
             console.error('Error fetching device:', error)
         }
@@ -217,7 +122,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
             })
 
             if (response.ok) {
-                toast.success(`Se actualizó' la incidencia correctamente`)
+                toast.success(`Se actualizó la incidencia correctamente`)
                 onClose()
             } else {
                 const errorData = await response.json()
@@ -231,22 +136,44 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
     }
 
     useEffect(() => {
-        fetchIncident()
-        fetchRole()
+        const fetchData = async () => {
+            await fetchIncident()
+            await fetchRole()
+        }
+        fetchData()
     }, [])
 
     useEffect(() => {
-        if (incidentData && incidentData) {
-            fetchDepartment()
-            fetchUsers()
+        if (specialty) {
+            let position = ''
+            if (specialty === 'SOFTWARE') {
+                position = 'TECHNICIAN_SOFTWARE'
+            } else if (specialty === 'HARDWARE') {
+                position = 'TECHNICIAN_HARDWARE'
+            } else if (specialty === 'DEVELOPMENT') {
+                position = 'TECHNICIAN_DEVELOPMENT'
+            } else if (specialty === 'NETWORK') {
+                position = 'TECHNICIAN_NETWORKS'
+            }
+
+            fetchUsers(position)
         }
-    }, [incidentData])
+    }, [specialty, fetchUsers])
+
+    useEffect(() => {
+        if (incidentData && userRole === 'TECHNICIAN') {
+            setSpecialty(incidentData.technician_specialty)
+            setPriority(incidentData.priority)
+            setTechnicians(incidentData.technician_id)
+            setArriveHour(incidentData.arrival_time)
+        }
+    }, [incidentData, userRole])
 
     useEffect(() => {
         if (action === 'REJECTED') {
             setUpdateIncident({
                 status: 'REJECTED',
-                comments: formState.comments,
+                rejected_reason: formState.comments,
             })
         } else {
             if (action == 'ASSIGNED' && userRole === 'TECHNICIAN') {
@@ -254,35 +181,30 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                     status: 'IN_PROCESS',
                     arrival_time: arriveHour,
                     time_duration: timeDuration,
+                    diagnostic: formState.diagnostic,
+                    start_date: new Date(),
                 })
             } else {
                 setUpdateIncident({
                     status: 'ASSIGNED',
-                    technician_id: technicians,
+                    technician_specialty: specialty,
                     priority: priority,
+                    technician_id: technicians,
+                    arrival_time: arriveHour,
                 })
             }
         }
-    }, [priority, technicians, formState.comments, arriveHour, timeDuration])
-
-    useEffect(() => {
-        const createdAt = formState.created_at
-        if (userRole === 'TECHNICIAN') {
-            setTechnicians(
-                technicianOptions.find((technician) => technician.value === incidentData.technician_id)?.value,
-            )
-            setPriority(priorityOptions.find((priority) => priority.value === incidentData.priority)?.value)
-        }
-        updateFields({
-            work: translateIncident(formState.work, 'work'),
-            department_name: departmentName,
-            incident_type: translateIncident(formState.incident_type, 'incident'),
-            status: translateIncident(formState.status, 'status'),
-            date: new Date(formState.date).toLocaleDateString(),
-            arrival_time: getHoursIncident(new Date(incidentData.date)),
-            created_at: createdAt ? new Date(createdAt).toLocaleDateString() : '',
-        })
-    }, [formState.folio, departmentName, technicianOptions, priorityOptions])
+    }, [
+        priority,
+        technicians,
+        formState.comments,
+        arriveHour,
+        timeDuration,
+        action,
+        userRole,
+        specialty,
+        formState.diagnostic,
+    ])
 
     return (
         <>
@@ -308,12 +230,12 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                             </div>
                         </section>
                         <section className={style.disabled}>
-                            Equipo
+                            Edificio
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="device"
-                                    value={formState.device_id.name}
+                                    name="buildName"
+                                    value={formState.buildName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -328,7 +250,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="location"
-                                    value={formState.device_id.location_id.name}
+                                    value={formState.locationName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -340,7 +262,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="device"
-                                    value={formState.device_id.name}
+                                    value={formState.deviceName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -354,8 +276,8 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="location"
-                                    value={formState.department_name}
+                                    name="departmentName"
+                                    value={formState.departmentName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -366,7 +288,7 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                             <div className={style.formInput}>
                                 <CustomInput
                                     isFormInput
-                                    name="device"
+                                    name="created_at"
                                     value={formState.created_at}
                                     type="text"
                                     onChange={onInputChange}
@@ -402,19 +324,32 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                         </section>
                     </div>
 
-                    <></>
+                    <section className={style.disabled}>
+                        Descripción
+                        <div className={style.formDescription}>
+                            <CustomTextArea
+                                isFormInput
+                                name="description"
+                                value={formState.description}
+                                placeholder="Ingresa la descripción"
+                                type="description"
+                                onChange={onTextAreaChange}
+                            />
+                        </div>
+                    </section>
 
                     {action != 'REJECTED' && (
                         <div className={style.rowModal}>
                             <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
-                                Técnico
+                                Especialidad de incidencia
                                 <div className={style.formInput}>
                                     <CustomSelect
-                                        value={technicians}
-                                        placeholder="Selecciona al técnico"
-                                        options={technicianOptions}
+                                        value={specialty}
+                                        placeholder="Selecciona la especialidad"
+                                        options={specialtyOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
-                                            setTechnicians(selected.value)
+                                            setSpecialty(selected.value)
+                                            setTechnicians(undefined)
                                         }}
                                     />
                                 </div>
@@ -435,14 +370,27 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                         </div>
                     )}
 
-                    {userRole == 'TECHNICIAN' && (
+                    {action != 'REJECTED' && (
                         <div className={style.rowModal}>
-                            <section>
-                                Hora de llegada
+                            <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
+                                Técnico
+                                <div className={style.formInput}>
+                                    <CustomSelect
+                                        value={technicians}
+                                        placeholder="Selecciona al técnico"
+                                        options={technicianOptions}
+                                        onSelect={(selected: { label: string; value: string }) => {
+                                            setTechnicians(selected.value)
+                                        }}
+                                    />
+                                </div>
+                            </section>
+                            <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
+                                Hora max de llegada
                                 <div className={style.formInput}>
                                     <CustomSelect
                                         value={arriveHour}
-                                        placeholder="Selecciona al técnico"
+                                        placeholder="Selecciona la hora"
                                         options={arriveHourOptions}
                                         onSelect={(selected: { label: string; value: string }) => {
                                             setArriveHour(selected.value)
@@ -450,6 +398,11 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                                     />
                                 </div>
                             </section>
+                        </div>
+                    )}
+
+                    {userRole == 'TECHNICIAN' && (
+                        <div className={style.rowModal}>
                             <section>
                                 Tiempo de duración
                                 <div className={style.formInput}>
@@ -466,19 +419,21 @@ export const AssigmedModal = ({ incidentId, onClose, action }: Props) => {
                         </div>
                     )}
 
-                    <section className={style.disabled}>
-                        Descripción
-                        <div className={style.formDescription}>
-                            <CustomTextArea
-                                isFormInput
-                                name="description"
-                                value={formState.description}
-                                placeholder="Ingresa la descripción"
-                                type="description"
-                                onChange={onTextAreaChange}
-                            />
-                        </div>
-                    </section>
+                    {userRole == 'TECHNICIAN' && (
+                        <section>
+                            Diagnóstico
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="diagnostic"
+                                    value={formState.diagnostic}
+                                    placeholder="Ingresa el diagnóstico"
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    )}
 
                     {action == 'REJECTED' && (
                         <section>
