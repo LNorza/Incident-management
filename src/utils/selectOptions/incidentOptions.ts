@@ -4,24 +4,24 @@ export const getIncidentStateOptions = (select?: string): IOptions[] => {
     if (select === 'ALL') {
         return [
             { label: 'Todos', value: 'ALL' },
-            { label: 'Enviado', value: 'SENT' },
-            { label: 'Asignado', value: 'ASSIGNED' },
+            { label: 'Enviada', value: 'SENT' },
+            { label: 'Asignada', value: 'ASSIGNED' },
             { label: 'En proceso', value: 'IN_PROCESS' },
-            { label: 'Liberado', value: 'RELEASED' },
-            { label: 'Rechazado', value: 'REJECTED' },
+            { label: 'Liberada', value: 'RELEASED' },
+            { label: 'Rechazada', value: 'REJECTED' },
             {
-                label: 'Finalizado',
+                label: 'Finalizada',
                 value: 'FINISHED',
             },
         ]
     } else {
         return [
-            { label: 'Enviado', value: 'SENT' },
-            { label: 'Asignado', value: 'ASSIGNED' },
+            { label: 'Enviada', value: 'SENT' },
+            { label: 'Asignada', value: 'ASSIGNED' },
             { label: 'En proceso', value: 'IN_PROCESS' },
-            { label: 'Liberado', value: 'RELEASED' },
-            { label: 'Rechazado', value: 'REJECTED' },
-            { label: 'Finalizado', value: 'FINISHED' },
+            { label: 'Liberada', value: 'RELEASED' },
+            { label: 'Rechazada', value: 'REJECTED' },
+            { label: 'Finalizada', value: 'FINISHED' },
         ]
     }
 }

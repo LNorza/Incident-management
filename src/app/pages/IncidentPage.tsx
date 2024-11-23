@@ -160,7 +160,7 @@ export const IncidentPage = () => {
                         refresh={refreshTable}
                         typeIncident={typeIncident}
                         statusIncident={statusIncident}
-                        typeincidentModal={handletypeModal}
+                        typeIncidentModal={handletypeModal}
                         deleteIncident={handleDeleteModal}
                     />
                 </section>

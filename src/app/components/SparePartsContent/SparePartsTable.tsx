@@ -29,6 +29,10 @@ export const SparePartsTable: React.FC<SparePartsTableProps> = ({
     const parentRef = useRef<HTMLDivElement>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
 
+    const localeText = {
+        noRowsToShow: 'No hay datos disponibles',
+    }
+
     const handleEditClick = (row: ISpareParts) => {
         editSparePart(row)
     }
@@ -116,7 +120,13 @@ export const SparePartsTable: React.FC<SparePartsTableProps> = ({
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
-            <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
+            <AgGridReact
+                rowData={rowData}
+                columnDefs={colDefs}
+                theme={myTheme}
+                rowHeight={50}
+                localeText={localeText}
+            />
         </div>
     )
 }

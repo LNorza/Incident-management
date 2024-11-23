@@ -10,7 +10,6 @@ export const myTheme = themeQuartz.withPart(iconSetMaterial).withParams({
     columnBorder: false,
     foregroundColor: '#FFFFFF',
     headerBackgroundColor: '#21222D',
-
     headerFontSize: 18,
     headerFontWeight: 500,
     fontSize: 16,

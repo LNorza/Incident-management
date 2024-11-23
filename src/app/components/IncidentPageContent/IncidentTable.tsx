@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { AgGridReact } from 'ag-grid-react'
-import { IncidentModalType, IncidentState, myTheme, getUserDepartment } from '../../../utils'
+import { IncidentModalType, IncidentState, myTheme, getUserDepartment, IUserData } from '../../../utils'
 import { API_BASE_URL, getUserData, getUserRole } from '../../../utils/api'
 import { Actions } from '../../../ui'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
@@ -12,7 +12,7 @@ interface IncidentTableProps {
     refresh: boolean
     typeIncident: string
     statusIncident: string
-    typeincidentModal?: (
+    typeIncidentModal?: (
         deviceId: string,
         type?: IncidentModalType,
         incidentStatus?: IncidentState,
@@ -25,42 +25,46 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
     refresh,
     typeIncident,
     statusIncident,
-    typeincidentModal,
+    typeIncidentModal,
     deleteIncident,
 }) => {
     const [rowData, setRowData] = useState<IIncident[]>([])
 
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
-    const [userData, setUserData] = useState<string | undefined>(undefined)
+    const [userData, setUserData] = useState<IUserData | null>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
     const [departmentId, setDepartmentId] = useState<string | null>(null)
 
+    const localeText = {
+        noRowsToShow: 'No hay datos disponibles',
+    }
+
     const handleReleasedClick = useCallback(
         (row: IIncident, type?: IncidentModalType, action?: string) => {
-            if (typeincidentModal) {
+            if (typeIncidentModal) {
                 if (type == 'EditIncident') {
-                    typeincidentModal(row._id)
+                    typeIncidentModal(row._id)
                 }
                 if (type == 'ChangeModal') {
-                    typeincidentModal(row._id, 'ChangeModal', row.status)
+                    typeIncidentModal(row._id, 'ChangeModal', row.status)
                 }
                 if (type == 'InfoIncident') {
                     if (row.status != 'SENT') {
-                        typeincidentModal(row._id, 'InfoIncident', row.status)
+                        typeIncidentModal(row._id, 'InfoIncident', row.status)
                     } else {
-                        typeincidentModal(row._id, 'InfoIncident', 'SENT')
+                        typeIncidentModal(row._id, 'InfoIncident', 'SENT')
                     }
                 }
                 if (type == 'FinishedIncident') {
-                    typeincidentModal(row._id, 'FinishedIncident', row.status, action)
+                    typeIncidentModal(row._id, 'FinishedIncident', row.status, action)
                 }
                 if (type == 'AssignedIncident') {
-                    typeincidentModal(row._id, 'AssignedIncident', row.status, action)
+                    typeIncidentModal(row._id, 'AssignedIncident', row.status, action)
                 }
             }
         },
-        [typeincidentModal],
+        [typeIncidentModal],
     )
 
     const handleDeleteClick = useCallback(
@@ -77,17 +81,16 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
         setDepartmentId(department)
     }
 
-    // Función para obtener el rol del usuario
     const fetchRole = async () => {
-        const role = await getUserRole() // Obtener el rol del usuario
-        setUserRole(role) // Guardar el rol en el estado
+        const role = await getUserRole()
+        setUserRole(role)
     }
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const userData = await getUserData()
-                setUserData(userData?._id)
+                setUserData(userData ?? null)
             } catch (error) {
                 console.error('Error fetching data:', error)
             }
@@ -102,27 +105,43 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                 credentials: 'include',
             })
             const data = await response.json()
-            return data.name // Devuelve el nombre del dispositivo
+            return data.name
         } catch (err) {
             console.error(`Error fetching device ${deviceId}:`, err)
-            return 'Desconocido' // En caso de error, devuelve un valor por defecto
+            return 'Desconocido'
         }
     }
 
     // Función principal para obtener los incidentes
     const fetchIncident = useCallback(async () => {
         try {
-            const url =
-                userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
-                    ? `${API_BASE_URL}/incidents`
-                    : `${API_BASE_URL}/incidents-search?department_id=${departmentId}`
+            if (!departmentId) return
+            let url = `${API_BASE_URL}/incidents-search?department_id=${departmentId}`
+            if (userRole === 'ADMIN_TECHNICIANS') {
+                url = `${API_BASE_URL}/incidents`
+                if (typeIncident !== 'ALL' || statusIncident !== 'ALL') {
+                    url = `${API_BASE_URL}/incidents-search?incident_type=${typeIncident}&status=${statusIncident}`
+                }
+            }
+
+            if (userRole === 'TECHNICIAN' && userData) {
+                url = `${API_BASE_URL}/incidents-search?technician_id=${userData._id}`
+                if (typeIncident !== 'ALL' || statusIncident !== 'ALL') {
+                    url = `${API_BASE_URL}/incidents-search?technician_id=${userData._id}&incident_type=${typeIncident}&status=${statusIncident}`
+                }
+            }
+
+            if (userRole === 'ADMIN_DEPARTMENT') {
+                url = `${API_BASE_URL}/incidents-search?department_id=${departmentId}`
+                if (typeIncident !== 'ALL' || statusIncident !== 'ALL') {
+                    url = `${API_BASE_URL}/incidents-search?department_id=${departmentId}&incident_type=${typeIncident}&status=${statusIncident}`
+                }
+            }
+
             const response = await fetch(url, {
                 credentials: 'include',
             })
             const data = await response.json()
-
-            // Cache local para evitar múltiples solicitudes al mismo dispositivo
-            const deviceCache: { [key: string]: string } = {}
 
             const formattedData = await Promise.all(
                 data.map(
@@ -136,18 +155,11 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                         status,
                         technician_id,
                     }: IIncident) => {
-                        const formattedDate = dateFormatter(new Date(created_at))
-
-                        // Revisa si el dispositivo ya está en la caché
-                        if (!deviceCache[device_id]) {
-                            deviceCache[device_id] = await fetchDeviceById(device_id)
-                        }
-
                         return {
                             _id,
                             folio,
-                            date: formattedDate,
-                            device_id: deviceCache[device_id], // Usa el nombre del dispositivo desde la caché
+                            date: dateFormatter(new Date(created_at)),
+                            device_id: await fetchDeviceById(device_id),
                             incident_type,
                             description,
                             status,
@@ -157,37 +169,11 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
                 ),
             )
 
-            //filtra las incidencias por tecnico
-            if (userRole == 'TECHNICIAN') {
-                // Filtrar por `technician_id` (userData)
-                const incidentAssigned = formattedData.filter(
-                    (incident: IIncident) => incident.technician_id === userData,
-                )
-
-                // Filtrar además por `typeIncident` y `statusIncident`
-                const filteredByTypeAndStatus = incidentAssigned.filter(
-                    (incident: IIncident) =>
-                        (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
-                        (statusIncident === 'ALL' || incident.status === statusIncident),
-                )
-
-                // Asignar los datos filtrados a `rowData`
-                return setRowData(filteredByTypeAndStatus)
-            } else {
-                // Si no hay `userData`, filtrar solo por `typeIncident` y `statusIncident`
-                const filteredData = formattedData.filter(
-                    (incident: IIncident) =>
-                        (typeIncident === 'ALL' || incident.incident_type === typeIncident) &&
-                        (statusIncident === 'ALL' || incident.status === statusIncident),
-                )
-
-                // Asignar los datos filtrados a `rowData`
-                return setRowData(filteredData)
-            }
+            setRowData(formattedData)
         } catch (err) {
             console.error(err)
         }
-    }, [typeIncident, statusIncident, userRole, userData, departmentId])
+    }, [typeIncident, statusIncident, userRole, departmentId, userData])
 
     useEffect(() => {
         const initialize = async () => {
@@ -292,7 +278,13 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
-            <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
+            <AgGridReact
+                rowData={rowData}
+                columnDefs={colDefs}
+                theme={myTheme}
+                rowHeight={50}
+                localeText={localeText}
+            />
         </div>
     )
 }

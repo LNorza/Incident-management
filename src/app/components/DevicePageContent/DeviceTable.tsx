@@ -21,6 +21,10 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
     const [userRole, setUserRole] = useState<string | null>(null)
     const isTechnician = userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN'
 
+    const localeText = {
+        noRowsToShow: 'No hay datos disponibles',
+    }
+
     const handleEditClick = useCallback((row: IDevice) => {
         editDevice(row._id)
     }, [])
@@ -53,14 +57,9 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
                 credentials: 'include',
             })
             const data = await response.json()
-
-            console.log('Datos que trae', data)
-
             const formattedData = await Promise.all(
                 data.map(async ({ _id, name, type, brand, specs, location_id, status }: DeviceProps) => {
                     const userName = await getUserName(specs?.user_id ? specs.user_id : '')
-                    console.log('Nombre de usuario', userName)
-
                     return {
                         _id,
                         name,
@@ -223,7 +222,13 @@ export const DeviceTable: React.FC<DeviceTableProps> = ({ refresh, building, edi
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
-            <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
+            <AgGridReact
+                rowData={rowData}
+                columnDefs={colDefs}
+                theme={myTheme}
+                rowHeight={50}
+                localeText={localeText}
+            />
         </div>
     )
 }

@@ -17,6 +17,10 @@ export const UserTable: React.FC<UserTableProps> = ({ refresh, positionFilter, e
     const [departmentId, setDepartmentId] = useState<string | null>(null)
     const parentRef = useRef<HTMLDivElement>(null)
 
+    const localeText = {
+        noRowsToShow: 'No hay datos disponibles',
+    }
+
     const handleEditClick = (row: IUser) => {
         editUser(row)
     }
@@ -113,7 +117,13 @@ export const UserTable: React.FC<UserTableProps> = ({ refresh, positionFilter, e
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
-            <AgGridReact rowData={rowData} columnDefs={colDefs} theme={myTheme} rowHeight={50} />
+            <AgGridReact
+                rowData={rowData}
+                columnDefs={colDefs}
+                theme={myTheme}
+                rowHeight={50}
+                localeText={localeText}
+            />
         </div>
     )
 }
