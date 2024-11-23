@@ -79,7 +79,33 @@ export interface FinishIncident {
     initial_time: string
     end_time: string
     qualification: number
+    work: string
 }
+
+export interface InfoIncident {
+    folio: string
+    buildName: string
+    deviceName: string
+    status: string
+    specialty: string
+    locationName: string
+    departmentName: string
+    created_at: string
+    incident_type: string
+    technicianName: string
+    priority: string
+    work: string
+    start_date: string
+    arrival_time: string
+    time_duration: string
+    description: string
+    diagnostic: string
+    comments: string
+    initial_time: string
+    end_time: string
+    qualification: number
+}
+
 export interface ICreateIncident {
     folio: string
     device_id: string

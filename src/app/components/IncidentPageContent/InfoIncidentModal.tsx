@@ -1,18 +1,20 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CustomInput, CustomTextArea } from '../../../ui'
 import {
     API_BASE_URL,
     getArriveHourOptions,
     getTimeDurationOptions,
-    getUserDepartment,
+    getSpecialtyOptions,
+    translateIncident,
+    IOptions,
     getUserRole,
-    Incident,
     IncidentState,
+    InfoIncident,
 } from '../../../utils'
 import { InfoIcon } from 'lucide-react'
+import rating from '../../style/cardContainer.module.css'
 import style from '../../style/modal.module.css'
 import { useForm } from '../../../hooks'
-import { translateIncident } from '../../../utils/formatter/incident.formatter'
 
 interface Props {
     onClose: () => void
@@ -20,229 +22,102 @@ interface Props {
     status?: IncidentState
 }
 
-const rol = 'TECHNICIAN'
-const technicianDepartmentId = '67206b309acf1976ca32173b'
-const arriveHourOptions = getArriveHourOptions()
-const timeDurationOptions = getTimeDurationOptions()
-
 export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
-    const [departmentId, setDepartmentId] = useState<string | undefined>(undefined)
-    const [departmentName, setDepartmentName] = useState<string | undefined>(undefined)
-    const [colorState, setColorState] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
-    const [technicianName, setTechnicianName] = useState<string | undefined>(undefined)
-    const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
-    const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
+    const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
+    const [timeDurationOptions] = useState<IOptions[]>(getTimeDurationOptions())
+    const [specialtyOptions] = useState<IOptions[]>(getSpecialtyOptions)
 
-    const incidentFetched = useRef(false) // Se asegura de que fetchIncident solo se ejecute una vez por cambio en incidentId.
-
-    const [incidentData, setIncidentData] = useState<Incident>({
-        date: '',
-        location_id: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<InfoIncident>({
         folio: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
-        work: '',
-        _id: '',
-        technician_id: '',
-        priority: '',
-        arrival_time: '',
-        time_duration: '',
-    })
-
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
-        folio: '',
-        location_id: '',
-        department_name: '',
-        description: '',
-        device_id: {
-            _id: '',
-            name: '',
-            type: '',
-            brand: '',
-            specs: {},
-            location_id: {
-                _id: '',
-                name: '',
-                building_id: {
-                    _id: '',
-                    name: '',
-                    description: '',
-                    isShared: false,
-                    departments: [
-                        {
-                            department_id: '',
-                            build_manager: {
-                                _id: '',
-                                name: '',
-                            },
-                            _id: '',
-                        },
-                    ],
-                    totalDevices: 0,
-                },
-            },
-            status: '',
-            purchaseDate: '',
-            warrantyYears: 0,
-            deviceModel: '',
-        },
-        date: '',
-        incident_type: '',
-        period: 0,
-        status: '',
-        updated_at: '',
+        buildName: '',
+        deviceName: '',
+        locationName: '',
+        departmentName: '',
         created_at: '',
-        arrival_time: '',
-        time_duration: '',
-        technician_id: '',
+        incident_type: '',
+        technicianName: '',
         priority: '',
         work: '',
-        _id: '',
+        start_date: '',
+        arrival_time: '',
+        time_duration: '',
+        description: '',
+        diagnostic: '',
+        comments: '',
+        initial_time: '',
+        end_time: '',
+        status: '',
+        specialty: '',
+        qualification: 0,
     })
-
-    const fetchDepartment = useCallback(async () => {
-        if (!departmentId) {
-            try {
-                const id = await getUserDepartment()
-                setDepartmentId(id ?? undefined)
-            } catch (err) {
-                console.error(err)
-            }
-        } else {
-            try {
-                const response = await fetch(`${API_BASE_URL}/departments/${departmentId}`, { credentials: 'include' })
-                const data = await response.json()
-                setDepartmentName(data.name)
-            } catch (err) {
-                console.error(err)
-            }
-        }
-    }, [departmentId])
-
-    const fetchUsers = useCallback(async () => {
-        try {
-            const response = await fetch(
-                `${API_BASE_URL}/users-search?department_id=${technicianDepartmentId}&position=${rol}`,
-                { credentials: 'include' },
-            )
-            const data = await response.json()
-            const technician = data.find((user: any) => user._id === formState.technician_id)
-            setTechnicianName(technician ? technician.name : undefined)
-        } catch (err) {
-            console.error(err)
-        }
-    }, [formState.technician_id])
 
     const fetchRole = useCallback(async () => {
         const role = await getUserRole()
         setUserRole(role)
     }, [])
 
+    const getTechnicianName = async (technicianId: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${technicianId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            return data.name
+        } catch (error) {
+            console.error('Error fetching technician:', error)
+        }
+    }
+
     const fetchIncident = useCallback(async () => {
-        if (incidentFetched.current) return // Para prevenir múltiples llamadas
         try {
             const response = await fetch(`${API_BASE_URL}/incidents/${incidentId}`, { credentials: 'include' })
             const data = await response.json()
-            setIncidentData(data)
-            incidentFetched.current = true
+
+            const formatTime = (dateString: string) => {
+                if (!dateString) return ''
+                const date = new Date(dateString)
+                const hours = String(date.getHours()).padStart(2, '0')
+                const minutes = String(date.getMinutes()).padStart(2, '0')
+                return `${hours}:${minutes}`
+            }
+
+            updateFields({
+                folio: data.folio,
+                buildName: data.device_id.location_id.building_id.name,
+                deviceName: data.device_id.name,
+                locationName: data.device_id.location_id.name,
+                departmentName: data.department_id.name,
+                created_at: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
+                incident_type: data.incident_type ? translateIncident(data.incident_type, 'incident') : '',
+                technicianName: await getTechnicianName(data.technician_id),
+                priority: translateIncident(data.priority, 'priority') || 'No asignado',
+                work: data.work ? translateIncident(data.work, 'work') : '',
+                start_date: data.start_date ? new Date(data.start_date).toLocaleDateString() : '',
+                arrival_time: arriveHourOptions.find((option) => option.value === data.arrival_time)?.label,
+                time_duration: timeDurationOptions.find((option) => option.value === data.time_duration)?.label,
+                description: data.description,
+                diagnostic: data.diagnostic,
+                comments: data.comments,
+                initial_time: formatTime(data.start_date),
+                end_time: data.end_date ? formatTime(data.end_date) : '',
+                status: translateIncident(data.status, 'status'),
+                specialty: specialtyOptions.find((option) => option.value === data.technician_specialty)?.label,
+                qualification: data.qualification,
+            })
         } catch (error) {
             console.error('Error fetching device:', error)
         }
-    }, [incidentId, updateFields])
+    }, [incidentId])
 
     useEffect(() => {
         const fetchData = async () => {
-            await fetchDepartment()
+            // await fetchDepartment()
             await fetchIncident()
             await fetchRole()
         }
         fetchData()
-    }, [fetchIncident, fetchRole, fetchDepartment])
-
-    useEffect(() => {
-        if (incidentData) {
-            updateFields(incidentData)
-        }
-    }, [incidentData.folio])
-
-    useEffect(() => {
-        fetchUsers()
-    }, [departmentId, fetchUsers])
-
-    useEffect(() => {
-        // Solo actualizamos si la información cambia
-        if (formState.arrival_time) {
-            const arrivalOption = arriveHourOptions.find((option) => option.value === formState.arrival_time)
-            // Si no es igual al estado actual, actualizamos el estado
-            if (arrivalOption && arrivalOption.label !== arriveHour) {
-                setArriveHour(arrivalOption.label)
-            }
-        }
-
-        if (formState.time_duration) {
-            const durationOption = timeDurationOptions.find((option) => option.value === formState.time_duration)
-            // Si no es igual al estado actual, actualizamos el estado
-            if (durationOption && durationOption.label !== timeDuration) {
-                setTimeDuration(durationOption.label)
-            }
-        }
-
-        // Solo cambiamos el color de estado si es necesario
-        if (formState.status === 'REJECTED' && colorState !== 'r') {
-            setColorState('r')
-        } else if (formState.status !== 'REJECTED' && colorState !== undefined) {
-            setColorState(undefined)
-        }
-    }, [formState.arrival_time, formState.time_duration, formState.status, arriveHour, timeDuration, colorState])
-
-    useEffect(() => {
-        updateFields({
-            department_name: departmentName,
-            created_at: formState.created_at ? new Date(formState.created_at).toLocaleDateString() : '',
-            incident_type: formState.incident_type ? translateIncident(formState.incident_type, 'incident') : '',
-            work: formState.work ? translateIncident(formState.work, 'work') : '',
-            priority: formState.priority ? translateIncident(formState.priority, 'priority') : 'No asignado',
-            arrival_time: arriveHour,
-            time_duration: timeDuration,
-            date: formState.date ? new Date(formState.date).toLocaleDateString() : '',
-        })
-    }, [incidentId, status, departmentId, departmentName, arriveHour, timeDuration])
+    }, [fetchIncident, fetchRole])
 
     return (
         <>
@@ -272,7 +147,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     <CustomInput
                                         isFormInput
                                         name="device"
-                                        value={formState.device_id.name || ''}
+                                        value={formState.deviceName || ''}
                                         type="text"
                                         onChange={onInputChange}
                                     />
@@ -285,7 +160,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     <CustomInput
                                         isFormInput
                                         name="building"
-                                        value={formState.device_id.location_id.building_id.name || ''}
+                                        value={formState.buildName || ''}
                                         type="text"
                                         onChange={onInputChange}
                                     />
@@ -303,7 +178,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="incident_type"
-                                            value={formState.incident_type || ''}
+                                            value={formState.incident_type}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -315,7 +190,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="work"
-                                            value={formState.work || ''}
+                                            value={formState.work}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -329,9 +204,9 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="status"
-                                            value={formState.status || ''}
+                                            value={formState.status}
                                             type="text"
-                                            color={colorState}
+                                            color="r"
                                             onChange={onInputChange}
                                         />
                                     </div>
@@ -347,7 +222,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="location"
-                                            value={formState.device_id.location_id.name || ''}
+                                            value={formState.locationName}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -359,7 +234,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                         <CustomInput
                                             isFormInput
                                             name="device"
-                                            value={formState.device_id.name || ''}
+                                            value={formState.deviceName}
                                             type="text"
                                             onChange={onInputChange}
                                         />
@@ -375,7 +250,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                             <CustomInput
                                                 isFormInput
                                                 name="department_name"
-                                                value={formState.department_name || ''}
+                                                value={formState.departmentName || ''}
                                                 type="text"
                                                 onChange={onInputChange}
                                             />
@@ -422,201 +297,9 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     </div>
                                 </section>
                             </div>
-
-                            <div className={style.rowModal}>
-                                <section className={style.disabled}>
-                                    Técnico
-                                    <div className={style.formInput}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="technician"
-                                            value={technicianName || 'No asignado'}
-                                            type="text"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                                <section className={style.disabled}>
-                                    {userRole == 'ADMIN_TECHNICIANS' ? 'Prioridad' : 'Prioridad asignada'}
-                                    <div className={`${style.formInput}`}>
-                                        <CustomInput
-                                            isFormInput
-                                            name="priority"
-                                            value={formState.priority || ''}
-                                            type="text"
-                                            color="g"
-                                            onChange={onInputChange}
-                                        />
-                                    </div>
-                                </section>
-                            </div>
-
-                            {(userRole == 'ADMIN_TECHNICIANS' || userRole == 'TECHNICIAN') && status != 'ASSIGNED' ? (
-                                <>
-                                    <div className={style.rowModal}>
-                                        <section className={style.disabled}>
-                                            Hora de llegada
-                                            <div className={style.formInput}>
-                                                <CustomInput
-                                                    isFormInput
-                                                    name="arrivaltime"
-                                                    value={formState.arrival_time || ''}
-                                                    type="text"
-                                                    onChange={onInputChange}
-                                                />
-                                            </div>
-                                        </section>
-                                        <section className={style.disabled}>
-                                            Tiempo de duración
-                                            <div className={style.formInput}>
-                                                <CustomInput
-                                                    isFormInput
-                                                    name="durationtime"
-                                                    value={formState.time_duration || ''}
-                                                    type="text"
-                                                    onChange={onInputChange}
-                                                />
-                                            </div>
-                                        </section>
-                                    </div>
-
-                                    <div className={style.rowModal}>
-                                        <section className={style.disabled}></section>
-                                        <section className={style.disabled}>
-                                            Fecha de inicio
-                                            <div className={style.formInput}>
-                                                <CustomInput
-                                                    isFormInput
-                                                    name="durationtime"
-                                                    value={formState.date || ''}
-                                                    type="text"
-                                                    onChange={onInputChange}
-                                                />
-                                            </div>
-                                        </section>
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    {status != 'ASSIGNED' && userRole == 'ADMIN_TECHNICIANS' && (
-                                        <>
-                                            <div className={style.rowModal}>
-                                                <section className={style.disabled}>
-                                                    Fecha de solicitud
-                                                    <div className={style.formInput}>
-                                                        <CustomInput
-                                                            isFormInput
-                                                            name="arrivaltime"
-                                                            value={formState.created_at || ''}
-                                                            type="text"
-                                                            onChange={onInputChange}
-                                                        />
-                                                    </div>
-                                                </section>
-                                                <section className={style.disabled}>
-                                                    Fecha de inicio
-                                                    <div className={style.formInput}>
-                                                        <CustomInput
-                                                            isFormInput
-                                                            name="durationtime"
-                                                            value={formState.date || ''}
-                                                            type="text"
-                                                            onChange={onInputChange}
-                                                        />
-                                                    </div>
-                                                </section>
-                                            </div>
-                                            <div className={style.rowModal}>
-                                                <section className={style.disabled}>
-                                                    Hora de llegada
-                                                    <div className={style.formInput}>
-                                                        <CustomInput
-                                                            isFormInput
-                                                            name="arrivaltime"
-                                                            value={formState.arrival_time || ''}
-                                                            type="text"
-                                                            onChange={onInputChange}
-                                                        />
-                                                    </div>
-                                                </section>
-                                                <section className={style.disabled}>
-                                                    Tiempo de duración
-                                                    <div className={style.formInput}>
-                                                        <CustomInput
-                                                            isFormInput
-                                                            name="durationtime"
-                                                            value={formState.time_duration || ''}
-                                                            type="text"
-                                                            onChange={onInputChange}
-                                                        />
-                                                    </div>
-                                                </section>
-                                            </div>
-                                        </>
-                                    )}
-                                </>
-                            )}
                         </>
                     )}
 
-                    {(status == undefined && status != 'SENT') ||
-                        (userRole == 'ADMIN_DEPARTMENT' && (
-                            <>
-                                <div className={style.rowModal}>
-                                    <section className={style.disabled}>
-                                        Fecha de solicitud
-                                        <div className={style.formInput}>
-                                            <CustomInput
-                                                isFormInput
-                                                name="created_at"
-                                                value={formState.created_at || ''}
-                                                type="text"
-                                                onChange={onInputChange}
-                                            />
-                                        </div>
-                                    </section>
-                                    <section className={style.disabled}>
-                                        Fecha de inicio
-                                        <div className={style.formInput}>
-                                            <CustomInput
-                                                isFormInput
-                                                name="date_start"
-                                                value={formState.date || ''}
-                                                type="text"
-                                                onChange={onInputChange}
-                                            />
-                                        </div>
-                                    </section>
-                                </div>
-
-                                <div className={style.rowModal}>
-                                    <section className={style.disabled}>
-                                        Hora de llegada
-                                        <div className={style.formInput}>
-                                            <CustomInput
-                                                isFormInput
-                                                name="arrivaltime"
-                                                value={formState.arrival_time || ''}
-                                                type="text"
-                                                onChange={onInputChange}
-                                            />
-                                        </div>
-                                    </section>
-                                    <section className={style.disabled}>
-                                        Tiempo de duración
-                                        <div className={style.formInput}>
-                                            <CustomInput
-                                                isFormInput
-                                                name="durationtime"
-                                                value={formState.time_duration || ''}
-                                                type="text"
-                                                onChange={onInputChange}
-                                            />
-                                        </div>
-                                    </section>
-                                </div>
-                            </>
-                        ))}
                     {status == 'REJECTED' ? (
                         <section className={style.disabled}>
                             Motivos
@@ -646,6 +329,191 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                     )}
                 </div>
 
+                {status != 'REJECTED' && (
+                    <>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Técnico
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="technician"
+                                        value={formState.technicianName || 'No asignado'}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            <section className={style.disabled}>
+                                {userRole == 'ADMIN_TECHNICIANS' ? 'Prioridad' : 'Prioridad asignada'}
+                                <div className={`${style.formInput}`}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="priority"
+                                        value={formState.priority || ''}
+                                        type="text"
+                                        color="g"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Especialidad de incidencia
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        value={formState.specialty}
+                                        placeholder="Selecciona la especialidad"
+                                        type="text"
+                                        id="specialty"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            <section className={style.disabled}>
+                                Hora max de llegada
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        value={formState.arrival_time}
+                                        placeholder="Selecciona la hora"
+                                        type="text"
+                                        id="arrival_time"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                    </>
+                )}
+
+                {status != 'SENT' && status != 'ASSIGNED' && status != 'REJECTED' && (
+                    <>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Tiempo de duración
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="time_duration"
+                                        value={formState.time_duration}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            {status == 'IN_PROCESS' ? (
+                                <section className={style.disabled}>
+                                    Hora de inicio
+                                    <div className={`${style.formInput}`}>
+                                        <CustomInput
+                                            isFormInput
+                                            name="priority"
+                                            value={formState.initial_time}
+                                            type="text"
+                                            onChange={onInputChange}
+                                        />
+                                    </div>
+                                </section>
+                            ) : status == 'RELEASED' || status === 'FINISHED' ? (
+                                <section className={style.disabled}>
+                                    Fecha de inicio
+                                    <div className={`${style.formInput}`}>
+                                        <CustomInput
+                                            isFormInput
+                                            name="start_date"
+                                            value={formState.start_date}
+                                            type="text"
+                                            onChange={onInputChange}
+                                        />
+                                    </div>
+                                </section>
+                            ) : (
+                                <></>
+                            )}
+                        </div>
+
+                        <section className={style.disabled}>
+                            Diagnóstico
+                            <div className={style.formDescription}>
+                                <CustomTextArea
+                                    isFormInput
+                                    name="diagnostic"
+                                    value={formState.diagnostic || ''}
+                                    type="description"
+                                    onChange={onTextAreaChange}
+                                />
+                            </div>
+                        </section>
+                    </>
+                )}
+
+                {(status === 'FINISHED' || status == 'RELEASED') && (
+                    <>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Hora de inicio
+                                <div className={`${style.formInput}`}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="priority"
+                                        value={formState.initial_time}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            <section className={style.disabled}>
+                                Hora de terminación
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="end_duration"
+                                        value={formState.end_time}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+
+                        {status === 'RELEASED' && (
+                            <>
+                                <section className={style.disabled}>
+                                    Calificación del técnico
+                                    <div className={rating.ratingContainerInfo}>
+                                        <div className={rating.rating}>
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <label
+                                                    key={star}
+                                                    style={{
+                                                        color:
+                                                            star <= formState.qualification
+                                                                ? 'var(--MainGreenColor)'
+                                                                : '#ccc',
+                                                    }}
+                                                ></label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </section>
+                                <section className={style.disabled}>
+                                    Comentarios
+                                    <div className={style.formDescription}>
+                                        <CustomTextArea
+                                            isFormInput
+                                            name="comments"
+                                            value={formState.comments}
+                                            placeholder="Ingresa algún comentario sobre el servicio"
+                                            type="description"
+                                            onChange={onTextAreaChange}
+                                        />
+                                    </div>
+                                </section>
+                            </>
+                        )}
+                    </>
+                )}
                 <div className={`${style.modalButtonContainer} ${style.add}`}>
                     <button onClick={onClose} className={style.saveButton}>
                         Cerrar

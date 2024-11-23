@@ -55,6 +55,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         diagnostic: '',
         initial_time: '',
         end_time: '',
+        work: '',
         qualification: 0,
     })
 
@@ -96,6 +97,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 time_duration: timeDurationOptions.find((option) => option.value === data.time_duration)?.label,
                 description: data.description,
                 comments: data.comments,
+                work: data.work ? translateIncident(data.work, 'work') : '',
                 diagnostic: data.diagnostic,
                 initial_time: formatTime(data.start_date),
                 end_time: data.end_date ? formatTime(data.end_date) : '',
@@ -241,12 +243,13 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                         />
                                     </div>
                                 </section>
-                                <section>
+
+                                <section className={style.disabled}>
                                     Trabajo
                                     <div className={style.formInput}>
                                         <CustomSelect
                                             value={workType}
-                                            options={workTypeOptions ?? []}
+                                            options={workTypeOptions}
                                             onSelect={(selected) => setWorkType(selected.value)}
                                         />
                                     </div>
@@ -284,16 +287,17 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                     <section className={style.disabled}>
                                         Trabajo
                                         <div className={style.formInput}>
-                                            <CustomSelect
-                                                value={workType}
-                                                options={workTypeOptions}
-                                                onSelect={(selected) => setWorkType(selected.value)}
+                                            <CustomInput
+                                                value={formState.work}
+                                                type="text"
+                                                onChange={onInputChange}
+                                                id="work"
                                             />
                                         </div>
                                     </section>
 
                                     <section className={style.disabled}>
-                                        Fecha de inicio
+                                        Fecha de solicitud
                                         <div className={style.formInput}>
                                             <CustomInput
                                                 isFormInput

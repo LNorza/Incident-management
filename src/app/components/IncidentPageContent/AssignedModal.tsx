@@ -70,13 +70,13 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
 
     const fetchUsers = useCallback(async (position: string) => {
         try {
-            const response = await fetch(`${API_BASE_URL}/users-search?position=${position}`, {
+            const response = await fetch(`${API_BASE_URL}/technicians?position=${position}`, {
                 credentials: 'include',
             })
             const data = await response.json()
             setTechnicianOptions(
-                data.map((technician: { _id: string; name: string }) => ({
-                    label: technician.name,
+                data.map((technician: { _id: string; name: string; incidents: number }) => ({
+                    label: `${technician.name}: ${technician.incidents} `,
                     value: technician._id,
                 })),
             )

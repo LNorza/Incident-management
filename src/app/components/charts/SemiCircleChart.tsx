@@ -1,7 +1,13 @@
+import React from 'react'
 import ReactApexChart from 'react-apexcharts'
 
-export const SemiCircleChart = () => {
-    const series = [100]
+interface SemiCircleChartProps {
+    percentage: number
+}
+
+export const SemiCircleChart: React.FC<SemiCircleChartProps> = ({ percentage }) => {
+    // Redondear el porcentaje a 2 decimales
+    const roundedPercentage = Math.min(Math.max(Math.round(percentage * 100) / 100, 0), 100)
 
     const options: ApexCharts.ApexOptions = {
         chart: {
@@ -26,6 +32,7 @@ export const SemiCircleChart = () => {
                     value: {
                         fontSize: '20px',
                         color: '#FFFFFF',
+                        formatter: () => `${roundedPercentage}%`, // Mostrar el porcentaje
                     },
                 },
             },
@@ -45,7 +52,7 @@ export const SemiCircleChart = () => {
 
     return (
         <div id="chart" style={{ display: 'flex', justifyContent: 'center' }}>
-            <ReactApexChart options={options} series={series} type="radialBar" width={400} height={340} />
+            <ReactApexChart options={options} series={[roundedPercentage]} type="radialBar" width={400} height={340} />
         </div>
     )
 }
