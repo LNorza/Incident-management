@@ -1,15 +1,23 @@
 import { useState } from 'react'
+import { ChangeModal, ChangeTable } from '../components'
+import { ChangeModalType } from '../../utils'
 import style from '../style/deviceContainer.module.css'
-import { ChangeTable } from '../components'
-// import { SparePartModal, SparePartsTable } from '../components'
+import { set } from 'date-fns'
 
 export const ChangePage = () => {
     const [showModal, setShowModal] = useState(false)
+    const [typeModal, setTypeModal] = useState<ChangeModalType>()
     const [refreshTable, setRefreshTable] = useState(false)
+    const [actionModal, setActionModal] = useState<string | undefined>('')
+
+    const handleTypeModal = (id: string, type: ChangeModalType = 'InfoChange', action?: string) => {
+        setActionModal(action)
+        setTypeModal(type)
+        setShowModal(true)
+    }
 
     const onOpenModal = () => {
-        // setTypeModal('AddDevice')
-        // setDeviceId(undefined)
+        setTypeModal('InfoChange')
         setShowModal(true)
     }
 
@@ -26,9 +34,11 @@ export const ChangePage = () => {
                 </section>
 
                 <section>
-                    <ChangeTable />
+                    <ChangeTable refresh={refreshTable} typeChangeModal={handleTypeModal} />
                 </section>
             </div>
+
+            <ChangeModal isOpen={showModal} onClose={onCloseModal} type={typeModal} actionModal={actionModal} />
         </>
     )
 }

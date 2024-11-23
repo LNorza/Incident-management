@@ -24,8 +24,9 @@ export interface IUpdateChange {
 export interface IChange {
   _id: string
   incident_folio?: string
-  date_change?: Date
-  created_at?: Date
+  updatedAt?: string
+  created_at?: string
+  incident: []
   technician?: string
   device_type: string
   spare_part: string

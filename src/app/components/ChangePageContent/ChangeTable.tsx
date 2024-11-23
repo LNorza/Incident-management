@@ -1,6 +1,6 @@
 import { AgGridReact } from 'ag-grid-react'
 import { Actions } from '../../../ui'
-import { Trash2, Pencil, InfoIcon, CircleCheck, Ban } from 'lucide-react'
+import { InfoIcon, CircleCheck, Ban } from 'lucide-react'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -11,26 +11,22 @@ import {
     ISpareParts,
     getUserRole,
     IChange,
+    dateFormatter,
+    ChangeModalType,
 } from '../../../utils'
 
-interface SparePartsTableProps {
+interface ChangeProps {
     refresh?: boolean
-    device?: string
-    editSparePart?: (spareData: ISpareParts) => void
-    deleteSparePart?: (spareId: string, spareName: string) => void
+    typeChangeModal?: (id: string, type: ChangeModalType, action?: string) => void
 }
 
-export const ChangeTable: React.FC<SparePartsTableProps> = ({ refresh, device, editSparePart, deleteSparePart }) => {
-    const [rowData, setRowData] = useState<ISpareParts[]>([])
+export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal }) => {
+    const [rowData, setRowData] = useState<IChange[]>([])
     const parentRef = useRef<HTMLDivElement>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
 
-    const handleEditClick = (row: ISpareParts) => {
-        // editSparePart(row)
-    }
-
-    const handleDeleteClick = (row: ISpareParts) => {
-        // deleteSparePart(row._id, row.name)
+    const handleType = (id: string, type: ChangeModalType, action?: string) => {
+        typeChangeModal && typeChangeModal(id, type, action)
     }
 
     useEffect(() => {
@@ -51,35 +47,36 @@ export const ChangeTable: React.FC<SparePartsTableProps> = ({ refresh, device, e
                     _id,
                     created_at,
                     description,
-                    date_change,
+                    updatedAt,
                     device_type,
                     incident_folio,
                     piece_type,
                     spare_part,
                     status,
                     technician,
-                }: IChange) => ({
+                }: any) => ({
                     _id,
                     folio: incident_folio,
-                    date_change,
-                    technician,
+                    updatedAt: updatedAt ? dateFormatter(new Date(updatedAt)) : 'N/A',
+                    technician: technician || 'N/A',
                     device: deviceFormatOptions(device_type),
-                    parts: sparePartsFormatOptions(spare_part),
-                    type: piece_type,
+                    parts: sparePartsFormatOptions('ram'),
+                    type: device_type,
                     description,
                 }),
             )
+
             setRowData(formattedData)
         } catch (error) {
             console.log('error', error)
         }
-    }, [device])
+    }, [])
 
     const roleColDef = (): ColDef[] => {
         if (userRole === 'ADMIN_TECHNICIANS') {
             return [
                 { field: 'folio', headerName: 'Folio de incidencia', sortable: true, flex: 1.2 },
-                { field: 'date_change', headerName: 'Fecha de solicitud', sortable: true, flex: 1.2 },
+                { field: 'updatedAt', headerName: 'Fecha de solicitud', sortable: true, flex: 1.2 },
                 { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.7 },
                 { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.7 },
                 { field: 'parts', headerName: 'Piezas', sortable: true, flex: 0.7 },
@@ -97,25 +94,25 @@ export const ChangeTable: React.FC<SparePartsTableProps> = ({ refresh, device, e
                             {
                                 text: 'Información',
                                 icon: InfoIcon,
-                                onClick: (row: ISpareParts, e: React.MouseEvent<HTMLDivElement>) => {
+                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
                                     e.stopPropagation()
-                                    handleEditClick(row)
+                                    handleType(row._id, 'InfoChange')
                                 },
                             },
                             {
                                 text: 'Aprovar',
                                 icon: CircleCheck,
-                                onClick: (row: ISpareParts, e: React.MouseEvent<HTMLDivElement>) => {
+                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
                                     e.stopPropagation()
-                                    handleEditClick(row)
+                                    handleType(row._id, 'ApproveOrRejectedChange', 'Aprove')
                                 },
                             },
                             {
                                 text: 'Rechazar',
                                 icon: Ban,
-                                onClick: (row: ISpareParts, e: React.MouseEvent<HTMLDivElement>) => {
+                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
                                     e.stopPropagation()
-                                    handleEditClick(row)
+                                    handleType(row._id, 'ApproveOrRejectedChange', 'Rejected')
                                 },
                             },
                         ],
@@ -127,7 +124,7 @@ export const ChangeTable: React.FC<SparePartsTableProps> = ({ refresh, device, e
         }
         return [
             { field: 'folio', headerName: 'Folio de incidencia', sortable: true, flex: 1 },
-            { field: 'date_change', headerName: 'Fecha del cambio', sortable: true, flex: 0.7 },
+            { field: 'updateAt', headerName: 'Fecha del cambio', sortable: true, flex: 0.7 },
             { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.7 },
             { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.7 },
             { field: 'parts', headerName: 'Piezas', sortable: true, flex: 0.7 },
@@ -147,7 +144,7 @@ export const ChangeTable: React.FC<SparePartsTableProps> = ({ refresh, device, e
                             icon: InfoIcon,
                             onClick: (row: ISpareParts, e: React.MouseEvent<HTMLDivElement>) => {
                                 e.stopPropagation()
-                                handleEditClick(row)
+                                handleType(row._id, 'InfoChange')
                             },
                         },
                     ],
