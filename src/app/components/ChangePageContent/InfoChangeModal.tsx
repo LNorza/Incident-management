@@ -1,7 +1,7 @@
 import { InfoIcon } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { CustomInput, CustomTextArea } from '../../../ui'
-import { API_BASE_URL, formatSparePartType, IChange, sparePartsFormatOptions } from '../../../utils'
+import { API_BASE_URL, InfoChangeRequest, sparePartsFormatOptions } from '../../../utils'
 import { useForm } from '../../../hooks'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -13,69 +13,18 @@ interface Props {
 export const InfoChangeModal = ({ onClose, changeId }: Props) => {
     const [technicianName, setTechnicianName] = useState<string | undefined>()
 
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IChange>({
-        approval_date: '',
+    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<InfoChangeRequest>({
+        folio: '',
         created_at: '',
-        description: '',
-        device_type: '',
-        incident: {
-            date: '',
-            location_id: '',
-            description: '',
-            device_id: {
-                _id: '',
-                name: '',
-                type: '',
-                brand: '',
-                specs: {},
-                location_id: {
-                    _id: '',
-                    name: '',
-                    building_id: {
-                        _id: '',
-                        name: '',
-                        description: '',
-                        isShared: false,
-                        departments: [
-                            {
-                                department_id: '',
-                                build_manager: {
-                                    _id: '',
-                                    name: '',
-                                },
-                                _id: '',
-                            },
-                        ],
-                        totalDevices: 0,
-                    },
-                },
-                status: '',
-                purchaseDate: '',
-                warrantyYears: 0,
-                deviceModel: '',
-            },
-            folio: '',
-            incident_type: '',
-            period: 0,
-            status: '',
-            updated_at: '',
-            work: '',
-            _id: '',
-            technician_id: '',
-            priority: '',
-            arrival_time: '',
-            time_duration: '',
-            technician_specialty: '',
-            diagnostic: '',
-        },
-        falsename: '',
+        technician_id: '',
+        technician_name: '',
+        device_name: '',
+        spare_part: '',
         piece_to_change: '',
         price: '',
-        spare_part: '',
-
+        description: '',
+        approval_date: '',
         status: '',
-        updatedAt: '',
-        _id: '',
     })
 
     const getTechnicianName = async (technicianId: string) => {
@@ -97,31 +46,36 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                 credentials: 'include',
             })
             const data = await response.json()
-            console.log('data', data)
 
-            const formattedData = {
-                ...data,
+            updateFields({
+                folio: data.incident.folio,
+                technician_id: data.incident.technician_id,
+                device_name: data.incident.device_id.name,
+                spare_part: data.spare_part,
                 piece_to_change: sparePartsFormatOptions(data.piece_to_change),
                 created_at: new Date(data.created_at).toLocaleDateString(),
-                updatedAt: new Date(data.updatedAt).toLocaleDateString(),
-            }
-            updateFields(formattedData)
+                approval_date: new Date(data.approval_date).toLocaleDateString(),
+                price: data.price,
+                description: data.description,
+                status: data.status,
+            })
         } catch (error) {
             console.error('Error fetching incident:', error)
         }
-    }, [changeId])
-
-    useEffect(() => {
-        fetchChange()
     }, [])
 
+    const fetchTechnicianName = useCallback(async () => {
+        const techName = await getTechnicianName(formState.technician_id)
+        setTechnicianName(techName)
+    }, [formState.technician_id])
+
     useEffect(() => {
-        const fetchTechnicianName = async () => {
-            const techName = await getTechnicianName(formState.incident.technician_id)
-            setTechnicianName(techName)
+        const fetchData = async () => {
+            await fetchChange()
+            await fetchTechnicianName()
         }
-        fetchTechnicianName()
-    }, [formState.incident.technician_id])
+        fetchData()
+    }, [changeId, fetchChange, fetchTechnicianName])
 
     return (
         <>
@@ -132,21 +86,21 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
             <div className={style.modalDetail}>
                 <div className={style.columnModal}>
                     <div className={style.rowModal}>
-                        <section className={style.disabled}>
+                        <section>
                             Folio de incidencia
-                            <div className={style.formInput}>
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
                                     name="incident_folio"
-                                    value={formState.incident.folio}
+                                    value={formState.folio}
                                     type="text"
                                     onChange={onInputChange}
                                 />
                             </div>
                         </section>
-                        <section className={style.disabled}>
-                            Fecha de cambio
-                            <div className={style.formInput}>
+                        <section>
+                            Fecha de solicitud
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
                                     name="created_at"
@@ -158,9 +112,9 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                         </section>
                     </div>
                     <div className={style.rowModal}>
-                        <section className={style.disabled}>
+                        <section>
                             Técnico
-                            <div className={style.formInput}>
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
                                     name="technician"
@@ -170,13 +124,13 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={style.disabled}>
-                            Fecha de cambio
-                            <div className={style.formInput}>
+                        <section>
+                            Equipo
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
-                                    name="updated_at"
-                                    value={formState.updatedAt}
+                                    name="device_name"
+                                    value={formState.device_name}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -184,9 +138,9 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                         </section>
                     </div>
                     <div className={style.rowModal}>
-                        <section className={style.disabled}>
+                        <section>
                             Pieza
-                            <div className={style.formInput}>
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
                                     name="spare_part"
@@ -196,9 +150,9 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                                 />
                             </div>
                         </section>
-                        <section className={style.disabled}>
+                        <section>
                             Tipo de pieza
-                            <div className={style.formInput}>
+                            <div className={`${style.formInput}  ${style.disabled}`}>
                                 <CustomInput
                                     isFormInput
                                     name="piece_type"
@@ -209,10 +163,37 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
                             </div>
                         </section>
                     </div>
-
+                    <div className={style.rowModal}>
+                        <section>
+                            Precio
+                            <div className={`${style.formInput}  ${style.disabled}`}>
+                                <CustomInput
+                                    isFormInput
+                                    name="price"
+                                    value={formState.price}
+                                    type="text"
+                                    onChange={onInputChange}
+                                />
+                            </div>
+                        </section>
+                        {formState.status === 'APPROVED' && (
+                            <section>
+                                Fecha de aprobación
+                                <div className={`${style.formInput}  ${style.disabled}`}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="approval_date"
+                                        value={formState.approval_date}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                        )}
+                    </div>
                     <section>
                         Descripción
-                        <div className={style.formDescription}>
+                        <div className={`${style.formDescription} ${style.disabled}`}>
                             <CustomTextArea
                                 isFormInput
                                 name="description"

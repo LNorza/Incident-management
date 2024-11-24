@@ -35,7 +35,7 @@ export const sparePartsFormatOptions = (sparePartsTypes: string) => {
             return 'Disco duro'
         case 'powerSupply':
             return 'Fuente de poder'
-        case 'OTHER':
+        case 'other':
             return 'Otro'
         default:
             return 'No definido'
