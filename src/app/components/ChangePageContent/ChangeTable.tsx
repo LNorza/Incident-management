@@ -1,19 +1,18 @@
 import { AgGridReact } from 'ag-grid-react'
 import { Actions } from '../../../ui'
 import { InfoIcon, CircleCheck, Ban } from 'lucide-react'
-import { ColDef, ICellRendererParams } from 'ag-grid-community'
+import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
     API_BASE_URL,
     myTheme,
-    deviceFormatOptions,
     sparePartsFormatOptions,
+    getSparePartType,
     ISpareParts,
     getUserRole,
     IChange,
     dateFormatter,
     ChangeModalType,
-    formatSparePartType,
 } from '../../../utils'
 
 interface ChangeProps {
@@ -60,22 +59,20 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
             const promises = data.map(
                 async ({
                     _id,
-                    approval_date,
                     created_at,
+                    approval_date,
                     description,
-                    device_type,
                     incident,
                     piece_to_change,
-                    price,
                     spare_part,
                     status,
-                    updatedAt,
                 }: IChange) => ({
                     _id,
                     folio: incident.folio,
-                    updatedAt: dateFormatter(new Date(updatedAt)),
+                    approval_date: approval_date ? dateFormatter(new Date(approval_date)) : 'Sin fecha',
+                    piece_to_change: await getSparePartType(piece_to_change),
                     technician: await getTechnicianName(incident.technician_id), // Asíncrono
-                    device: deviceFormatOptions(device_type),
+                    device: incident.device_id.name,
                     parts: spare_part,
                     type: sparePartsFormatOptions(piece_to_change),
                     description,
@@ -96,13 +93,40 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
     const roleColDef = (): ColDef[] => {
         if (userRole === 'ADMIN_TECHNICIANS') {
             return [
-                { field: 'folio', headerName: 'Folio de incidencia', sortable: true, flex: 1.2 },
-                { field: 'created_ad', headerName: 'Fecha de solicitud', sortable: true, flex: 1.2 },
-                { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.7 },
+                { field: 'folio', headerName: 'Folio incidencia', sortable: true, flex: 0.9 },
+                { field: 'created_at', headerName: 'Fecha de solicitud', sortable: true, flex: 1 },
+                { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.9 },
                 { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.7 },
-                { field: 'parts', headerName: 'Piezas', sortable: true, flex: 0.7 },
+                { field: 'parts', headerName: 'Pieza', sortable: true, flex: 0.9 },
                 { field: 'description', headerName: 'Descripción', sortable: true, flex: 1.3 },
-                { field: 'status', headerName: 'Estatus', sortable: true, flex: 0.7 },
+                {
+                    field: 'status',
+                    headerName: 'Estatus',
+                    sortable: true,
+                    flex: 0.7,
+                    cellRenderer: (params: ICellRendererParams) => {
+                        switch (params.value) {
+                            case 'SENT':
+                                return 'Enviada'
+                            case 'APPROVED':
+                                return 'Aprobada'
+                            case 'REJECTED':
+                                return 'Rechazada'
+                            default:
+                                return 'Desconocido'
+                        }
+                    },
+                    cellStyle: (params: CellClassParams) => {
+                        switch (params.value) {
+                            case 'APPROVED':
+                                return { color: '#A9DFD8' }
+                            case 'REJECTED':
+                                return { color: '#FF0000' }
+                            default:
+                                return { color: '#FFFF' }
+                        }
+                    },
+                },
                 {
                     field: 'actions',
                     headerName: 'Acciones',
@@ -145,12 +169,12 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
         }
         return [
             { field: 'folio', headerName: 'Folio de incidencia', sortable: true, flex: 1 },
-            { field: 'updateAt', headerName: 'Fecha del cambio', sortable: true, flex: 0.7 },
-            { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.7 },
-            { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.7 },
-            { field: 'parts', headerName: 'Piezas', sortable: true, flex: 0.7 },
-            { field: 'type', headerName: 'Tipo', sortable: true, flex: 0.7 },
-            { field: 'description', headerName: 'Descripción', sortable: true, flex: 1.2 },
+            { field: 'approval_date', headerName: 'Fecha del cambio', sortable: true, flex: 1 },
+            { field: 'technician', headerName: 'Técnico', sortable: true, flex: 1 },
+            { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.9 },
+            { field: 'parts', headerName: 'Pieza', sortable: true, flex: 1 },
+            { field: 'piece_to_change', headerName: 'Tipo', sortable: true, flex: 1 },
+            { field: 'description', headerName: 'Descripción', sortable: true, flex: 1.3 },
             {
                 field: 'actions',
                 headerName: 'Acciones',

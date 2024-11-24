@@ -136,6 +136,11 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
                 value: key,
             }))
 
+        // Agregar la opción de "Otro" para piezas no listadas
+        options.push({
+            label: 'Otro',
+            value: 'other',
+        })
         setPartsToChangeOptions(options)
     }, [incidentData, specsWhitelist])
 

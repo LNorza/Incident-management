@@ -15,6 +15,10 @@ export const pcSparePartTypeOptions: IOptions[] = [
     { label: 'Tarjeta de video', value: 'gpu' },
     { label: 'Tarjeta madre', value: 'motherboard' },
     { label: 'Fuente de poder', value: 'powerSupply' },
+    { label: 'Gabinete', value: 'case' },
+    { label: 'Monitor', value: 'monitor' },
+    { label: 'Teclado', value: 'keyboard' },
+    { label: 'Mouse', value: 'mouse' },
     { label: 'Otro', value: 'other' },
 ]
 
