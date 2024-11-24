@@ -14,13 +14,15 @@ import {
     dateFormatter,
     ChangeModalType,
 } from '../../../utils'
+import { is } from 'date-fns/locale'
 
 interface ChangeProps {
     refresh?: boolean
+    isHistory?: boolean
     typeChangeModal?: (id: string, type: ChangeModalType, action?: string) => void
 }
 
-export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal }) => {
+export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeChangeModal }) => {
     const [rowData, setRowData] = useState<IChange[]>([])
     const parentRef = useRef<HTMLDivElement>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
@@ -90,7 +92,7 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
     }, [])
 
     const roleColDef = (): ColDef[] => {
-        if (userRole === 'ADMIN_TECHNICIANS') {
+        if (userRole === 'ADMIN_TECHNICIANS' && !isHistory) {
             return [
                 { field: 'folio', headerName: 'Folio incidencia', sortable: true, flex: 0.9 },
                 { field: 'created_at', headerName: 'Fecha de solicitud', sortable: true, flex: 1 },

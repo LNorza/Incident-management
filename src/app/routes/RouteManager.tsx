@@ -8,6 +8,7 @@ import {
     ProfilePage,
     ChangePage,
     SparePartsPage,
+    ChangeHistoryPage,
 } from '../pages'
 import { Navbar, Sidebar } from '../../ui'
 import { Toaster } from 'sonner'
@@ -37,6 +38,7 @@ export const RouteManager = () => {
                     <Route path="incident" element={<IncidentPage />} />
                     <Route path="change" element={<ChangePage />} />
                     <Route path="spare-parts" element={<SparePartsPage />} />
+                    <Route path="changes-history" element={<ChangeHistoryPage />} />
 
                     <Route path="profile" element={<ProfilePage />} />
                     {/* DefaultRoute */}
