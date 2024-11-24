@@ -29,7 +29,6 @@ export const IncidentTable: React.FC<IncidentTableProps> = ({
     deleteIncident,
 }) => {
     const [rowData, setRowData] = useState<IIncident[]>([])
-
     const contentRef = useRef<HTMLDivElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
     const [userData, setUserData] = useState<IUserData | null>(null)

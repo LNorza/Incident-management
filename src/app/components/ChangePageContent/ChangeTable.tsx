@@ -25,6 +25,10 @@ interface ChangeProps {
 }
 
 export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeChangeModal }) => {
+    const localeText = {
+        noRowsToShow: 'No hay datos disponibles',
+    }
+
     const [rowData, setRowData] = useState<IChange[]>([])
     const parentRef = useRef<HTMLDivElement>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
@@ -143,44 +147,6 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
                         }
                     },
                 },
-                // {
-                //     field: 'actions',
-                //     headerName: 'Acciones',
-                //     cellRenderer: Actions,
-                //     cellRendererParams: (params: ICellRendererParams) => ({
-                //         row: params.data,
-                //         table: true,
-                //         parentRef: parentRef,
-                //         actions: [
-                //             {
-                //                 text: 'Información',
-                //                 icon: InfoIcon,
-                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                //                     e.stopPropagation()
-                //                     handleType(row._id, 'InfoChange')
-                //                 },
-                //             },
-                //             {
-                //                 text: 'Aprovar',
-                //                 icon: CircleCheck,
-                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                //                     e.stopPropagation()
-                //                     handleType(row._id, 'ApproveOrRejectedChange', 'Aprove')
-                //                 },
-                //             },
-                //             {
-                //                 text: 'Rechazar',
-                //                 icon: Ban,
-                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                //                     e.stopPropagation()
-                //                     handleType(row._id, 'ApproveOrRejectedChange', 'Rejected')
-                //                 },
-                //             },
-                //         ],
-                //     }),
-                //     autoHeight: true,
-                //     flex: 0.7,
-                // },
                 {
                     field: 'actions',
                     headerName: 'Acciones',
@@ -245,7 +211,13 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
 
     return (
         <div className="ag-theme-quartz-dark" style={{ height: 440, width: '100%' }} ref={parentRef}>
-            <AgGridReact rowData={rowData} columnDefs={baseColDefs} theme={myTheme} rowHeight={50} />
+            <AgGridReact
+                rowData={rowData}
+                columnDefs={baseColDefs}
+                theme={myTheme}
+                rowHeight={50}
+                localeText={localeText}
+            />
         </div>
     )
 }
