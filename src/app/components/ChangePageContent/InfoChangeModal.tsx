@@ -1,13 +1,13 @@
 import { InfoIcon } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { CustomInput, CustomTextArea } from '../../../ui'
-import { API_BASE_URL, IChange } from '../../../utils'
+import { API_BASE_URL, formatSparePartType, IChange, sparePartsFormatOptions } from '../../../utils'
 import { useForm } from '../../../hooks'
 import { useCallback, useEffect, useState } from 'react'
 
 interface Props {
     onClose: () => void
-    changeId: string
+    changeId: string | undefined
 }
 
 export const InfoChangeModal = ({ onClose, changeId }: Props) => {
@@ -90,19 +90,30 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
         }
     }
 
-    const fetchIncident = useCallback(async () => {
+    const fetchChange = useCallback(async () => {
         try {
             const url = `${API_BASE_URL}/change-requests/${changeId}`
             const response = await fetch(url, {
                 credentials: 'include',
             })
             const data = await response.json()
+            console.log('data', data)
 
-            updateFields(data)
+            const formattedData = {
+                ...data,
+                piece_to_change: sparePartsFormatOptions(data.piece_to_change),
+                created_at: new Date(data.created_at).toLocaleDateString(),
+                updatedAt: new Date(data.updatedAt).toLocaleDateString(),
+            }
+            updateFields(formattedData)
         } catch (error) {
             console.error('Error fetching incident:', error)
         }
     }, [changeId])
+
+    useEffect(() => {
+        fetchChange()
+    }, [])
 
     useEffect(() => {
         const fetchTechnicianName = async () => {
@@ -110,7 +121,7 @@ export const InfoChangeModal = ({ onClose, changeId }: Props) => {
             setTechnicianName(techName)
         }
         fetchTechnicianName()
-    }, [changeId])
+    }, [formState.incident.technician_id])
 
     return (
         <>

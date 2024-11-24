@@ -9,9 +9,11 @@ export const ChangePage = () => {
     const [typeModal, setTypeModal] = useState<ChangeModalType>()
     const [refreshTable, setRefreshTable] = useState(false)
     const [actionModal, setActionModal] = useState<string | undefined>('')
+    const [changeId, setChangeId] = useState<string | undefined>()
 
     const handleTypeModal = (id: string, type: ChangeModalType = 'InfoChange', action?: string) => {
         setActionModal(action)
+        setChangeId(id)
         setTypeModal(type)
         setShowModal(true)
     }
@@ -38,7 +40,13 @@ export const ChangePage = () => {
                 </section>
             </div>
 
-            <ChangeModal isOpen={showModal} onClose={onCloseModal} type={typeModal} actionModal={actionModal} />
+            <ChangeModal
+                isOpen={showModal}
+                changeId={changeId}
+                onClose={onCloseModal}
+                type={typeModal}
+                actionModal={actionModal}
+            />
         </>
     )
 }

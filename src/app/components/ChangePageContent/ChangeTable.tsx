@@ -54,7 +54,6 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
                 credentials: 'include',
             })
             const data = await response.json()
-            console.log('data', data)
 
             // Crear un array de promesas
             const promises = data.map(

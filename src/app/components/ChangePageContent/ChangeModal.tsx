@@ -5,7 +5,7 @@ import { InfoChangeModal } from './InfoChangeModal'
 
 interface Props {
     isOpen: boolean
-    changeId: string
+    changeId: string | undefined
     onClose: () => void
     actionModal?: string
     type?: ChangeModalType
