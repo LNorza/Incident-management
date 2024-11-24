@@ -5,12 +5,13 @@ import { InfoChangeModal } from './InfoChangeModal'
 
 interface Props {
     isOpen: boolean
+    changeId: string
     onClose: () => void
     actionModal?: string
     type?: ChangeModalType
 }
 
-export const ChangeModal = ({ isOpen, type = 'InfoChange', onClose, actionModal }: Props) => {
+export const ChangeModal = ({ isOpen, changeId, type = 'InfoChange', onClose, actionModal }: Props) => {
     return (
         <>
             {isOpen && (
@@ -18,7 +19,7 @@ export const ChangeModal = ({ isOpen, type = 'InfoChange', onClose, actionModal 
                     <div onClick={onClose} className={style.overlay}></div>
                     {type === 'InfoChange' ? (
                         <section className={style.largeModalInfoContainer}>
-                            <InfoChangeModal onClose={onClose} />
+                            <InfoChangeModal onClose={onClose} changeId={changeId} />
                         </section>
                     ) : (
                         <section className={style.modalInfoContainer}>

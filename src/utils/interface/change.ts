@@ -1,3 +1,6 @@
+import { string } from "prop-types"
+import { Incident } from "./incident"
+
 export interface ICreateChange {
   piece_to_change?: string
   spare_part?: string
@@ -22,16 +25,17 @@ export interface IUpdateChange {
 }
 
 export interface IChange {
-  _id: string
-  incident_folio?: string
-  updatedAt?: string
-  created_at?: string
-  incident: []
-  technician?: string
+  approval_date: string
+  created_at: string
+  description: string
   device_type: string
+  incident: Incident
+  falsename: string
+  piece_to_change: string
+  price: string
   spare_part: string
-  status?: string
-  piece_type: string
-  description?: string
+  status: string
+  updatedAt: string
+  _id: string
 }
 

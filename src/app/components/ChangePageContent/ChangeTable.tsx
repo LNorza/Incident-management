@@ -13,6 +13,7 @@ import {
     IChange,
     dateFormatter,
     ChangeModalType,
+    formatSparePartType,
 } from '../../../utils'
 
 interface ChangeProps {
@@ -29,6 +30,19 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
         typeChangeModal && typeChangeModal(id, type, action)
     }
 
+    const getTechnicianName = async (technicianId: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${technicianId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+
+            return data.name
+        } catch (error) {
+            console.error('Error fetching technician:', error)
+        }
+    }
+
     useEffect(() => {
         getUserRole().then((role) => setUserRole(role))
     }, [])
@@ -42,29 +56,36 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
             const data = await response.json()
             console.log('data', data)
 
-            const formattedData = data.map(
-                ({
+            // Crear un array de promesas
+            const promises = data.map(
+                async ({
                     _id,
+                    approval_date,
                     created_at,
                     description,
-                    updatedAt,
                     device_type,
-                    incident_folio,
-                    piece_type,
+                    incident,
+                    piece_to_change,
+                    price,
                     spare_part,
                     status,
-                    technician,
-                }: any) => ({
+                    updatedAt,
+                }: IChange) => ({
                     _id,
-                    folio: incident_folio,
-                    updatedAt: updatedAt ? dateFormatter(new Date(updatedAt)) : 'N/A',
-                    technician: technician || 'N/A',
+                    folio: incident.folio,
+                    updatedAt: dateFormatter(new Date(updatedAt)),
+                    technician: await getTechnicianName(incident.technician_id), // Asíncrono
                     device: deviceFormatOptions(device_type),
-                    parts: sparePartsFormatOptions('ram'),
-                    type: device_type,
+                    parts: spare_part,
+                    type: sparePartsFormatOptions(piece_to_change),
                     description,
+                    status,
+                    created_at: dateFormatter(new Date(created_at)),
                 }),
             )
+
+            // Resolver todas las promesas
+            const formattedData = await Promise.all(promises)
 
             setRowData(formattedData)
         } catch (error) {
@@ -76,7 +97,7 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, typeChangeModal })
         if (userRole === 'ADMIN_TECHNICIANS') {
             return [
                 { field: 'folio', headerName: 'Folio de incidencia', sortable: true, flex: 1.2 },
-                { field: 'updatedAt', headerName: 'Fecha de solicitud', sortable: true, flex: 1.2 },
+                { field: 'created_ad', headerName: 'Fecha de solicitud', sortable: true, flex: 1.2 },
                 { field: 'technician', headerName: 'Técnico', sortable: true, flex: 0.7 },
                 { field: 'device', headerName: 'Equipo', sortable: true, flex: 0.7 },
                 { field: 'parts', headerName: 'Piezas', sortable: true, flex: 0.7 },

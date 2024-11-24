@@ -1,27 +1,117 @@
 import { InfoIcon } from 'lucide-react'
 import style from '../../style/modal.module.css'
 import { CustomInput, CustomTextArea } from '../../../ui'
-import { IChange } from '../../../utils'
+import { API_BASE_URL, IChange } from '../../../utils'
 import { useForm } from '../../../hooks'
+import { useCallback, useEffect, useState } from 'react'
 
 interface Props {
     onClose: () => void
+    changeId: string
 }
 
-export const InfoChangeModal = ({ onClose }: Props) => {
+export const InfoChangeModal = ({ onClose, changeId }: Props) => {
+    const [technicianName, setTechnicianName] = useState<string | undefined>()
+
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IChange>({
-        _id: '',
-        incident_folio: '',
-        updatedAt: '',
+        approval_date: '',
         created_at: '',
-        incident: [],
-        technician: '',
-        device_type: '',
-        spare_part: '',
-        status: '',
-        piece_type: '',
         description: '',
+        device_type: '',
+        incident: {
+            date: '',
+            location_id: '',
+            description: '',
+            device_id: {
+                _id: '',
+                name: '',
+                type: '',
+                brand: '',
+                specs: {},
+                location_id: {
+                    _id: '',
+                    name: '',
+                    building_id: {
+                        _id: '',
+                        name: '',
+                        description: '',
+                        isShared: false,
+                        departments: [
+                            {
+                                department_id: '',
+                                build_manager: {
+                                    _id: '',
+                                    name: '',
+                                },
+                                _id: '',
+                            },
+                        ],
+                        totalDevices: 0,
+                    },
+                },
+                status: '',
+                purchaseDate: '',
+                warrantyYears: 0,
+                deviceModel: '',
+            },
+            folio: '',
+            incident_type: '',
+            period: 0,
+            status: '',
+            updated_at: '',
+            work: '',
+            _id: '',
+            technician_id: '',
+            priority: '',
+            arrival_time: '',
+            time_duration: '',
+            technician_specialty: '',
+            diagnostic: '',
+        },
+        falsename: '',
+        piece_to_change: '',
+        price: '',
+        spare_part: '',
+
+        status: '',
+        updatedAt: '',
+        _id: '',
     })
+
+    const getTechnicianName = async (technicianId: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${technicianId}`, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+            return data.name
+        } catch (error) {
+            console.error('Error fetching technician:', error)
+        }
+    }
+
+    const fetchIncident = useCallback(async () => {
+        try {
+            const url = `${API_BASE_URL}/change-requests/${changeId}`
+            const response = await fetch(url, {
+                credentials: 'include',
+            })
+            const data = await response.json()
+
+            updateFields(data)
+        } catch (error) {
+            console.error('Error fetching incident:', error)
+        }
+    }, [changeId])
+
+    useEffect(() => {
+        const fetchTechnicianName = async () => {
+            const techName = await getTechnicianName(formState.incident.technician_id)
+            setTechnicianName(techName)
+        }
+        fetchTechnicianName()
+    }, [changeId])
+
     return (
         <>
             <div className={style.titleModal}>
@@ -37,7 +127,7 @@ export const InfoChangeModal = ({ onClose }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="incident_folio"
-                                    value={formState.incident_folio}
+                                    value={formState.incident.folio}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -63,7 +153,7 @@ export const InfoChangeModal = ({ onClose }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="technician"
-                                    value={formState.technician}
+                                    value={technicianName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -101,7 +191,7 @@ export const InfoChangeModal = ({ onClose }: Props) => {
                                 <CustomInput
                                     isFormInput
                                     name="piece_type"
-                                    value={formState.piece_type}
+                                    value={formState.piece_to_change}
                                     type="text"
                                     onChange={onInputChange}
                                 />

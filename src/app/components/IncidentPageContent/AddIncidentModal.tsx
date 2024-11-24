@@ -290,7 +290,6 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
     useEffect(() => {
         fetchOffices()
         if (building != undefined && location != undefined) {
-            console.log('entre')
             fetchDevices()
         }
     }, [buildingId, fetchOffices, location])
