@@ -44,8 +44,8 @@ export const sparePartsFormatOptions = (sparePartsTypes: string) => {
 
 export const getSparePartType = (type: string): string => {
     switch (type) {
-        case 'RAM':
-            return 'ram'
+        case 'ram':
+            return 'RAM'
         case 'storage':
             return 'Disco duro'
         case 'cpu':

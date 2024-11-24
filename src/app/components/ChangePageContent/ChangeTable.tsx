@@ -1,6 +1,6 @@
 import { AgGridReact } from 'ag-grid-react'
 import { Actions } from '../../../ui'
-import { InfoIcon, CircleCheck, Ban } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import { ColDef, ICellRendererParams, CellClassParams } from 'ag-grid-community'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
@@ -13,7 +13,10 @@ import {
     IChange,
     dateFormatter,
     ChangeModalType,
+    IUserData,
+    getUserData,
 } from '../../../utils'
+import { getActionChangeRequest } from '../../utils/getActionsChangeRequest'
 
 interface ChangeProps {
     refresh?: boolean
@@ -25,6 +28,7 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
     const [rowData, setRowData] = useState<IChange[]>([])
     const parentRef = useRef<HTMLDivElement>(null)
     const [userRole, setUserRole] = useState<string | null>(null)
+    const [userData, setUserData] = useState<IUserData | null>(null)
 
     const handleType = (id: string, type: ChangeModalType, action?: string) => {
         typeChangeModal && typeChangeModal(id, type, action)
@@ -47,9 +51,23 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
         getUserRole().then((role) => setUserRole(role))
     }, [])
 
+    useEffect(() => {
+        getUserData().then((data) => setUserData(data))
+    }, [])
+
     const fetchChange = useCallback(async () => {
         try {
-            const url = `${API_BASE_URL}/change-requests-search`
+            let url = ''
+            if (isHistory) {
+                url = `${API_BASE_URL}/change-requests-search?status=APPROVED`
+            } else {
+                if (userRole === 'ADMIN_TECHNICIANS') {
+                    url = `${API_BASE_URL}/change-requests-search`
+                } else {
+                    url = `${API_BASE_URL}/change-requests-search?technician_id=${userData?._id}`
+                }
+            }
+
             const response = await fetch(url, {
                 credentials: 'include',
             })
@@ -71,27 +89,25 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
                     folio: incident.folio,
                     approval_date: approval_date ? dateFormatter(new Date(approval_date)) : 'Sin fecha',
                     piece_to_change: await getSparePartType(piece_to_change),
-                    technician: await getTechnicianName(incident.technician_id), // Asíncrono
+                    technician: await getTechnicianName(incident.technician_id),
                     device: incident.device_id.name,
                     parts: spare_part,
-                    type: sparePartsFormatOptions(piece_to_change),
+                    type: await sparePartsFormatOptions(piece_to_change),
                     description,
                     status,
                     created_at: dateFormatter(new Date(created_at)),
                 }),
             )
-
-            // Resolver todas las promesas
             const formattedData = await Promise.all(promises)
 
             setRowData(formattedData)
         } catch (error) {
             console.log('error', error)
         }
-    }, [])
+    }, [userRole, userData, isHistory])
 
     const roleColDef = (): ColDef[] => {
-        if (userRole === 'ADMIN_TECHNICIANS' && !isHistory) {
+        if ((userRole === 'ADMIN_TECHNICIANS' || userRole === 'TECHNICIAN') && !isHistory) {
             return [
                 { field: 'folio', headerName: 'Folio incidencia', sortable: true, flex: 0.9 },
                 { field: 'created_at', headerName: 'Fecha de solicitud', sortable: true, flex: 1 },
@@ -127,41 +143,62 @@ export const ChangeTable: React.FC<ChangeProps> = ({ refresh, isHistory, typeCha
                         }
                     },
                 },
+                // {
+                //     field: 'actions',
+                //     headerName: 'Acciones',
+                //     cellRenderer: Actions,
+                //     cellRendererParams: (params: ICellRendererParams) => ({
+                //         row: params.data,
+                //         table: true,
+                //         parentRef: parentRef,
+                //         actions: [
+                //             {
+                //                 text: 'Información',
+                //                 icon: InfoIcon,
+                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
+                //                     e.stopPropagation()
+                //                     handleType(row._id, 'InfoChange')
+                //                 },
+                //             },
+                //             {
+                //                 text: 'Aprovar',
+                //                 icon: CircleCheck,
+                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
+                //                     e.stopPropagation()
+                //                     handleType(row._id, 'ApproveOrRejectedChange', 'Aprove')
+                //                 },
+                //             },
+                //             {
+                //                 text: 'Rechazar',
+                //                 icon: Ban,
+                //                 onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
+                //                     e.stopPropagation()
+                //                     handleType(row._id, 'ApproveOrRejectedChange', 'Rejected')
+                //                 },
+                //             },
+                //         ],
+                //     }),
+                //     autoHeight: true,
+                //     flex: 0.7,
+                // },
                 {
                     field: 'actions',
                     headerName: 'Acciones',
                     cellRenderer: Actions,
-                    cellRendererParams: (params: ICellRendererParams) => ({
-                        row: params.data,
-                        table: true,
-                        parentRef: parentRef,
-                        actions: [
-                            {
-                                text: 'Información',
-                                icon: InfoIcon,
-                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                                    e.stopPropagation()
-                                    handleType(row._id, 'InfoChange')
-                                },
-                            },
-                            {
-                                text: 'Aprovar',
-                                icon: CircleCheck,
-                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                                    e.stopPropagation()
-                                    handleType(row._id, 'ApproveOrRejectedChange', 'Aprove')
-                                },
-                            },
-                            {
-                                text: 'Rechazar',
-                                icon: Ban,
-                                onClick: (row: IChange, e: React.MouseEvent<HTMLDivElement>) => {
-                                    e.stopPropagation()
-                                    handleType(row._id, 'ApproveOrRejectedChange', 'Rejected')
-                                },
-                            },
-                        ],
-                    }),
+                    cellRendererParams: (params: ICellRendererParams) => {
+                        const actions = getActionChangeRequest({
+                            status: params.data.status,
+                            role: userRole ?? undefined,
+                            openModal: handleType,
+                        })
+
+                        return {
+                            row: params.data,
+                            table: true,
+                            parentRef: parentRef,
+                            actions: actions,
+                        }
+                    },
                     autoHeight: true,
                     flex: 0.7,
                 },

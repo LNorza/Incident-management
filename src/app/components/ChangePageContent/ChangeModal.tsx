@@ -1,6 +1,6 @@
 import { ChangeModalType } from '../../../utils'
 import style from '../../style/modal.module.css'
-import { AproveOrRejectedModal } from './AproveOrRejectedModal'
+import { ApproveOrRejectedModal } from './ApproveOrRejectedModal'
 import { InfoChangeModal } from './InfoChangeModal'
 
 interface Props {
@@ -23,7 +23,7 @@ export const ChangeModal = ({ isOpen, changeId, type = 'InfoChange', onClose, ac
                         </section>
                     ) : (
                         <section className={style.modalInfoContainer}>
-                            <AproveOrRejectedModal onClose={onClose} action={actionModal} />
+                            <ApproveOrRejectedModal onClose={onClose} action={actionModal} changeId={changeId} />
                         </section>
                     )}
                 </div>
