@@ -14,7 +14,6 @@ import {
     dateFormatter,
     ChangeModalType,
 } from '../../../utils'
-import { is } from 'date-fns/locale'
 
 interface ChangeProps {
     refresh?: boolean

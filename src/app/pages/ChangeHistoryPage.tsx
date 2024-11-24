@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { ChangeModal, ChangeTable } from '../components'
 import { ChangeModalType } from '../../utils'
 import style from '../style/deviceContainer.module.css'
-import { set } from 'date-fns'
 
 export const ChangeHistoryPage = () => {
     const [showModal, setShowModal] = useState(false)
@@ -15,11 +14,6 @@ export const ChangeHistoryPage = () => {
         setActionModal(action)
         setChangeId(id)
         setTypeModal(type)
-        setShowModal(true)
-    }
-
-    const onOpenModal = () => {
-        setTypeModal('InfoChange')
         setShowModal(true)
     }
 
