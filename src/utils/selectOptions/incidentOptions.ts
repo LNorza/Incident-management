@@ -151,10 +151,37 @@ export const getTimeDurationOptions = () => {
     return [
         { label: '15 min', value: '0.25' },
         { label: '30 min', value: '0.5' },
+        { label: '45 min', value: '0.75' },
         { label: '1 hr', value: '1' },
+        { label: '1 hr 30 min', value: '1.5' },
         { label: '2 hr', value: '2' },
         { label: '3 hr', value: '3' },
         { label: '4 hr', value: '4' },
         { label: '5 hr o más', value: '5' },
     ]
+}
+
+export const translateTimeDuration = (duration: string) => {
+    switch (duration) {
+        case '0.25':
+            return '15 min'
+        case '0.5':
+            return '30 min'
+        case '0.75':
+            return '45 min'
+        case '1':
+            return '1 hr'
+        case '1.5':
+            return '1 hr 30 min'
+        case '2':
+            return '2 hr'
+        case '3':
+            return '3 hr'
+        case '4':
+            return '4 hr'
+        case '5':
+            return '5 hr o más'
+        default:
+            return ''
+    }
 }

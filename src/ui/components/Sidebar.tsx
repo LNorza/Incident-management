@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { House, Users, Building2, Laptop, CircleX, Cpu, History, ArrowRightLeft } from 'lucide-react'
+import { House, Users, Building2, Laptop, CircleX, Cpu, History, ArrowRightLeft, BookText } from 'lucide-react'
 import style from '../style/sidebar.module.css'
 import { getUserRole } from '../../utils/api/userData'
 import { ISidebar } from '../../utils/interface/sidebar'
@@ -16,6 +16,7 @@ const iconMap = {
     Changes: ArrowRightLeft,
     History: History,
     Incidents: CircleX,
+    Book: BookText,
 }
 
 export const Sidebar = () => {

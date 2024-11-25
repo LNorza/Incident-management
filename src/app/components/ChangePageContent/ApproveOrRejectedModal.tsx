@@ -49,7 +49,7 @@ export const ApproveOrRejectedModal = ({ onClose, action, changeId }: Props) => 
     return (
         <>
             <div className={style.titleModal}>
-                {action == 'Aprove' ? <CircleCheck /> : <Ban />}
+                {action == 'Aprove' ? <CircleCheck size={40} /> : <Ban size={40} />}
                 <h2>{action == 'Aprove' ? 'Aprobar' : 'Rechazar'}</h2>
             </div>
 

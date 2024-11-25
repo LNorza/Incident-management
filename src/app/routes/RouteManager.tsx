@@ -9,6 +9,7 @@ import {
     ChangePage,
     SparePartsPage,
     ChangeHistoryPage,
+    ServicesPage,
 } from '../pages'
 import { Navbar, Sidebar } from '../../ui'
 import { Toaster } from 'sonner'
@@ -39,7 +40,7 @@ export const RouteManager = () => {
                     <Route path="change" element={<ChangePage />} />
                     <Route path="spare-parts" element={<SparePartsPage />} />
                     <Route path="changes-history" element={<ChangeHistoryPage />} />
-
+                    <Route path="services" element={<ServicesPage />} />
                     <Route path="profile" element={<ProfilePage />} />
                     {/* DefaultRoute */}
                     <Route path="/*" element={<Navigate to={'/home'} />} />
