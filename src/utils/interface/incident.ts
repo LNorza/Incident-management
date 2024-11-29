@@ -40,12 +40,16 @@ export interface Incident {
     status: string
     updated_at: string
     created_at?: string
+    end_date?: string
     technician_id: string
     priority: string
     arrival_time?: string
     time_duration?: string
     comments?: string
     work: string
+    isProblem: boolean
+    root_cause: string
+    problem_solution: string
     technician_specialty: string
     diagnostic: string
     _id: string
@@ -60,6 +64,8 @@ export interface FormIncident {
     created_at: string
     incident_type: string
     work: string
+    isProblem: boolean
+    root_cause: string
     description: string
     comments: string
     diagnostic: string
@@ -79,6 +85,8 @@ export interface FinishIncident {
     initial_time: string
     end_time: string
     qualification: number
+    isProblem: boolean
+    problem_solution: string
     work: string
 }
 
@@ -104,6 +112,9 @@ export interface InfoIncident {
     initial_time: string
     end_time: string
     qualification: number
+    isProblem: boolean
+    problem_solution: string
+    root_cause: string
 }
 
 export interface ICreateIncident {
@@ -133,6 +144,9 @@ export interface UpdateIncidentDto {
     technician_specialty?: string
     diagnostic?: string
     comments?: string
+    isProblem?: boolean
+    root_cause?: string
+    problem_solution?: string
     technician_id?: string
 }
 

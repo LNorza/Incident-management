@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { CustomInput, CustomTextArea } from '../../../ui'
+import { CustomInput, CustomTextArea, CustomCheckBox } from '../../../ui'
 import {
     API_BASE_URL,
     getArriveHourOptions,
@@ -50,6 +50,9 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         status: '',
         specialty: '',
         qualification: 0,
+        isProblem: false,
+        problem_solution: '',
+        root_cause: '',
     })
 
     const fetchRole = useCallback(async () => {
@@ -104,6 +107,9 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                 status: translateIncident(data.status, 'status'),
                 specialty: specialtyOptions.find((option) => option.value === data.technician_specialty)?.label,
                 qualification: data.qualification,
+                isProblem: data.isProblem,
+                problem_solution: data.problem_solution,
+                root_cause: data.root_cause,
             })
         } catch (error) {
             console.error('Error fetching device:', error)
@@ -315,7 +321,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                         </section>
                     ) : (
                         <section className={style.disabled}>
-                            Descripción
+                            {formState.isProblem ? 'Error conocido' : 'Descripción'}
                             <div className={style.formDescription}>
                                 <CustomTextArea
                                     isFormInput
@@ -384,6 +390,14 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 </div>
                             </section>
                         </div>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Asignar como problema
+                                <div className={style.formInput}>
+                                    <CustomCheckBox checked={formState.isProblem} />
+                                </div>
+                            </section>
+                        </div>
                     </>
                 )}
 
@@ -433,18 +447,34 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                             )}
                         </div>
 
-                        <section className={style.disabled}>
-                            Diagnóstico
-                            <div className={style.formDescription}>
-                                <CustomTextArea
-                                    isFormInput
-                                    name="diagnostic"
-                                    value={formState.diagnostic || ''}
-                                    type="description"
-                                    onChange={onTextAreaChange}
-                                />
-                            </div>
-                        </section>
+                        {formState.isProblem ? (
+                            <section className={style.disabled}>
+                                Causa raíz
+                                <div className={style.formDescription}>
+                                    <CustomTextArea
+                                        isFormInput
+                                        name="root_cause"
+                                        value={formState.root_cause}
+                                        placeholder="Ingresa la causa raíz"
+                                        type="description"
+                                        onChange={onTextAreaChange}
+                                    />
+                                </div>
+                            </section>
+                        ) : (
+                            <section className={style.disabled}>
+                                Diagnóstico
+                                <div className={style.formDescription}>
+                                    <CustomTextArea
+                                        isFormInput
+                                        name="diagnostic"
+                                        value={formState.diagnostic || ''}
+                                        type="description"
+                                        onChange={onTextAreaChange}
+                                    />
+                                </div>
+                            </section>
+                        )}
                     </>
                 )}
 
@@ -476,6 +506,21 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 </div>
                             </section>
                         </div>
+                        {formState.isProblem && (
+                            <section className={style.disabled}>
+                                Solución del problema
+                                <div className={style.formDescription}>
+                                    <CustomTextArea
+                                        isFormInput
+                                        name="problem_solution"
+                                        value={formState.problem_solution}
+                                        placeholder="Ingresa la solución el problema"
+                                        type="description"
+                                        onChange={onTextAreaChange}
+                                    />
+                                </div>
+                            </section>
+                        )}
 
                         {status === 'RELEASED' && (
                             <>

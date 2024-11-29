@@ -16,7 +16,7 @@ import {
     FinishIncident,
 } from '../../../utils'
 import { toast } from 'sonner'
-import { Calification } from '../../../ui/components/calification'
+import { Calification } from '../../../ui/components/CalificationStars'
 
 interface Props {
     onClose: () => void
@@ -38,6 +38,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         work: '',
         description: '',
         qualification: 0,
+        problem_solution: '',
     })
 
     const [incidentData, setIncidentData] = useState<Incident | null>(null)
@@ -56,6 +57,8 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
         initial_time: '',
         end_time: '',
         work: '',
+        isProblem: false,
+        problem_solution: '',
         qualification: 0,
     })
 
@@ -101,6 +104,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 diagnostic: data.diagnostic,
                 initial_time: formatTime(data.start_date),
                 end_time: data.end_date ? formatTime(data.end_date) : '',
+                isProblem: data.isProblem,
             })
         } catch (error) {
             console.error('Error fetching device:', error)
@@ -165,6 +169,7 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 setUpdateIncident({
                     status: 'FINISHED',
                     end_date: new Date(),
+                    problem_solution: formState.problem_solution,
                 })
                 break
             default:
@@ -175,7 +180,15 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                 })
                 break
         }
-    }, [incidentType, workType, formState.description, formState.comments, formState.qualification, action])
+    }, [
+        incidentType,
+        workType,
+        formState.description,
+        formState.comments,
+        formState.qualification,
+        formState.problem_solution,
+        action,
+    ])
 
     return (
         <>
@@ -198,6 +211,22 @@ export const FinishIncidentModal = ({ incidentId, onClose, action }: Props) => {
                                 Una vez finalizada no podrás hacer ningún cambio en el equipo asignado y serás
                                 calificado por el usuario
                             </span>
+
+                            {formState.isProblem && (
+                                <section>
+                                    Solución del problema
+                                    <div className={style.formDescription}>
+                                        <CustomTextArea
+                                            isFormInput
+                                            name="problem_solution"
+                                            value={formState.problem_solution}
+                                            placeholder="Ingresa la solución el problema"
+                                            type="description"
+                                            onChange={onTextAreaChange}
+                                        />
+                                    </div>
+                                </section>
+                            )}
                         </div>
                     </>
                 ) : (

@@ -74,7 +74,7 @@ export const ServicesPage = () => {
         <>
             <div className={style.container}>
                 <section className={style.header}>
-                    <h2>Catalogo de servicios</h2>
+                    <h2>Catálogo de servicios</h2>
                     <article>
                         {/* <span>Equipo</span> */}
                         <div className={style.actionSection}>

@@ -13,7 +13,7 @@ import {
     translateIncident,
     UpdateIncidentDto,
 } from '../../../utils'
-import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
+import { CustomInput, CustomSelect, CustomTextArea, CustomCheckBox } from '../../../ui'
 import style from '../../style/modal.module.css'
 import { Ban, UserRoundPlus } from 'lucide-react'
 import { toast } from 'sonner'
@@ -31,6 +31,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
     const [arriveHour, setArriveHour] = useState<string | undefined>(undefined)
     const [timeDuration, setTimeDuration] = useState<string | undefined>(undefined)
     const [userRole, setUserRole] = useState<string | null>(null)
+    const [isProblem, setIsProblem] = useState<boolean>(false)
 
     const [specialtyOptions] = useState<IOptions[]>(getSpecialtyOptions)
     const [priorityOptions] = useState<IOptions[]>(getIncidentPriorityOptions)
@@ -49,6 +50,8 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
         work: '',
         description: '',
         comments: '',
+        isProblem: false,
+        root_cause: '',
         diagnostic: '',
     })
 
@@ -166,6 +169,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
             setPriority(incidentData.priority)
             setTechnicians(incidentData.technician_id)
             setArriveHour(incidentData.arrival_time)
+            setIsProblem(incidentData.isProblem)
         }
     }, [incidentData, userRole])
 
@@ -181,6 +185,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
                     status: 'IN_PROCESS',
                     arrival_time: arriveHour,
                     time_duration: timeDuration,
+                    root_cause: formState.root_cause,
                     diagnostic: formState.diagnostic,
                     start_date: new Date(),
                 })
@@ -191,6 +196,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
                     priority: priority,
                     technician_id: technicians,
                     arrival_time: arriveHour,
+                    isProblem: isProblem,
                 })
             }
         }
@@ -204,6 +210,8 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
         userRole,
         specialty,
         formState.diagnostic,
+        isProblem,
+        formState.root_cause,
     ])
 
     return (
@@ -401,38 +409,67 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
                         </div>
                     )}
 
-                    {userRole == 'TECHNICIAN' && (
+                    {action != 'REJECTED' && (
                         <div className={style.rowModal}>
-                            <section>
-                                Tiempo de duración
+                            <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
+                                Asignar como problema
                                 <div className={style.formInput}>
-                                    <CustomSelect
-                                        value={timeDuration}
-                                        placeholder="Selecciona el equipo"
-                                        options={timeDurationOptions}
-                                        onSelect={(selected: { label: string; value: string }) => {
-                                            setTimeDuration(selected.value)
-                                        }}
-                                    />
+                                    <CustomCheckBox checked={isProblem} setChecked={setIsProblem} />
                                 </div>
                             </section>
                         </div>
                     )}
 
                     {userRole == 'TECHNICIAN' && (
-                        <section>
-                            Diagnóstico
-                            <div className={style.formDescription}>
-                                <CustomTextArea
-                                    isFormInput
-                                    name="diagnostic"
-                                    value={formState.diagnostic}
-                                    placeholder="Ingresa el diagnóstico"
-                                    type="description"
-                                    onChange={onTextAreaChange}
-                                />
+                        <>
+                            <div className={style.rowModal}>
+                                <section>
+                                    Tiempo de duración
+                                    <div className={style.formInput}>
+                                        <CustomSelect
+                                            value={timeDuration}
+                                            placeholder="Selecciona el equipo"
+                                            options={timeDurationOptions}
+                                            onSelect={(selected: { label: string; value: string }) => {
+                                                setTimeDuration(selected.value)
+                                            }}
+                                        />
+                                    </div>
+                                </section>
                             </div>
-                        </section>
+
+                            {isProblem && (
+                                <section>
+                                    Causa raíz
+                                    <div className={style.formDescription}>
+                                        <CustomTextArea
+                                            isFormInput
+                                            name="root_cause"
+                                            value={formState.root_cause}
+                                            placeholder="Ingresa la causa raíz"
+                                            type="description"
+                                            onChange={onTextAreaChange}
+                                        />
+                                    </div>
+                                </section>
+                            )}
+
+                            {!isProblem && (
+                                <section>
+                                    Diagnóstico
+                                    <div className={style.formDescription}>
+                                        <CustomTextArea
+                                            isFormInput
+                                            name="diagnostic"
+                                            value={formState.diagnostic}
+                                            placeholder="Ingresa el diagnóstico"
+                                            type="description"
+                                            onChange={onTextAreaChange}
+                                        />
+                                    </div>
+                                </section>
+                            )}
+                        </>
                     )}
 
                     {action == 'REJECTED' && (
