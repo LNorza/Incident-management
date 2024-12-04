@@ -310,7 +310,7 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
 
                     <div className={style.rowModal}>
                         <section>
-                            ¿La pieza de repuesto se encuentra en las opciones?
+                            ¿La pieza de repuesto no se encuentra en las opciones?
                             <CustomCheckBox checked={existPart} setChecked={setExistPart} />
                         </section>
 

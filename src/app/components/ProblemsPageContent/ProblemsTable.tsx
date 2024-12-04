@@ -24,7 +24,7 @@ export const ProblemsTable: React.FC<ServicesTableProps> = ({ refresh, infoProbl
 
     const fetchSpareParts = useCallback(async () => {
         try {
-            const url = `${API_BASE_URL}/incidents-search?isProblem=true`
+            const url = `${API_BASE_URL}/incidents-search?isProblem=true&status=RELEASED`
             const response = await fetch(url, {
                 credentials: 'include',
             })
