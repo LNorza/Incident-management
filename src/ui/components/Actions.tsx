@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { LucideIcon, Ellipsis } from 'lucide-react'
 import ReactDOM from 'react-dom'
-import style from '../style/Actions.module.css'
+import style from '../style/actions.module.css'
 
 export interface Action {
     text: string
