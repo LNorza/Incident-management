@@ -81,6 +81,9 @@ export const IncidentChangeModal = ({ incidentId, onClose }: Props) => {
         time_duration: '',
         technician_specialty: '',
         diagnostic: '',
+        isProblem: false,
+        root_cause: '',
+        problem_solution: '',
     })
 
     const { onInputChange, onTextAreaChange, formState } = useForm<ICreateChange>({

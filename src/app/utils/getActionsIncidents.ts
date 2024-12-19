@@ -93,6 +93,7 @@ export const getActionIncident = ({ status, role, function1, function2 }: Props)
                         icon: Printer,
                         onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation()
+                            console.log(rowData)
                             // handleDeleteClick(rowData)
                         },
                     },
@@ -126,6 +127,7 @@ export const getActionIncident = ({ status, role, function1, function2 }: Props)
                         icon: Printer,
                         onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation()
+                            console.log(rowData)
                             // handleDeleteClick(rowData)
                         },
                     },
@@ -147,6 +149,7 @@ export const getActionIncident = ({ status, role, function1, function2 }: Props)
                         icon: Printer,
                         onClick: (rowData: IIncident, e: React.MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation()
+                            console.log(rowData)
                             // handleDeleteClick(rowData)
                         },
                     },
