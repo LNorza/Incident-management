@@ -5,7 +5,7 @@ import {
     getIncidentTypeOptions,
     formatDeviceType,
     IServicesModal,
-    Incident,
+    IServices,
 } from '../../../utils'
 import { InfoIcon } from 'lucide-react'
 import { CustomInput, CustomSelect, CustomTextArea } from '../../../ui'
@@ -15,10 +15,10 @@ import style from '../../style/modal.module.css'
 
 interface Props {
     onClose: () => void
-    incidentData?: Incident | undefined
+    serviceData?: IServices | undefined
 }
 
-export const InfoProblemsModal = ({ onClose, incidentData }: Props) => {
+export const InfoProblemsModal = ({ onClose, serviceData }: Props) => {
     const [deviceType, setDeviceType] = useState<string | undefined>(undefined)
     const [deviceTypeOptions] = useState<IOptions[]>(getDeviceTypeOptions)
 

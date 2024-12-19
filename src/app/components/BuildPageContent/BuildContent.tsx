@@ -206,6 +206,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                                                         icon: Pencil,
                                                         onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
                                                             e.stopPropagation()
+                                                            console.log(row)
                                                             const type = 'EditOfficeClass'
                                                             const officeData = location
                                                             setTypeModal(type, undefined, officeData)
@@ -216,6 +217,7 @@ export const BuildContent = ({ building, updateLocations, setUpdateLocations, de
                                                         icon: Trash2,
                                                         onClick: (row, e: React.MouseEvent<HTMLDivElement>) => {
                                                             e.stopPropagation()
+                                                            console.log(row)
                                                             setTypeModal(
                                                                 'DeleteOfficeClass',
                                                                 undefined,

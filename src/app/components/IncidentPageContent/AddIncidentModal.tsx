@@ -47,6 +47,9 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         period: 1,
         description: '',
         department_id: '',
+        isProblem: false,
+        root_cause: '',
+        problem_solution: '',
     })
 
     const [updateIncident, setUpdateIncident] = useState<UpdateIncidentDto>({
@@ -104,6 +107,9 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
         time_duration: '',
         technician_specialty: '',
         diagnostic: '',
+        isProblem: false,
+        root_cause: '',
+        problem_solution: '',
     })
 
     const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<IFormIncident>({
@@ -331,6 +337,9 @@ export const AddIncidentModal = ({ incidentId, onClose }: Props) => {
             period: 1,
             description: formState.description,
             department_id: departmentId ?? '',
+            isProblem: false,
+            root_cause: '',
+            problem_solution: '',
         })
     }, [formState.description])
 

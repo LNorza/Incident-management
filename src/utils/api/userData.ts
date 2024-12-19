@@ -71,6 +71,7 @@ export const getUserData = async (): Promise<IUserData | null> => {
         const response = await fetch(`${API_BASE_URL}/info`, {
             method: 'GET',
             headers: {
+                Authorization: `Bearer ${sessionStorage.getItem('token')}`,
                 'Content-Type': 'application/json',
             },
             credentials: 'include',

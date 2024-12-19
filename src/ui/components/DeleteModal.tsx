@@ -13,7 +13,7 @@ interface Props {
 }
 
 export const DeleteModal = ({ onClose, name, incidentId, deleteFunction }: Props) => {
-    const { onInputChange, onTextAreaChange, formState, updateFields } = useForm<Incident>({
+    const { updateFields } = useForm<Incident>({
         folio: '',
         department_name: '',
         location_id: '',
@@ -64,6 +64,11 @@ export const DeleteModal = ({ onClose, name, incidentId, deleteFunction }: Props
         priority: '',
         work: '',
         _id: '',
+        isProblem: false,
+        root_cause: '',
+        problem_solution: '',
+        technician_specialty: '',
+        diagnostic: '',
     })
 
     const fetchIncident = async () => {

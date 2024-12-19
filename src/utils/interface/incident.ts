@@ -94,6 +94,7 @@ export interface InfoIncident {
     folio: string
     buildName: string
     deviceName: string
+    responsableName: string
     status: string
     specialty: string
     locationName: string
@@ -126,6 +127,9 @@ export interface ICreateIncident {
     work: string
     period: number
     description: string
+    isProblem: boolean
+    root_cause: string
+    problem_solution: string
     department_id: string
 }
 

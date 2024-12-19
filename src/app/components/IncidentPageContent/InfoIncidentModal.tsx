@@ -10,6 +10,7 @@ import {
     getUserRole,
     IncidentState,
     InfoIncident,
+    IDepartment,
 } from '../../../utils'
 import { InfoIcon } from 'lucide-react'
 import rating from '../../style/cardContainer.module.css'
@@ -33,6 +34,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
         buildName: '',
         deviceName: '',
         locationName: '',
+        responsableName: '',
         departmentName: '',
         created_at: '',
         incident_type: '',
@@ -89,6 +91,7 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                 folio: data.folio,
                 buildName: data.device_id.location_id.building_id.name,
                 deviceName: data.device_id.name,
+                responsableName: data.device_id.location_id.building_id.departments[0].build_manager,
                 locationName: data.device_id.location_id.name,
                 departmentName: data.department_id.name,
                 created_at: data.created_at ? new Date(data.created_at).toLocaleDateString() : '',
@@ -111,10 +114,26 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                 problem_solution: data.problem_solution,
                 root_cause: data.root_cause,
             })
+
+            fetchResponsable(
+                data.device_id.location_id.building_id.departments.filter(
+                    (department: IDepartment) => department.department_id === data.department_id._id,
+                )[0].build_manager,
+            )
         } catch (error) {
             console.error('Error fetching device:', error)
         }
     }, [incidentId])
+
+    const fetchResponsable = async (userId: string) => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/users/${userId}`, { credentials: 'include' })
+            const data = await response.json()
+            updateFields({ responsableName: data.name })
+        } catch (error) {
+            console.error('Error fetching responsable:', error)
+        }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -141,6 +160,20 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                     isFormInput
                                     name="folio"
                                     value={formState.folio || ''}
+                                    type="text"
+                                    onChange={onInputChange}
+                                />
+                            </div>
+                        </section>
+                    </div>
+                    <div className={style.rowModal}>
+                        <section className={style.disabled}>
+                            Responsable del edificio
+                            <div className={style.formInput}>
+                                <CustomInput
+                                    isFormInput
+                                    name="responsable"
+                                    value={formState.responsableName}
                                     type="text"
                                     onChange={onInputChange}
                                 />
@@ -395,6 +428,64 @@ export const InfoIncidentModal = ({ incidentId, onClose, status }: Props) => {
                                 Asignar como problema
                                 <div className={style.formInput}>
                                     <CustomCheckBox checked={formState.isProblem} />
+                                </div>
+                            </section>
+                        </div>
+                    </>
+                )}
+
+                {status != 'REJECTED' && formState.isProblem && (
+                    <>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Técnico
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="technician"
+                                        value={formState.technicianName || 'No asignado'}
+                                        type="text"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            <section className={style.disabled}>
+                                {userRole == 'ADMIN_TECHNICIANS' ? 'Prioridad' : 'Prioridad asignada'}
+                                <div className={`${style.formInput}`}>
+                                    <CustomInput
+                                        isFormInput
+                                        name="priority"
+                                        value={formState.priority || ''}
+                                        type="text"
+                                        color="g"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                        </div>
+                        <div className={style.rowModal}>
+                            <section className={style.disabled}>
+                                Especialidad de incidencia
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        value={formState.specialty}
+                                        placeholder="Selecciona la especialidad"
+                                        type="text"
+                                        id="specialty"
+                                        onChange={onInputChange}
+                                    />
+                                </div>
+                            </section>
+                            <section className={style.disabled}>
+                                Hora max de llegada
+                                <div className={style.formInput}>
+                                    <CustomInput
+                                        value={formState.arrival_time}
+                                        placeholder="Selecciona la hora"
+                                        type="text"
+                                        id="arrival_time"
+                                        onChange={onInputChange}
+                                    />
                                 </div>
                             </section>
                         </div>

@@ -34,6 +34,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
     const [isProblem, setIsProblem] = useState<boolean>(false)
 
     const [specialtyOptions] = useState<IOptions[]>(getSpecialtyOptions)
+    const [specialistTechnicians, setSpecialistTechnicians] = useState<string | undefined>(undefined)
     const [priorityOptions] = useState<IOptions[]>(getIncidentPriorityOptions)
     const [technicianOptions, setTechnicianOptions] = useState<IOptions[]>([])
     const [arriveHourOptions] = useState<IOptions[]>(getArriveHourOptions())
@@ -166,6 +167,7 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
     useEffect(() => {
         if (incidentData && userRole === 'TECHNICIAN') {
             setSpecialty(incidentData.technician_specialty)
+            setSpecialistTechnicians(incidentData.technician_id)
             setPriority(incidentData.priority)
             setTechnicians(incidentData.technician_id)
             setArriveHour(incidentData.arrival_time)
@@ -417,6 +419,21 @@ export const AssignedModal = ({ incidentId, onClose, action }: Props) => {
                                     <CustomCheckBox checked={isProblem} setChecked={setIsProblem} />
                                 </div>
                             </section>
+                            {action != 'REJECTED' && isProblem && (
+                                <section className={userRole == 'TECHNICIAN' ? style.disabled : ''}>
+                                    Técnico especialista
+                                    <div className={style.formInput}>
+                                        <CustomSelect
+                                            value={specialistTechnicians}
+                                            placeholder="Selecciona al técnico"
+                                            options={technicianOptions}
+                                            onSelect={(selected: { label: string; value: string }) => {
+                                                setSpecialistTechnicians(selected.value)
+                                            }}
+                                        />
+                                    </div>
+                                </section>
+                            )}
                         </div>
                     )}
 

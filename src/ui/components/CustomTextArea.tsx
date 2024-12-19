@@ -1,4 +1,4 @@
-import React, { InputHTMLAttributes, TextareaHTMLAttributes } from 'react'
+import React from 'react'
 import styles from '../style/customInput.module.css'
 
 interface Props {
@@ -16,7 +16,7 @@ export const CustomTextArea = ({ isFormInput, onChange, ...props }: Props) => {
         <textarea
             {...props}
             className={`${styles.textarea} ${isFormInput ? styles.form : ''}`}
-            onChange={onChange || (() => {})} // Aseguramos que siempre haya una función de onChange
+            onChange={onChange || (() => {})}
         />
     )
 }

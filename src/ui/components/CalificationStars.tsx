@@ -10,6 +10,7 @@ export const Calification = ({ onRatingChange }: CalificationProps) => {
 
     const handleRatingChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const selectedRating = Number(event.target.value)
+        console.log(rating)
         setRating(selectedRating)
         onRatingChange(selectedRating)
     }

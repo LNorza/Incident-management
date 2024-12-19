@@ -4,6 +4,7 @@ import { AuthReducer } from './authReducer'
 import { IUserLogin } from '../../utils/interface/user'
 import { types } from './types'
 import { toast } from 'sonner'
+import { API_BASE_URL } from '../../utils'
 
 // Define las props del AuthProvider
 interface AuthProviderProps {
@@ -24,7 +25,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const login = async (user: IUserLogin) => {
         try {
-            const response = await fetch('http://localhost:3000/login', {
+            const response = await fetch(`${API_BASE_URL}/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -50,7 +51,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const logout = async () => {
         try {
-            const response = await fetch('http://localhost:3000/logout', {
+            const response = await fetch(`${API_BASE_URL}/logout`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

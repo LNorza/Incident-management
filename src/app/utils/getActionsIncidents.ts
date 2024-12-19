@@ -12,23 +12,28 @@ import {
     CircleCheckBig,
     ArrowLeftRight,
 } from 'lucide-react' // Importa los íconos necesarios
-import { getArriveHourOptions, IIncident, IncidentModalType } from '../../utils'
+import { IIncident, IncidentModalType } from '../../utils'
 
 interface Props {
-    rowData: any
+    rowData: IIncident
     status: string
     role?: string
-    function1: (row: any, type: IncidentModalType, nameAction: string, e: React.MouseEvent<HTMLDivElement>) => void
-    function2: (row: any, e: React.MouseEvent<HTMLDivElement>) => void
+    function1: (
+        row: IIncident,
+        type: IncidentModalType,
+        nameAction: string,
+        e: React.MouseEvent<HTMLDivElement>,
+    ) => void
+    function2: (row: IIncident, e: React.MouseEvent<HTMLDivElement>) => void
 }
 export interface Action {
     text: string
     icon: LucideIcon
     color?: string
-    onClick: (row: any, e: React.MouseEvent<HTMLDivElement>) => void
+    onClick: (row: IIncident, e: React.MouseEvent<HTMLDivElement>) => void
 }
 
-export const getActionIncident = ({ status, role, rowData, function1, function2 }: Props): Action[] => {
+export const getActionIncident = ({ status, role, function1, function2 }: Props): Action[] => {
     if (role == 'ADMIN_DEPARTMENT') {
         switch (status) {
             case 'FINISHED':
